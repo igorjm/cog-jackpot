@@ -1,36 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚽ Bolão Copa do Mundo 2026
+
+![Bolão Copa 2026](public/banner-derlis.png)
+
+A fullstack World Cup 2026 betting pool app for friends. Mobile-first, real-time scoring, admin-managed.
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router, RSC, Server Actions, Turbopack) |
+| UI | Tailwind CSS 4, Oswald + Inter fonts |
+| Auth | NextAuth v5 (Credentials, JWT) |
+| Database | PostgreSQL 17 (Neon serverless) |
+| ORM | Prisma 6 with `@prisma/adapter-neon` (WebSocket) |
+| Validation | Zod 4 |
+| Runtime | Node.js 20+ |
+
+## Features
+
+- **User registration** with admin approval (payment-gated)
+- **Match betting** — predict scores for all 102 World Cup matches
+- **Automated scoring** — exact score (10pts), correct winner + 1 score (7pts), correct winner (5pts), correct draw (5pts), 1 score correct (2pts)
+- **Phase multipliers** — knockout rounds multiply points (1.5× to 3×)
+- **Live ranking** with tiebreakers and position change tracking
+- **Admin panel** — approve users, enter results, triggers recalculation
+- **Responsive** — mobile bottom nav + desktop sidebar
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 20+
+- A Neon PostgreSQL database (free tier works)
+
+### Environment Variables
+
+Create a `.env` file:
+
+```env
+DATABASE_URL="postgresql://user:pass@host/db?sslmode=require&pgbouncer=true"
+NODE_TLS_REJECT_UNAUTHORIZED="0"
+AUTH_SECRET="your-secret-here"
+AUTH_URL="http://localhost:3000"
+ADMIN_EMAIL="admin@example.com"
+NEXT_PUBLIC_PIX_KEY="your-pix-key"
+NEXT_PUBLIC_ENTRY_FEE="50.00"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Install & Run
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run db:push    # push schema to database
+npm run db:seed    # seed matches + admin user
+npm run dev        # start dev server (http://localhost:3000)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Scripts
 
-## Learn More
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server with Turbopack |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run db:push` | Push Prisma schema to DB |
+| `npm run db:seed` | Seed 102 matches + admin user |
+| `npm run db:reset` | Reset DB + reseed |
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+├── (main)/          # Authenticated app (dashboard, matches, ranking, bets, rules)
+├── admin/           # Admin panel (users, results)
+├── login/           # Login page (with background image)
+├── register/        # Registration
+├── pending/         # Payment pending screen
+├── rejected/        # Rejected screen
+├── actions/         # Server actions (auth, bets, admin)
+└── api/             # API routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+components/
+├── ui/              # Reusable primitives (Button, Input, Badge)
+├── match-card.tsx   # Match display with score + bet info
+├── bet-form.tsx     # Score input for betting
+├── phase-tabs.tsx   # Phase/group navigation
+├── ranking-*.tsx    # Podium + table
+└── countdown-timer.tsx
 
-## Deploy on Vercel
+lib/
+├── auth.ts          # NextAuth config
+├── prisma.ts        # Prisma client (Neon adapter)
+├── ranking.ts       # Ranking calculation + tiebreakers
+├── constants.ts     # Points, multipliers, prize distribution
+└── deadline.ts      # Bet deadline logic (1h before match)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+prisma/
+├── schema.prisma    # Database schema
+└── seed.ts          # Seed data (matches, admin)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scoring Rules
+
+| Result | Points |
+|--------|--------|
+| Exact score | 10 |
+| Correct winner + 1 correct score | 7 |
+| Correct winner only | 5 |
+| Correct draw (different score) | 5 |
+| 1 score correct (wrong winner) | 2 |
+| Wrong / didn't bet | 0 |
+
+Points are multiplied by phase: Group (1×), Round of 16 (1.5×), Quarters (2×), Semis (2.5×), Final (3×).
+
+## License
+
+Private — internal use only.
