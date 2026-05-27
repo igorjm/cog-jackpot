@@ -2,9 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 
 export default async function AdminDashboard() {
-  const totalUsers = await prisma.user.count();
-  const approvedUsers = await prisma.user.count({ where: { status: "APPROVED" } });
-  const pendingUsers = await prisma.user.count({ where: { status: "PENDING_PAYMENT" } });
+  const totalUsers = await prisma.user.count({ where: { role: { not: "ADMIN" } } });
+  const approvedUsers = await prisma.user.count({ where: { status: "APPROVED", role: { not: "ADMIN" } } });
+  const pendingUsers = await prisma.user.count({ where: { status: "PENDING_PAYMENT", role: { not: "ADMIN" } } });
   const entryFee = parseFloat(process.env.NEXT_PUBLIC_ENTRY_FEE ?? "50");
   const totalAmount = approvedUsers * entryFee;
 
