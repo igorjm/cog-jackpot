@@ -106,16 +106,26 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
             <span className="text-xs text-[#94B8D8]">0 pts</span>
           </div>
         ) : isOpen ? (
-          <div className="flex items-center justify-between">
-            <CountdownTimer matchDate={new Date(match.matchDate)} />
-            {showBetLink && (
-              <a
-                href={`/matches/${match.id}`}
-                className="text-xs font-medium text-[#22C55E] hover:text-[#22C55E]/80 transition-colors"
-              >
-                {userBet ? "Editar →" : "Palpitar →"}
-              </a>
+          <div className="space-y-2">
+            {userBet && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[#94B8D8]">
+                  Seu palpite: <span className="font-mono font-bold text-white">{userBet.homeScore} × {userBet.awayScore}</span>
+                </span>
+                <Badge variant="success">✓</Badge>
+              </div>
             )}
+            <div className="flex items-center justify-between">
+              <CountdownTimer matchDate={new Date(match.matchDate)} />
+              {showBetLink && (
+                <a
+                  href={`/matches/${match.id}`}
+                  className="text-xs font-medium text-[#22C55E] hover:text-[#22C55E]/80 transition-colors"
+                >
+                  {userBet ? "Editar →" : "Palpitar →"}
+                </a>
+              )}
+            </div>
           </div>
         ) : (
           <div className="flex items-center justify-between">

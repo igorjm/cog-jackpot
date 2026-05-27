@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { placeBet } from "@/app/actions/bets";
 import { Button } from "./ui/button";
 
@@ -21,6 +22,7 @@ export function BetForm({
   existingBet,
   isLocked,
 }: BetFormProps) {
+  const router = useRouter();
   const [homeScore, setHomeScore] = useState(existingBet?.homeScore ?? 0);
   const [awayScore, setAwayScore] = useState(existingBet?.awayScore ?? 0);
   const [loading, setLoading] = useState(false);
@@ -38,10 +40,10 @@ export function BetForm({
     const result = await placeBet(formData);
     if (result?.error) {
       setMessage(result.error);
+      setLoading(false);
     } else {
-      setMessage("Palpite salvo!");
+      router.push("/matches");
     }
-    setLoading(false);
   };
 
   if (isLocked) {
