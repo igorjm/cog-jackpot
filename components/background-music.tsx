@@ -4,14 +4,30 @@ import { useRef, useState, useEffect } from "react";
 
 export function BackgroundMusic({ src }: { src: string }) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     audio.volume = 0.3;
-    audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+
+    // Try unmuted autoplay first
+    audio.play().then(() => setPlaying(true)).catch(() => {
+      // Browser blocked unmuted autoplay — start muted and unmute on first interaction
+      audio.muted = true;
+      audio.play();
+
+      const unmute = () => {
+        audio.muted = false;
+        setPlaying(true);
+        document.removeEventListener("click", unmute);
+        document.removeEventListener("touchstart", unmute);
+      };
+
+      document.addEventListener("click", unmute, { once: true });
+      document.addEventListener("touchstart", unmute, { once: true });
+    });
   }, []);
 
   const toggle = () => {
