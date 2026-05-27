@@ -214,7 +214,7 @@ export default function AdminResultsPage() {
                         [match.id]: { ...prev[match.id], home: Number(e.target.value) },
                       }))
                     }
-                    className="w-12 h-11 sm:w-14 sm:h-12 text-center bg-black border border-[#1E3A6E] rounded-lg text-xl font-mono font-bold focus:border-[#22C55E] focus:outline-none focus:ring-1 focus:ring-[#22C55E]/50 transition-colors"
+                    className="w-12 h-11 sm:w-14 sm:h-12 text-center bg-[#0A1A3A] border border-[#1E3A6E] rounded-lg text-xl font-mono font-bold focus:border-[#22C55E] focus:outline-none focus:ring-1 focus:ring-[#22C55E]/50 transition-colors"
                   />
                   <span className="text-[#FFD60A] font-bold text-lg">×</span>
                   <input
@@ -228,7 +228,7 @@ export default function AdminResultsPage() {
                         [match.id]: { ...prev[match.id], away: Number(e.target.value) },
                       }))
                     }
-                    className="w-12 h-11 sm:w-14 sm:h-12 text-center bg-black border border-[#1E3A6E] rounded-lg text-xl font-mono font-bold focus:border-[#22C55E] focus:outline-none focus:ring-1 focus:ring-[#22C55E]/50 transition-colors"
+                    className="w-12 h-11 sm:w-14 sm:h-12 text-center bg-[#0A1A3A] border border-[#1E3A6E] rounded-lg text-xl font-mono font-bold focus:border-[#22C55E] focus:outline-none focus:ring-1 focus:ring-[#22C55E]/50 transition-colors"
                   />
                 </div>
 
