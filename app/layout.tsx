@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Oswald, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -34,6 +35,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#0A1A3A] text-white font-[var(--font-inter),system-ui,sans-serif]">
         {children}
+        <Analytics />
       </body>
     </html>
   );
