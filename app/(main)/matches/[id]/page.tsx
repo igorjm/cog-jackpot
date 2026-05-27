@@ -58,14 +58,18 @@ export default async function MatchDetailPage({
         {/* Teams */}
         <div className="flex items-center justify-center gap-6 py-4">
           <div className="text-center space-y-1">
-            <img
-              src={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png`}
-              srcSet={`https://flagcdn.com/w160/${match.homeFlag.toLowerCase()}.png 2x`}
-              width={64}
-              height={48}
-              alt={match.homeTeam}
-              className="inline-block rounded-sm"
-            />
+            {match.homeFlag !== "xx" ? (
+              <img
+                src={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png`}
+                srcSet={`https://flagcdn.com/w160/${match.homeFlag.toLowerCase()}.png 2x`}
+                width={64}
+                height={48}
+                alt={match.homeTeam}
+                className="inline-block rounded-sm"
+              />
+            ) : (
+              <span className="inline-block w-16 h-12 rounded-sm bg-[#1A3058] border border-[#1E3A6E] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
+            )}
             <p className="text-sm font-medium">{match.homeTeam}</p>
           </div>
 
@@ -83,14 +87,18 @@ export default async function MatchDetailPage({
           )}
 
           <div className="text-center space-y-1">
-            <img
-              src={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png`}
-              srcSet={`https://flagcdn.com/w160/${match.awayFlag.toLowerCase()}.png 2x`}
-              width={64}
-              height={48}
-              alt={match.awayTeam}
-              className="inline-block rounded-sm"
-            />
+            {match.awayFlag !== "xx" ? (
+              <img
+                src={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png`}
+                srcSet={`https://flagcdn.com/w160/${match.awayFlag.toLowerCase()}.png 2x`}
+                width={64}
+                height={48}
+                alt={match.awayTeam}
+                className="inline-block rounded-sm"
+              />
+            ) : (
+              <span className="inline-block w-16 h-12 rounded-sm bg-[#1A3058] border border-[#1E3A6E] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
+            )}
             <p className="text-sm font-medium">{match.awayTeam}</p>
           </div>
         </div>

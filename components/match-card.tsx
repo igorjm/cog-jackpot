@@ -1,6 +1,7 @@
 import { CountdownTimer } from "./countdown-timer";
 import { Badge } from "./ui/badge";
 import { isBeforeDeadline } from "@/lib/deadline";
+import { getKnockoutHint } from "@/lib/knockout-hints";
 
 interface MatchCardProps {
   match: {
@@ -28,6 +29,9 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
   const isFinished = match.homeScore !== null && match.awayScore !== null;
   const isOpen = isBeforeDeadline(match.matchDate);
   const isExactScore = userBet?.rawPoints === 10;
+  const isTbd = match.homeFlag === "xx";
+  const homeHint = isTbd ? getKnockoutHint(match.homeTeam) : null;
+  const awayHint = isTbd ? getKnockoutHint(match.awayTeam) : null;
 
   return (
     <div
@@ -58,15 +62,22 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
       {/* Teams + Score */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 text-right">
-          <p className="text-sm font-medium truncate">{match.homeTeam}</p>
-          <img
-            src={`https://flagcdn.com/w40/${match.homeFlag.toLowerCase()}.png`}
-            srcSet={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png 2x`}
-            width={32}
-            height={24}
-            alt={match.homeTeam}
-            className="inline-block rounded-sm"
-          />
+          <p className="text-sm font-medium leading-tight line-clamp-2">{match.homeTeam}</p>
+          {homeHint && (
+            <p className="text-[10px] text-[#5A7A9A] leading-tight mt-0.5 line-clamp-2">{homeHint}</p>
+          )}
+          {match.homeFlag !== "xx" ? (
+            <img
+              src={`https://flagcdn.com/w40/${match.homeFlag.toLowerCase()}.png`}
+              srcSet={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png 2x`}
+              width={32}
+              height={24}
+              alt={match.homeTeam}
+              className="inline-block rounded-sm mt-1"
+            />
+          ) : (
+            <span className="inline-block w-8 h-6 rounded-sm bg-[#1A3058] border border-[#1E3A6E] mt-1 text-center text-[10px] leading-6 text-[#5A7A9A]">?</span>
+          )}
         </div>
 
         <div className="flex items-center gap-2 px-3">
@@ -91,15 +102,22 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
         </div>
 
         <div className="flex-1">
-          <p className="text-sm font-medium truncate">{match.awayTeam}</p>
-          <img
-            src={`https://flagcdn.com/w40/${match.awayFlag.toLowerCase()}.png`}
-            srcSet={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png 2x`}
-            width={32}
-            height={24}
-            alt={match.awayTeam}
-            className="inline-block rounded-sm"
-          />
+          <p className="text-sm font-medium leading-tight line-clamp-2">{match.awayTeam}</p>
+          {awayHint && (
+            <p className="text-[10px] text-[#5A7A9A] leading-tight mt-0.5 line-clamp-2">{awayHint}</p>
+          )}
+          {match.awayFlag !== "xx" ? (
+            <img
+              src={`https://flagcdn.com/w40/${match.awayFlag.toLowerCase()}.png`}
+              srcSet={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png 2x`}
+              width={32}
+              height={24}
+              alt={match.awayTeam}
+              className="inline-block rounded-sm mt-1"
+            />
+          ) : (
+            <span className="inline-block w-8 h-6 rounded-sm bg-[#1A3058] border border-[#1E3A6E] mt-1 text-center text-[10px] leading-6 text-[#5A7A9A]">?</span>
+          )}
         </div>
       </div>
 

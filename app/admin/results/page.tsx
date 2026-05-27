@@ -32,6 +32,9 @@ const PHASE_OPTIONS = [
 ];
 
 function getFlagImg({ code, team }: { code: string; team: string }) {
+  if (code === "xx") {
+    return <span className="inline-block w-7 h-5 rounded-sm bg-[#1A3058] border border-[#1E3A6E] text-center text-[9px] leading-5 text-[#5A7A9A]">?</span>;
+  }
   return (
     <img
       src={`https://flagcdn.com/w40/${code.toLowerCase()}.png`}
