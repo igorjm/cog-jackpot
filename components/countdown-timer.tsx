@@ -8,14 +8,19 @@ interface CountdownTimerProps {
 }
 
 export function CountdownTimer({ matchDate }: CountdownTimerProps) {
-  const [timeLeft, setTimeLeft] = useState(getTimeUntilDeadline(matchDate));
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
+    setTimeLeft(getTimeUntilDeadline(matchDate));
     const interval = setInterval(() => {
       setTimeLeft(getTimeUntilDeadline(matchDate));
     }, 1000);
     return () => clearInterval(interval);
   }, [matchDate]);
+
+  if (timeLeft === null) {
+    return <span className="text-xs font-mono font-medium text-[#5A7A9A]">⏱️ --:--:--</span>;
+  }
 
   if (timeLeft <= 0) {
     return (
