@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* FIFA World Cup 2026 Palette — inspired by Panini sticker album */
+  --bg-primary: #0A1A3A;
+  --bg-elevated: #122448;
+  --bg-secondary: #1A3058;
+  --bg-tertiary: #223C68;
+  --separator: #1E3A6E;
+  --separator-light: #2A4A7A;
+
+  /* Vivid World Cup Colors */
+  --blue: #38BDF8;
+  --green: #22C55E;
+  --orange: #F97316;
+  --yellow: #FFD60A;
+  --red: #EF4444;
+  --purple: #A855F7;
+  --teal: #2DD4BF;
+  --pink: #F472B6;
+  --mint: #34D399;
+  --indigo: #818CF8;
+
+  /* Text */
+  --text-primary: #FFFFFF;
+  --text-secondary: #94B8D8;
+  --text-tertiary: #5A7A9A;
+
+  /* Legacy mappings */
+  --gold: #FFD60A;
+  --success: #22C55E;
+  --error: #EF4444;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+
+.tabular-nums { font-variant-numeric: tabular-nums; }
