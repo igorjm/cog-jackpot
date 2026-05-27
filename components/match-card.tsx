@@ -59,7 +59,14 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 text-right">
           <p className="text-sm font-medium truncate">{match.homeTeam}</p>
-          <p className="text-lg">{getFlagEmoji(match.homeFlag)}</p>
+          <img
+            src={`https://flagcdn.com/w40/${match.homeFlag.toLowerCase()}.png`}
+            srcSet={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png 2x`}
+            width={32}
+            height={24}
+            alt={match.homeTeam}
+            className="inline-block rounded-sm"
+          />
         </div>
 
         <div className="flex items-center gap-2 px-3">
@@ -85,7 +92,14 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
 
         <div className="flex-1">
           <p className="text-sm font-medium truncate">{match.awayTeam}</p>
-          <p className="text-lg">{getFlagEmoji(match.awayFlag)}</p>
+          <img
+            src={`https://flagcdn.com/w40/${match.awayFlag.toLowerCase()}.png`}
+            srcSet={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png 2x`}
+            width={32}
+            height={24}
+            alt={match.awayTeam}
+            className="inline-block rounded-sm"
+          />
         </div>
       </div>
 
@@ -142,10 +156,4 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
   );
 }
 
-function getFlagEmoji(countryCode: string): string {
-  const codePoints = countryCode
-    .toUpperCase()
-    .split("")
-    .map((char) => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-}
+

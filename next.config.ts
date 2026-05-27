@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "flagcdn.com",
+      },
+    ],
+  },
   async headers() {
     return [
       {
@@ -20,9 +28,9 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob:",
+              "img-src 'self' data: blob: https://flagcdn.com",
               "font-src 'self' data:",
-              "connect-src 'self'",
+              "connect-src 'self' https://api.football-data.org",
               "frame-ancestors 'none'",
             ].join("; "),
           },

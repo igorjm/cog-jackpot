@@ -58,7 +58,14 @@ export default async function MatchDetailPage({
         {/* Teams */}
         <div className="flex items-center justify-center gap-6 py-4">
           <div className="text-center space-y-1">
-            <p className="text-3xl">{getFlagEmoji(match.homeFlag)}</p>
+            <img
+              src={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png`}
+              srcSet={`https://flagcdn.com/w160/${match.homeFlag.toLowerCase()}.png 2x`}
+              width={64}
+              height={48}
+              alt={match.homeTeam}
+              className="inline-block rounded-sm"
+            />
             <p className="text-sm font-medium">{match.homeTeam}</p>
           </div>
 
@@ -76,7 +83,14 @@ export default async function MatchDetailPage({
           )}
 
           <div className="text-center space-y-1">
-            <p className="text-3xl">{getFlagEmoji(match.awayFlag)}</p>
+            <img
+              src={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png`}
+              srcSet={`https://flagcdn.com/w160/${match.awayFlag.toLowerCase()}.png 2x`}
+              width={64}
+              height={48}
+              alt={match.awayTeam}
+              className="inline-block rounded-sm"
+            />
             <p className="text-sm font-medium">{match.awayTeam}</p>
           </div>
         </div>
@@ -128,10 +142,4 @@ export default async function MatchDetailPage({
   );
 }
 
-function getFlagEmoji(countryCode: string): string {
-  const codePoints = countryCode
-    .toUpperCase()
-    .split("")
-    .map((char) => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-}
+

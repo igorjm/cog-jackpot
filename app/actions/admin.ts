@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resultSchema } from "@/lib/validations";
 import { calculatePoints, calculateFinalPoints } from "@/lib/scoring";
+import { fetchFinishedMatches } from "@/lib/football-api";
 import { revalidatePath } from "next/cache";
 
 const userIdSchema = z.string().cuid("ID de usuário inválido");
@@ -99,4 +100,72 @@ export async function rejectUser(userId: string) {
 
   revalidatePath("/admin/users");
   return { success: true };
+}
+
+export async function syncScores() {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { error: "Acesso negado" };
+  }
+
+  try {
+    const results = await fetchFinishedMatches();
+    if (results.length === 0) {
+      return { success: true, synced: 0, message: "Nenhum resultado novo encontrado" };
+    }
+
+    let synced = 0;
+
+    for (const result of results) {
+      // Find matching match by date proximity (within 2 hours)
+      const matchDate = new Date(result.matchDate);
+      const dateFrom = new Date(matchDate.getTime() - 2 * 60 * 60 * 1000);
+      const dateTo = new Date(matchDate.getTime() + 2 * 60 * 60 * 1000);
+
+      const match = await prisma.match.findFirst({
+        where: {
+          matchDate: { gte: dateFrom, lte: dateTo },
+          homeScore: null,
+          phase: result.phase,
+        },
+        include: { bets: true },
+      });
+
+      if (!match) continue;
+
+      // Update match result
+      await prisma.match.update({
+        where: { id: match.id },
+        data: {
+          homeScore: result.homeScore,
+          awayScore: result.awayScore,
+          isLocked: true,
+        },
+      });
+
+      // Calculate points for all bets
+      for (const bet of match.bets) {
+        const pointsResult = calculatePoints(
+          { homeScore: bet.homeScore, awayScore: bet.awayScore },
+          { homeScore: result.homeScore, awayScore: result.awayScore }
+        );
+        const finalPoints = calculateFinalPoints(pointsResult.points, match.multiplier);
+
+        await prisma.bet.update({
+          where: { id: bet.id },
+          data: { rawPoints: pointsResult.points, points: finalPoints },
+        });
+      }
+
+      synced++;
+    }
+
+    revalidatePath("/admin/results");
+    revalidatePath("/ranking");
+    revalidatePath("/matches");
+    return { success: true, synced, message: `${synced} resultado(s) sincronizado(s)` };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Erro desconhecido";
+    return { error: `Falha na sincronização: ${msg}` };
+  }
 }

@@ -10,7 +10,12 @@ DO $$ BEGIN CREATE TYPE "UserStatus" AS ENUM ('PENDING_PAYMENT', 'APPROVED', 'RE
 
 DO $$ BEGIN CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN'); EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-DO $$ BEGIN CREATE TYPE "Phase" AS ENUM ('GROUP', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'THIRD_PLACE', 'FINAL'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "Phase" AS ENUM ('GROUP', 'ROUND_OF_32', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'THIRD_PLACE', 'FINAL'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+-- Add ROUND_OF_32 to existing Phase enum if not present
+DO $$ BEGIN
+  ALTER TYPE "Phase" ADD VALUE IF NOT EXISTS 'ROUND_OF_32' BEFORE 'ROUND_OF_16';
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- CreateTable
 CREATE TABLE IF NOT EXISTS "User" (
@@ -109,6 +114,7 @@ CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
 `;
 
 async function main() {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
   console.log('Connected to database.');

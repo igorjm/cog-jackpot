@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { saveResult } from "@/app/actions/admin";
+import { saveResult, syncScores } from "@/app/actions/admin";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +23,7 @@ const PHASE_OPTIONS = [
   { value: "ALL", label: "Todos" },
   { value: "PENDING", label: "Pendentes" },
   { value: "GROUP", label: "Grupos" },
+  { value: "ROUND_OF_32", label: "32 Avos" },
   { value: "ROUND_OF_16", label: "Oitavas" },
   { value: "QUARTER_FINAL", label: "Quartas" },
   { value: "SEMI_FINAL", label: "Semis" },
@@ -30,12 +31,17 @@ const PHASE_OPTIONS = [
   { value: "FINAL", label: "Final" },
 ];
 
-function getFlagEmoji(countryCode: string): string {
-  const codePoints = countryCode
-    .toUpperCase()
-    .split("")
-    .map((char) => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
+function getFlagImg({ code, team }: { code: string; team: string }) {
+  return (
+    <img
+      src={`https://flagcdn.com/w40/${code.toLowerCase()}.png`}
+      srcSet={`https://flagcdn.com/w80/${code.toLowerCase()}.png 2x`}
+      width={28}
+      height={21}
+      alt={team}
+      className="inline-block rounded-sm"
+    />
+  );
 }
 
 export default function AdminResultsPage() {
@@ -45,6 +51,8 @@ export default function AdminResultsPage() {
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<Set<string>>(new Set());
   const [activeFilter, setActiveFilter] = useState("PENDING");
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/matches")
@@ -102,6 +110,23 @@ export default function AdminResultsPage() {
 
   const pendingCount = matches.filter((m) => m.homeScore === null).length;
 
+  const handleSync = async () => {
+    setSyncing(true);
+    setSyncMsg(null);
+    const result = await syncScores();
+    if (result.error) {
+      setSyncMsg(result.error);
+    } else {
+      setSyncMsg(result.message || "Sincronizado!");
+      // Refresh matches
+      const res = await fetch("/api/admin/matches");
+      const data = await res.json();
+      setMatches(data);
+    }
+    setSyncing(false);
+    setTimeout(() => setSyncMsg(null), 5000);
+  };
+
   if (loading) {
     return (
       <div className="space-y-3">
@@ -118,12 +143,35 @@ export default function AdminResultsPage() {
         <h1 className="text-xl font-bold font-[family-name:var(--font-oswald)] uppercase">
           Resultados
         </h1>
-        {pendingCount > 0 && (
-          <span className="text-xs bg-[#FFD60A]/15 text-[#FFD60A] px-2.5 py-1 rounded-full border border-[#FFD60A]/30">
-            {pendingCount} pendente{pendingCount > 1 ? "s" : ""}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className={cn(
+              "text-xs px-3 py-1.5 rounded-lg font-medium transition-all",
+              syncing
+                ? "bg-[#1A3058] text-[#5A7A9A] cursor-wait"
+                : "bg-[#38BDF8]/15 text-[#38BDF8] hover:bg-[#38BDF8]/25 border border-[#38BDF8]/30"
+            )}
+          >
+            {syncing ? "Sincronizando..." : "⟳ Sync API"}
+          </button>
+          {pendingCount > 0 && (
+            <span className="text-xs bg-[#FFD60A]/15 text-[#FFD60A] px-2.5 py-1 rounded-full border border-[#FFD60A]/30">
+              {pendingCount} pendente{pendingCount > 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
       </div>
+
+      {syncMsg && (
+        <div className={cn(
+          "text-xs px-3 py-2 rounded-lg",
+          syncMsg.startsWith("Falha") ? "bg-[#EF4444]/15 text-[#EF4444]" : "bg-[#22C55E]/15 text-[#22C55E]"
+        )}>
+          {syncMsg}
+        </div>
+      )}
 
       {/* Phase filter tabs */}
       <div className="flex overflow-x-auto gap-1 pb-1 scrollbar-hide">
@@ -196,7 +244,7 @@ export default function AdminResultsPage() {
                       {match.homeTeam}
                     </span>
                     <span className="text-lg flex-shrink-0">
-                      {getFlagEmoji(match.homeFlag)}
+                      {getFlagImg({ code: match.homeFlag, team: match.homeTeam })}
                     </span>
                   </div>
                 </div>
@@ -236,7 +284,7 @@ export default function AdminResultsPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-lg flex-shrink-0">
-                      {getFlagEmoji(match.awayFlag)}
+                      {getFlagImg({ code: match.awayFlag, team: match.awayTeam })}
                     </span>
                     <span className="text-sm font-medium truncate">
                       {match.awayTeam}
