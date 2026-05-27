@@ -8,11 +8,72 @@ import Link from "next/link";
 
 export default function RegisterPage() {
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
+  function validateField(name: string, value: string, formData?: FormData) {
+    switch (name) {
+      case "name":
+        if (!value.trim()) return "Nome é obrigatório";
+        if (value.trim().length < 2) return "Nome deve ter no mínimo 2 caracteres";
+        return "";
+      case "email":
+        if (!value.trim()) return "Email é obrigatório";
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "Email inválido";
+        return "";
+      case "nickname":
+        if (!value.trim()) return "Apelido é obrigatório";
+        if (value.trim().length < 2) return "Apelido deve ter no mínimo 2 caracteres";
+        if (value.trim().length > 20) return "Apelido deve ter no máximo 20 caracteres";
+        if (!/^[a-zA-Z0-9_-]+$/.test(value.trim()))
+          return "Apelido só pode ter letras, números, _ e -";
+        return "";
+      case "password":
+        if (!value) return "Senha é obrigatória";
+        if (value.length < 8) return "Senha deve ter no mínimo 8 caracteres";
+        return "";
+      case "confirmPassword": {
+        if (!value) return "Confirmação é obrigatória";
+        const password = formData?.get("password") as string;
+        if (password && value !== password) return "Senhas não conferem";
+        return "";
+      }
+      default:
+        return "";
+    }
+  }
+
+  function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
+    const { name, value, form } = e.target;
+    const formData = form ? new FormData(form) : undefined;
+    const fieldError = validateField(name, value, formData);
+    setFieldErrors((prev) => ({ ...prev, [name]: fieldError }));
+  }
+
+  function validateAll(formData: FormData): boolean {
+    const fields = ["name", "email", "nickname", "password", "confirmPassword"];
+    const errors: Record<string, string> = {};
+    let valid = true;
+
+    for (const field of fields) {
+      const value = (formData.get(field) as string) || "";
+      const fieldError = validateField(field, value, formData);
+      if (fieldError) {
+        errors[field] = fieldError;
+        valid = false;
+      }
+    }
+
+    setFieldErrors(errors);
+    return valid;
+  }
+
   async function handleSubmit(formData: FormData) {
-    setLoading(true);
     setError("");
+
+    if (!validateAll(formData)) return;
+
+    setLoading(true);
     const result = await registerAction(formData);
     if (result?.error) {
       setError(result.error);
@@ -41,6 +102,9 @@ export default function RegisterPage() {
             label="Nome completo"
             placeholder="João da Silva"
             required
+            minLength={2}
+            error={fieldErrors.name}
+            onBlur={handleBlur}
           />
           <Input
             name="email"
@@ -48,6 +112,8 @@ export default function RegisterPage() {
             label="Email"
             placeholder="seu@email.com"
             required
+            error={fieldErrors.email}
+            onBlur={handleBlur}
           />
           <Input
             name="nickname"
@@ -57,14 +123,18 @@ export default function RegisterPage() {
             required
             minLength={2}
             maxLength={20}
+            error={fieldErrors.nickname}
+            onBlur={handleBlur}
           />
           <Input
             name="password"
             type="password"
             label="Senha"
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mínimo 8 caracteres"
             required
-            minLength={6}
+            minLength={8}
+            error={fieldErrors.password}
+            onBlur={handleBlur}
           />
           <Input
             name="confirmPassword"
@@ -72,7 +142,9 @@ export default function RegisterPage() {
             label="Confirmar senha"
             placeholder="••••••"
             required
-            minLength={6}
+            minLength={8}
+            error={fieldErrors.confirmPassword}
+            onBlur={handleBlur}
           />
 
           {error && (
