@@ -1,0 +1,81 @@
+import { prisma } from "./prisma";
+
+export interface RankingEntry {
+  userId: string;
+  nickname: string;
+  name: string;
+  totalPoints: number;
+  exactScores: number;
+  correctWinners: number;
+  rawTotalPoints: number;
+  firstBetDate: Date | null;
+  position: number;
+  previousPosition?: number;
+  positionChange?: number;
+}
+
+export async function calculateRanking(): Promise<RankingEntry[]> {
+  const users = await prisma.user.findMany({
+    where: { status: "APPROVED", role: { not: "ADMIN" } },
+    include: {
+      bets: {
+        where: { points: { not: null } },
+      },
+    },
+  });
+
+  const entries: RankingEntry[] = users.map((user) => {
+    const totalPoints = user.bets.reduce((sum, bet) => sum + (bet.points ?? 0), 0);
+    const exactScores = user.bets.filter((bet) => bet.rawPoints === 10).length;
+    const correctWinners = user.bets.filter(
+      (bet) => bet.rawPoints !== null && bet.rawPoints >= 5
+    ).length;
+    const rawTotalPoints = user.bets.reduce(
+      (sum, bet) => sum + (bet.rawPoints ?? 0),
+      0
+    );
+    const firstBetDate = user.bets.length > 0
+      ? user.bets.reduce(
+          (earliest, bet) =>
+            bet.createdAt < earliest ? bet.createdAt : earliest,
+          user.bets[0].createdAt
+        )
+      : null;
+
+    return {
+      userId: user.id,
+      nickname: user.nickname,
+      name: user.name,
+      totalPoints,
+      exactScores,
+      correctWinners,
+      rawTotalPoints,
+      firstBetDate,
+      position: 0,
+    };
+  });
+
+  // Sort by tiebreaker rules
+  entries.sort((a, b) => {
+    // 1. Total points (desc)
+    if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+    // 2. Exact scores (desc)
+    if (b.exactScores !== a.exactScores) return b.exactScores - a.exactScores;
+    // 3. Correct winners (desc)
+    if (b.correctWinners !== a.correctWinners) return b.correctWinners - a.correctWinners;
+    // 4. Raw points without multiplier (desc)
+    if (b.rawTotalPoints !== a.rawTotalPoints) return b.rawTotalPoints - a.rawTotalPoints;
+    // 5. First bet date (asc - who bet first)
+    if (a.firstBetDate && b.firstBetDate) {
+      return a.firstBetDate.getTime() - b.firstBetDate.getTime();
+    }
+    return 0;
+  });
+
+  // Assign positions
+  entries.forEach((entry, index) => {
+    entry.position = index + 1;
+  });
+
+  return entries;
+}
