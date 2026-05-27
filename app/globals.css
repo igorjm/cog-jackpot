@@ -1,33 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  /* FIFA World Cup 2026 Palette — inspired by Panini sticker album */
-  --bg-primary: #0A1A3A;
-  --bg-elevated: #122448;
-  --bg-secondary: #1A3058;
-  --bg-tertiary: #223C68;
-  --separator: #1E3A6E;
-  --separator-light: #2A4A7A;
+  /* Azul escuro — gradiente do mais escuro ao levemente mais claro */
+  --bg-darkest: #020810;
+  --bg-primary: #040d1f;
+  --bg-mid: #071428;
+  --bg-elevated: #0c1e3d;
+  --bg-card: #0e2548;
+  --bg-secondary: #122d54;
+  --bg-tertiary: #163560;
+  --bg-gradient: linear-gradient(
+    180deg,
+    var(--bg-darkest) 0%,
+    var(--bg-primary) 42%,
+    var(--bg-mid) 100%
+  );
 
-  /* Vivid World Cup Colors */
-  --blue: #38BDF8;
+  --separator: rgba(255, 255, 255, 0.1);
+  --separator-strong: #1a3560;
+
   --green: #22C55E;
-  --orange: #F97316;
+  --green-glow: rgba(34, 197, 94, 0.35);
+  --gold: #FACC15;
+  --gold-deep: #D4AF37;
+  --gold-glow: rgba(250, 204, 21, 0.35);
   --yellow: #FFD60A;
-  --red: #EF4444;
-  --purple: #A855F7;
-  --teal: #2DD4BF;
-  --pink: #F472B6;
-  --mint: #34D399;
-  --indigo: #818CF8;
+  --blue-accent: #38BDF8;
 
-  /* Text */
   --text-primary: #FFFFFF;
-  --text-secondary: #94B8D8;
+  --text-secondary: #A8C3E8;
   --text-tertiary: #5A7A9A;
 
-  /* Legacy mappings */
-  --gold: #FFD60A;
   --success: #22C55E;
   --error: #EF4444;
 }
@@ -39,15 +42,198 @@
   --font-mono: var(--font-mono);
 }
 
+html {
+  min-height: 100%;
+  background: var(--bg-gradient);
+}
+
 body {
-  background-color: var(--bg-primary);
+  min-height: 100%;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-track { background: var(--bg-darkest); }
 ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
 
 .tabular-nums { font-variant-numeric: tabular-nums; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* App shell — herda gradiente + brilho sutil dourado */
+.app-shell {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+}
+
+.app-shell::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% 100%, rgba(250, 204, 21, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(250, 204, 21, 0.05) 0%, transparent 50%);
+  z-index: 0;
+}
+
+.app-main {
+  position: relative;
+}
+
+.app-main::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.03;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 48px,
+    rgba(255, 255, 255, 0.03) 48px,
+    rgba(255, 255, 255, 0.03) 49px
+  );
+  z-index: 0;
+}
+
+/* Cards premium */
+.card-premium {
+  background: linear-gradient(155deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+  border: 1px solid var(--separator);
+  border-radius: 1rem;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.card-premium-gold {
+  border-color: rgba(250, 204, 21, 0.25);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    0 0 20px rgba(250, 204, 21, 0.08),
+    inset 0 1px 0 rgba(250, 204, 21, 0.1);
+}
+
+.card-match {
+  background: linear-gradient(160deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card-match:hover {
+  border-color: rgba(250, 204, 21, 0.4);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    0 0 16px var(--gold-glow);
+}
+
+.card-match-exact {
+  border-color: rgba(250, 204, 21, 0.4);
+  box-shadow: 0 0 20px rgba(250, 204, 21, 0.12);
+}
+
+/* Hero Derlis */
+.hero-derlis {
+  background: linear-gradient(
+    135deg,
+    rgba(250, 204, 21, 0.2) 0%,
+    rgba(250, 204, 21, 0.12) 40%,
+    rgba(2, 8, 16, 0.95) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.hero-derlis::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(250, 204, 21, 0.12) 0%, transparent 8%),
+    radial-gradient(circle at 75% 20%, rgba(250, 204, 21, 0.1) 0%, transparent 6%),
+    radial-gradient(circle at 60% 70%, rgba(250, 204, 21, 0.08) 0%, transparent 5%);
+  pointer-events: none;
+}
+
+/* Glow utilities */
+.glow-gold {
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+.text-gold-gradient {
+  background: linear-gradient(180deg, #FDE68A 0%, var(--gold) 50%, var(--gold-deep) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Phase / group tabs */
+.tab-phase-active {
+  background: linear-gradient(180deg, #FDE68A 0%, var(--gold) 100%);
+  color: var(--bg-darkest);
+  font-weight: 700;
+  box-shadow: 0 2px 12px var(--gold-glow);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+}
+
+.tab-phase-inactive {
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-card) 100%);
+  color: var(--text-secondary);
+  border: 1px solid var(--separator);
+}
+
+.tab-group-active {
+  background: linear-gradient(180deg, #FDE68A 0%, var(--gold) 100%);
+  color: var(--bg-darkest);
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(250, 204, 21, 0.3);
+}
+
+/* Bottom nav active */
+.nav-item-active {
+  background: radial-gradient(circle, rgba(250, 204, 21, 0.35) 0%, transparent 70%);
+}
+
+/* Page titles */
+.page-title {
+  font-family: var(--font-oswald), system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Intro splash */
+.intro-video {
+  width: 100vw;
+  height: 100dvh;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (min-width: 768px) {
+  .intro-video {
+    width: auto;
+    height: 100dvh;
+    max-width: 100vw;
+    object-fit: contain;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 32rem) {
+  .intro-video {
+    width: auto;
+    height: 100dvh;
+    max-width: 100vw;
+    object-fit: contain;
+  }
+}

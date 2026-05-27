@@ -28,7 +28,7 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="text-center space-y-3">
-          <h1 className="text-4xl font-[family-name:var(--font-oswald)] font-bold uppercase text-[#FFD60A] drop-shadow-lg">
+          <h1 className="page-title text-4xl text-gold-gradient drop-shadow-lg">
             Bolão Copa do Mundo 2026
           </h1>
           <p className="text-sm text-white/80">
@@ -37,7 +37,7 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form action={handleSubmit} className="space-y-4 bg-[#0A1A3A]/80 backdrop-blur-md rounded-2xl p-6 border border-[#FFD60A]/20 shadow-2xl">
+        <form action={handleSubmit} className="card-premium card-premium-gold space-y-4 rounded-2xl p-6 backdrop-blur-md">
           <Input
             name="email"
             type="email"

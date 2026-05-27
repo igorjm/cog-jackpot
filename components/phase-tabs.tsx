@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { Phase } from "@prisma/client";
 import { PHASE_LABELS } from "@/lib/constants";
+import { GroupTabs } from "@/components/group-tabs";
 
 interface PhaseTabsProps {
   activePhase: Phase;
@@ -29,17 +30,18 @@ export function PhaseTabs({
   groups,
 }: PhaseTabsProps) {
   return (
-    <div className="space-y-2">
-      <div className="flex overflow-x-auto gap-1 pb-2 scrollbar-hide">
+    <div className="space-y-3">
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
         {phases.map((phase) => (
           <button
             key={phase}
+            type="button"
             onClick={() => onPhaseChange(phase)}
             className={cn(
-              "px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
+              "shrink-0 rounded-xl px-4 py-2.5 text-xs font-semibold whitespace-nowrap transition-all",
               activePhase === phase
-                ? "bg-[#22C55E] text-white"
-                : "bg-[#122448] text-[#94B8D8] hover:text-white"
+                ? "tab-phase-active"
+                : "tab-phase-inactive hover:border-white/20 hover:text-white"
             )}
           >
             {PHASE_LABELS[phase]}
@@ -47,24 +49,17 @@ export function PhaseTabs({
         ))}
       </div>
 
-      {activePhase === "GROUP" && groups && groups.length > 0 && onGroupChange && (
-        <div className="flex overflow-x-auto gap-1 pb-2">
-          {groups.map((group) => (
-            <button
-              key={group}
-              onClick={() => onGroupChange(group)}
-              className={cn(
-                "px-3 py-1.5 rounded-md text-xs font-medium transition-all",
-                activeGroup === group
-                  ? "bg-[#FFD60A] text-black"
-                  : "bg-[#122448] text-[#94B8D8] hover:text-white"
-              )}
-            >
-              Grupo {group}
-            </button>
-          ))}
-        </div>
-      )}
+      {activePhase === "GROUP" &&
+        groups &&
+        groups.length > 0 &&
+        onGroupChange &&
+        activeGroup && (
+          <GroupTabs
+            groups={groups}
+            activeGroup={activeGroup}
+            onGroupChange={onGroupChange}
+          />
+        )}
     </div>
   );
 }

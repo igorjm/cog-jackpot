@@ -2,6 +2,10 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "@/lib/auth";
+import { AppHeader } from "@/components/app-header";
+import { BottomNav } from "@/components/bottom-nav";
+import { CrystalBallIcon } from "@/components/icons/crystal-ball";
+import { cn } from "@/lib/utils";
 
 export default async function MainLayout({
   children,
@@ -15,46 +19,42 @@ export default async function MainLayout({
   const nickname = (user as { nickname?: string }).nickname;
   const isAdmin = (user as { role?: string }).role === "ADMIN";
 
+  async function signOutAction() {
+    "use server";
+    await signOut({ redirectTo: "/login" });
+  }
+
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Desktop sidebar - hidden on mobile */}
-      <aside className="hidden md:flex md:flex-col md:w-56 md:fixed md:inset-y-0 bg-[#0A1A3A]/95 border-r border-[#1E3A6E]">
-        {/* Logo */}
-        <div className="px-4 py-5 border-b border-[#1E3A6E]">
-          <Link href="/dashboard">
-            <span className="text-lg font-[family-name:var(--font-oswald)] font-bold text-[#FFD60A] uppercase">
-              ⚽ Copa 2026
-            </span>
+    <div className="app-shell min-h-screen flex flex-col md:flex-row">
+      <aside className="hidden md:flex md:fixed md:inset-y-0 md:w-56 md:flex-col border-r border-white/10 bg-[#020810]/95 backdrop-blur-xl">
+        <div className="border-b border-white/10 px-4 py-5">
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <span className="page-title text-lg text-gold-gradient">Bolão Copa 2026</span>
           </Link>
         </div>
 
-        {/* Nav links */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 space-y-1 px-3 py-4">
           <SidebarLink href="/dashboard" icon="🏠" label="Início" />
           <SidebarLink href="/matches" icon="⚽" label="Jogos" />
           <SidebarLink href="/ranking" icon="🏆" label="Ranking" />
-          <SidebarLink href="/my-bets" icon="📋" label="Meus Palpites" />
+          <SidebarLink href="/my-bets" icon="🔮" label="Meus Palpites" />
           <SidebarLink href="/rules" icon="📖" label="Regras" />
           {isAdmin && <SidebarLink href="/admin" icon="⚙️" label="Admin" />}
         </nav>
 
-        {/* User section at bottom */}
-        <div className="px-4 py-4 border-t border-[#1E3A6E]">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-full bg-[#1E3A6E] flex items-center justify-center text-xs font-bold text-[#FFD60A]">
+        <div className="border-t border-white/10 px-4 py-4">
+          <div className="mb-3 flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#FACC15]/30 bg-[#0e2548] text-xs font-bold text-[#FACC15]">
               {nickname?.charAt(0).toUpperCase()}
             </div>
-            <span className="text-sm font-medium text-white truncate">{nickname}</span>
+            <span className="truncate text-sm font-medium text-white">
+              {nickname}
+            </span>
           </div>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
-          >
+          <form action={signOutAction}>
             <button
               type="submit"
-              className="w-full text-xs text-[#5A7A9A] hover:text-white transition-colors text-left"
+              className="text-xs text-[#A8C3E8] transition-colors hover:text-white"
             >
               ← Sair
             </button>
@@ -62,63 +62,19 @@ export default async function MainLayout({
         </div>
       </aside>
 
-      {/* Mobile top header - hidden on desktop */}
-      <header className="sticky top-0 z-50 bg-[#0A1A3A]/90 backdrop-blur-xl border-b border-[#1E3A6E] md:hidden">
-        <div className="px-4 py-3 flex items-center justify-between">
-          <Link href="/dashboard">
-            <span className="text-lg font-[family-name:var(--font-oswald)] font-bold text-[#FFD60A] uppercase">
-              ⚽ Copa 2026
-            </span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 bg-[#122448] px-2.5 py-1.5 rounded-full">
-              <div className="w-5 h-5 rounded-full bg-[#1E3A6E] flex items-center justify-center text-[10px] font-bold text-[#FFD60A]">
-                {nickname?.charAt(0).toUpperCase()}
-              </div>
-              <span className="text-xs font-medium text-white">{nickname}</span>
-            </div>
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="text-xs px-2 py-1.5 rounded-full bg-[#EF4444]/15 text-[#EF4444] font-medium"
-              >
-                Admin
-              </Link>
-            )}
-            <form
-              action={async () => {
-                "use server";
-                await signOut({ redirectTo: "/login" });
-              }}
-            >
-              <button
-                type="submit"
-                className="text-xs px-2 py-1.5 rounded-full bg-[#122448] text-[#5A7A9A] hover:text-white transition-colors"
-              >
-                Sair
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
+      <AppHeader
+        nickname={nickname}
+        isAdmin={isAdmin}
+        signOutAction={signOutAction}
+      />
 
-      {/* Main content */}
-      <main className="flex-1 md:ml-56">
-        <div className="max-w-5xl mx-auto w-full px-4 py-6">
+      <main className="app-main relative z-10 flex-1 md:ml-56">
+        <div className="relative z-10 mx-auto w-full max-w-5xl px-4 py-5 pb-24 md:py-6 md:pb-6">
           {children}
         </div>
       </main>
 
-      {/* Mobile bottom nav - hidden on desktop */}
-      <nav className="sticky bottom-0 z-50 bg-[#0A1A3A]/90 backdrop-blur-xl border-t border-[#1E3A6E] md:hidden">
-        <div className="flex items-center justify-around py-2">
-          <NavLink href="/dashboard" icon="🏠" label="Início" />
-          <NavLink href="/matches" icon="⚽" label="Jogos" />
-          <NavLink href="/ranking" icon="🏆" label="Ranking" />
-          <NavLink href="/my-bets" icon="📋" label="Palpites" />
-          <NavLink href="/rules" icon="📖" label="Regras" />
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   );
 }
@@ -135,30 +91,13 @@ function SidebarLink({
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#94B8D8] hover:text-white hover:bg-[#122448] transition-colors"
+      className={cn(
+        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#A8C3E8] transition-all",
+        "hover:border hover:border-white/10 hover:bg-[#0c1e3d] hover:text-white"
+      )}
     >
       <span className="text-base">{icon}</span>
       <span>{label}</span>
-    </Link>
-  );
-}
-
-function NavLink({
-  href,
-  icon,
-  label,
-}: {
-  href: string;
-  icon: string;
-  label: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex flex-col items-center gap-0.5 text-[#5A7A9A] hover:text-[#38BDF8] transition-colors"
-    >
-      <span className="text-lg">{icon}</span>
-      <span className="text-[10px]">{label}</span>
     </Link>
   );
 }

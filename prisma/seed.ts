@@ -6,8 +6,17 @@ import { hash } from "bcryptjs";
 import { MULTIPLIERS } from "../lib/constants";
 
 neonConfig.webSocketConstructor = ws;
-const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
+
+function createPrisma() {
+  const connectionString = process.env.DATABASE_URL!;
+  if (/neon\.tech|neon\.database/i.test(connectionString)) {
+    const adapter = new PrismaNeon({ connectionString });
+    return new PrismaClient({ adapter });
+  }
+  return new PrismaClient();
+}
+
+const prisma = createPrisma();
 
 interface MatchSeed {
   homeTeam: string;
