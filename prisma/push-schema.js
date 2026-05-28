@@ -86,6 +86,9 @@ CREATE TABLE IF NOT EXISTS "Config" (
     CONSTRAINT "Config_pkey" PRIMARY KEY ("id")
 );
 
+-- Add avatar column to User table (nullable)
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "avatar" TEXT;
+
 -- CreateIndex
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX IF NOT EXISTS "User_nickname_key" ON "User"("nickname");
@@ -118,19 +121,28 @@ async function main() {
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
   console.log('Connected to database.');
-  
-  try {
-    await client.query(sql);
-    console.log('Schema created successfully!');
-  } catch (e) {
-    if (e.message.includes('already exists')) {
-      console.log('Some objects already exist (OK):', e.message);
-    } else {
-      throw e;
+
+  // Split into individual statements and run each separately
+  const statements = sql
+    .split(';')
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+
+  for (const stmt of statements) {
+    try {
+      await client.query(stmt);
+    } catch (e) {
+      if (e.message.includes('already exists')) {
+        // Ignore "already exists" errors (idempotent)
+      } else {
+        console.error('Statement failed:', stmt.substring(0, 80));
+        throw e;
+      }
     }
-  } finally {
-    await client.end();
   }
+
+  console.log('Schema pushed successfully!');
+  await client.end();
 }
 
 main().catch(e => { console.error('ERROR:', e.message); process.exit(1); });

@@ -4,6 +4,7 @@ export interface RankingEntry {
   userId: string;
   nickname: string;
   name: string;
+  avatar: string | null;
   totalPoints: number;
   exactScores: number;
   correctWinners: number;
@@ -46,6 +47,7 @@ export async function calculateRanking(): Promise<RankingEntry[]> {
       userId: user.id,
       nickname: user.nickname,
       name: user.name,
+      avatar: user.avatar,
       totalPoints,
       exactScores,
       correctWinners,

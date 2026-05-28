@@ -5,12 +5,14 @@ import { registerAction } from "@/app/actions/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BackgroundMusic } from "@/components/background-music";
+import { AvatarPicker } from "@/components/avatar-picker";
 import Link from "next/link";
 
 export default function RegisterPage() {
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [avatar, setAvatar] = useState("");
 
   function validateField(name: string, value: string, formData?: FormData) {
     switch (name) {
@@ -83,9 +85,22 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative">
+      {/* Diagonal background split */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-[0.07]"
+          style={{
+            backgroundImage: "url('/background-app.png')",
+            clipPath: "polygon(100% 0, 100% 100%, 0 100%, 40% 0)",
+          }}
+        />
+      </div>
       <BackgroundMusic src="/background-music.m4a" />
-      <div className="w-full max-w-sm space-y-8">
+      <div className="w-full max-w-sm space-y-8 relative z-10">
         {/* Logo */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-[family-name:var(--font-oswald)] font-bold uppercase text-[#FFD60A]">
@@ -148,6 +163,9 @@ export default function RegisterPage() {
             error={fieldErrors.confirmPassword}
             onBlur={handleBlur}
           />
+
+          <AvatarPicker value={avatar} onChange={setAvatar} />
+          <input type="hidden" name="avatar" value={avatar} />
 
           {error && (
             <p className="text-sm text-[#EF4444] text-center">{error}</p>

@@ -17,6 +17,7 @@ export const authConfig = {
         token.role = (user as { role: string }).role;
         token.status = (user as { status: string }).status;
         token.nickname = (user as { nickname: string }).nickname;
+        token.avatar = (user as { avatar: string | null }).avatar;
       }
       return token;
     },
@@ -27,6 +28,8 @@ export const authConfig = {
         (session.user as { status: string }).status = token.status as string;
         (session.user as { nickname: string }).nickname =
           token.nickname as string;
+        (session.user as { avatar: string | null }).avatar =
+          token.avatar as string | null;
       }
       return session;
     },

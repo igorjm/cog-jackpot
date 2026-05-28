@@ -15,6 +15,7 @@ export const registerSchema = z
       .max(20, "Apelido deve ter no máximo 20 caracteres"),
     password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres"),
     confirmPassword: z.string(),
+    avatar: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Senhas não conferem",

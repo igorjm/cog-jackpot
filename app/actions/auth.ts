@@ -22,6 +22,7 @@ export async function registerAction(formData: FormData) {
     nickname: formData.get("nickname") as string,
     password: formData.get("password") as string,
     confirmPassword: formData.get("confirmPassword") as string,
+    avatar: (formData.get("avatar") as string) || undefined,
   };
 
   const parsed = registerSchema.safeParse(raw);
@@ -29,7 +30,7 @@ export async function registerAction(formData: FormData) {
     return { error: parsed.error.issues[0].message };
   }
 
-  const { name, email, nickname, password } = parsed.data;
+  const { name, email, nickname, password, avatar } = parsed.data;
 
   try {
     const existingEmail = await prisma.user.findUnique({ where: { email } });
@@ -52,6 +53,7 @@ export async function registerAction(formData: FormData) {
         email,
         nickname,
         password: hashedPassword,
+        avatar: avatar || null,
         role: isAdmin ? "ADMIN" : "USER",
         status: isAdmin ? "APPROVED" : "PENDING_PAYMENT",
       },

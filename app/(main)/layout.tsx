@@ -1,7 +1,9 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { signOut } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export default async function MainLayout({
   children,
@@ -12,8 +14,15 @@ export default async function MainLayout({
   if (!session?.user) redirect("/login");
 
   const user = session.user;
-  const nickname = (user as { nickname?: string }).nickname;
   const isAdmin = (user as { role?: string }).role === "ADMIN";
+
+  // Fetch fresh user data for avatar/nickname (JWT may be stale after profile update)
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { nickname: true, avatar: true },
+  });
+  const nickname = dbUser?.nickname ?? (user as { nickname?: string }).nickname;
+  const avatar = dbUser?.avatar ?? null;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
@@ -54,12 +63,22 @@ export default async function MainLayout({
 
         {/* User section at bottom */}
         <div className="px-4 py-4 border-t border-[#1E3A6E]">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-full bg-[#1E3A6E] flex items-center justify-center text-xs font-bold text-[#FFD60A]">
-              {nickname?.charAt(0).toUpperCase()}
-            </div>
+          <Link href="/profile" className="flex items-center gap-2 mb-3 hover:opacity-80 transition-opacity">
+            {avatar ? (
+              <Image
+                src={avatar}
+                alt=""
+                width={32}
+                height={32}
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-[#1E3A6E] flex items-center justify-center text-xs font-bold text-[#FFD60A]">
+                {nickname?.charAt(0).toUpperCase()}
+              </div>
+            )}
             <span className="text-sm font-medium text-white truncate">{nickname}</span>
-          </div>
+          </Link>
           <form
             action={async () => {
               "use server";
@@ -85,12 +104,22 @@ export default async function MainLayout({
             </span>
           </Link>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 bg-[#122448] px-2.5 py-1.5 rounded-full">
-              <div className="w-5 h-5 rounded-full bg-[#1E3A6E] flex items-center justify-center text-[10px] font-bold text-[#FFD60A]">
-                {nickname?.charAt(0).toUpperCase()}
-              </div>
+            <Link href="/profile" className="flex items-center gap-1.5 bg-[#122448] px-2.5 py-1.5 rounded-full hover:bg-[#1A3058] transition-colors">
+              {avatar ? (
+                <Image
+                  src={avatar}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-5 h-5 rounded-full bg-[#1E3A6E] flex items-center justify-center text-[10px] font-bold text-[#FFD60A]">
+                  {nickname?.charAt(0).toUpperCase()}
+                </div>
+              )}
               <span className="text-xs font-medium text-white">{nickname}</span>
-            </div>
+            </Link>
             {isAdmin && (
               <Link
                 href="/admin"

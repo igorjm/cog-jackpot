@@ -3,8 +3,6 @@ import { RankingEntry } from "@/lib/ranking";
 import { PositionChange } from "./position-change";
 import Image from "next/image";
 
-const TOP3_AVATARS = ["/r9.png", "/ney.png", "/vini.png"];
-
 interface RankingTableProps {
   entries: RankingEntry[];
   currentUserId?: string;
@@ -35,9 +33,9 @@ export function RankingTable({ entries, currentUserId }: RankingTableProps) {
             {entry.position}
           </span>
           <div className="flex items-center gap-2 min-w-0">
-            {entry.position <= 3 ? (
+            {entry.avatar ? (
               <Image
-                src={TOP3_AVATARS[entry.position - 1]}
+                src={entry.avatar}
                 alt=""
                 width={32}
                 height={40}

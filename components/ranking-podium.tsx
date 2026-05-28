@@ -1,7 +1,6 @@
 import { RankingEntry } from "@/lib/ranking";
+import { getInitials } from "@/lib/utils";
 import Image from "next/image";
-
-const TOP3_AVATARS = ["/r9.png", "/ney.png", "/vini.png"];
 
 interface RankingPodiumProps {
   top3: RankingEntry[];
@@ -28,7 +27,6 @@ export function RankingPodium({ top3 }: RankingPodiumProps) {
   const displayColors = [colors[1], colors[0], colors[2]];
   const displayGlows = [glows[1], glows[0], glows[2]];
   const displayHeights = [heights[1], heights[0], heights[2]];
-  const displayAvatars = [TOP3_AVATARS[1], TOP3_AVATARS[0], TOP3_AVATARS[2]];
 
   return (
     <div className="flex items-end justify-center gap-2 py-6">
@@ -38,13 +36,19 @@ export function RankingPodium({ top3 }: RankingPodiumProps) {
           <div
             className={`w-16 h-20 rounded-lg bg-gradient-to-br ${displayColors[i]} border overflow-hidden shadow-lg ${displayGlows[i]}`}
           >
-            <Image
-              src={displayAvatars[i]}
-              alt=""
-              width={64}
-              height={80}
-              className="w-full h-full object-cover"
-            />
+            {entry.avatar ? (
+              <Image
+                src={entry.avatar}
+                alt=""
+                width={64}
+                height={80}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-lg font-bold text-[#FFD60A]">
+                {getInitials(entry.name)}
+              </div>
+            )}
           </div>
           <p className="text-xs font-medium mt-1 text-center max-w-[80px] truncate">
             {entry.nickname}
