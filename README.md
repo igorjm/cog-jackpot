@@ -29,10 +29,15 @@ A fullstack World Cup 2026 betting pool app for friends. Mobile-first, real-time
 - **User registration** with admin approval (payment-gated)
 - **Match betting** — predict scores for all 104 World Cup matches
 - **Automated scoring** — exact score (10pts), correct winner + 1 score (7pts), correct winner (5pts), correct draw (5pts), 1 score correct (2pts)
-- **Phase multipliers** — knockout rounds multiply points (1.5× to 3×)
+- **Phase multipliers** — knockout rounds multiply points (1.25× to 3×)
 - **Live ranking** with tiebreakers and position change tracking
-- **Admin panel** — approve users, enter results, triggers recalculation
+- **Prize distribution** — 1st (60%), 2nd (25%), 3rd (15%) of the pool
+- **API sync** — football-data.org integration for automatic score updates
+- **Knockout hints** — shows possible teams for undecided bracket matches
+- **Admin dashboard** — approve users, enter/sync results, view ranking + prizes
 - **Responsive** — mobile bottom nav + desktop sidebar
+- **FIFA 2026 branding** — diagonal background split with official World Cup pattern
+- **Analytics** — Vercel Analytics + SpeedInsights
 
 ## Getting Started
 
@@ -53,6 +58,7 @@ AUTH_URL="http://localhost:3000"
 ADMIN_EMAIL="admin@example.com"
 NEXT_PUBLIC_PIX_KEY="your-pix-key"
 NEXT_PUBLIC_ENTRY_FEE="50.00"
+FOOTBALL_DATA_API_KEY="your-football-data-org-key"
 ```
 
 ### Install & Run
@@ -101,6 +107,8 @@ lib/
 ├── prisma.ts        # Prisma client (Neon adapter)
 ├── ranking.ts       # Ranking calculation + tiebreakers
 ├── constants.ts     # Points, multipliers, prize distribution
+├── football-api.ts  # football-data.org API client (live scores)
+├── knockout-hints.ts # Bracket team resolution hints
 └── deadline.ts      # Bet deadline logic (1h before match)
 
 prisma/
@@ -120,6 +128,16 @@ prisma/
 | Wrong / didn't bet | 0 |
 
 Points are multiplied by phase: Group (1×), R32 (1.25×), Round of 16 (1.5×), Quarters (2×), Semis (2.5×), Final (3×).
+
+## Prize Distribution
+
+| Place | Share |
+|-------|-------|
+| 1st | 60% |
+| 2nd | 25% |
+| 3rd | 15% |
+
+Pool = number of approved participants × entry fee (default R$50).
 
 ## License
 
