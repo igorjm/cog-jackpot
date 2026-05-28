@@ -1,5 +1,13 @@
 # ⚽ Bolão Copa do Mundo 2026
 
+[![Deploy](https://img.shields.io/badge/Vercel-deployed-black?logo=vercel)](https://bolao-cog.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io)
+[![Neon](https://img.shields.io/badge/Neon-PostgreSQL_17-00E599?logo=postgresql&logoColor=white)](https://neon.tech)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 ![Bolão Copa 2026](public/banner-derlis.png)
 
 A fullstack World Cup 2026 betting pool app for friends. Mobile-first, real-time scoring, admin-managed.
@@ -19,7 +27,7 @@ A fullstack World Cup 2026 betting pool app for friends. Mobile-first, real-time
 ## Features
 
 - **User registration** with admin approval (payment-gated)
-- **Match betting** — predict scores for all 102 World Cup matches
+- **Match betting** — predict scores for all 104 World Cup matches
 - **Automated scoring** — exact score (10pts), correct winner + 1 score (7pts), correct winner (5pts), correct draw (5pts), 1 score correct (2pts)
 - **Phase multipliers** — knockout rounds multiply points (1.5× to 3×)
 - **Live ranking** with tiebreakers and position change tracking
@@ -64,7 +72,7 @@ npm run dev        # start dev server (http://localhost:3000)
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
 | `npm run db:push` | Push Prisma schema to DB |
-| `npm run db:seed` | Seed 102 matches + admin user |
+| `npm run db:seed` | Seed 104 matches + admin user |
 | `npm run db:reset` | Reset DB + reseed |
 
 ## Project Structure
@@ -111,8 +119,8 @@ prisma/
 | 1 score correct (wrong winner) | 2 |
 | Wrong / didn't bet | 0 |
 
-Points are multiplied by phase: Group (1×), Round of 16 (1.5×), Quarters (2×), Semis (2.5×), Final (3×).
+Points are multiplied by phase: Group (1×), R32 (1.25×), Round of 16 (1.5×), Quarters (2×), Semis (2.5×), Final (3×).
 
 ## License
 
-Private — internal use only.
+This project is licensed under the [MIT License](./LICENSE).
