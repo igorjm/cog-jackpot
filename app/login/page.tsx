@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BackgroundMusic } from "@/components/background-music";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LoginPage() {
   const [error, setError] = useState("");
@@ -22,15 +23,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4 py-8 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/derlis.png')" }}>
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-8 bg-[#0A1A3A]">
       <BackgroundMusic src="/background-music.m4a" />
+      {/* Tiled background pattern — keeps image crisp on all screen sizes */}
+      <div
+        className="absolute inset-0 bg-repeat"
+        style={{
+          backgroundImage: "url('/derlis.png')",
+          backgroundSize: "33.33% auto",
+          opacity: 0.25,
+          imageRendering: "crisp-edges",
+        }}
+      />
       {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-[#0A1A3A]/70" />
 
       <div className="relative z-10 w-full max-w-sm space-y-8">
         {/* Logo */}
-        <div className="text-center space-y-3">
-          <h1 className="page-title text-4xl text-gold-gradient drop-shadow-lg">
+        <div className="text-center space-y-4">
+          <Image src="/logo-fifa.png" alt="FIFA World Cup 2026" width={80} height={80} className="h-20 w-auto mx-auto" />
+          <h1 className="text-4xl font-[family-name:var(--font-oswald)] font-bold uppercase text-[#FFD60A] drop-shadow-lg">
             Bolão Copa do Mundo 2026
           </h1>
           <p className="text-sm text-white/80">

@@ -47,10 +47,11 @@ export default async function MainLayout({
       {/* Desktop sidebar - hidden on mobile */}
       <aside className="hidden md:flex md:flex-col md:w-56 md:fixed md:inset-y-0 bg-[#0A1A3A]/95 border-r border-[#1E3A6E]">
         {/* Logo */}
-        <div className="px-4 py-5 border-b border-[#1E3A6E]">
-          <Link href="/dashboard">
-            <span className="text-lg font-[family-name:var(--font-oswald)] font-bold text-[#FFD60A] uppercase">
-              ⚽ Copa 2026
+        <div className="px-4 py-4 border-b border-[#1E3A6E]">
+          <Link href="/dashboard" className="flex items-center gap-2.5">
+            <Image src="/logo-fifa.png" alt="FIFA World Cup 2026" width={44} height={44} className="h-11 w-auto" />
+            <span className="text-base font-[family-name:var(--font-oswald)] font-bold text-[#FFD60A] uppercase tracking-wide">
+              Bolão Copa 26
             </span>
           </Link>
         </div>
@@ -101,9 +102,10 @@ export default async function MainLayout({
       {/* Mobile top header - hidden on desktop */}
       <header className="sticky top-0 z-50 bg-[#0A1A3A]/90 backdrop-blur-xl border-b border-[#1E3A6E] md:hidden">
         <div className="px-4 py-3 flex items-center justify-between">
-          <Link href="/dashboard">
-            <span className="text-lg font-[family-name:var(--font-oswald)] font-bold text-[#FFD60A] uppercase">
-              ⚽ Copa 2026
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <Image src="/logo-fifa.png" alt="FIFA World Cup 2026" width={36} height={36} className="h-9 w-auto" />
+            <span className="text-base font-[family-name:var(--font-oswald)] font-bold text-[#FFD60A] uppercase tracking-wide">
+              Bolão Copa 26
             </span>
           </Link>
           <div className="flex items-center gap-2">
