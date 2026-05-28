@@ -1,6 +1,9 @@
 import { getInitials } from "@/lib/utils";
 import { RankingEntry } from "@/lib/ranking";
 import { PositionChange } from "./position-change";
+import Image from "next/image";
+
+const TOP3_AVATARS = ["/r9.png", "/ney.png", "/vini.png"];
 
 interface RankingTableProps {
   entries: RankingEntry[];
@@ -32,9 +35,19 @@ export function RankingTable({ entries, currentUserId }: RankingTableProps) {
             {entry.position}
           </span>
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-[#1A3058] flex items-center justify-center text-xs font-bold shrink-0">
-              {getInitials(entry.name)}
-            </div>
+            {entry.position <= 3 ? (
+              <Image
+                src={TOP3_AVATARS[entry.position - 1]}
+                alt=""
+                width={32}
+                height={40}
+                className="w-8 h-10 rounded-md object-cover shrink-0"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-[#1A3058] flex items-center justify-center text-xs font-bold shrink-0">
+                {getInitials(entry.name)}
+              </div>
+            )}
             <span className="text-sm truncate">{entry.nickname}</span>
           </div>
           <span className="text-sm font-mono font-bold text-right text-[#FFD60A] tabular-nums">

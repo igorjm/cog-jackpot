@@ -1,5 +1,7 @@
-import { getInitials } from "@/lib/utils";
 import { RankingEntry } from "@/lib/ranking";
+import Image from "next/image";
+
+const TOP3_AVATARS = ["/r9.png", "/ney.png", "/vini.png"];
 
 interface RankingPodiumProps {
   top3: RankingEntry[];
@@ -23,10 +25,10 @@ export function RankingPodium({ top3 }: RankingPodiumProps) {
 
   // Display order: 2nd, 1st, 3rd
   const displayOrder = [top3[1], top3[0], top3[2]];
-  const displayMedals = [medals[1], medals[0], medals[1] ? medals[1] : "", medals[2]];
   const displayColors = [colors[1], colors[0], colors[2]];
   const displayGlows = [glows[1], glows[0], glows[2]];
   const displayHeights = [heights[1], heights[0], heights[2]];
+  const displayAvatars = [TOP3_AVATARS[1], TOP3_AVATARS[0], TOP3_AVATARS[2]];
 
   return (
     <div className="flex items-end justify-center gap-2 py-6">
@@ -34,9 +36,15 @@ export function RankingPodium({ top3 }: RankingPodiumProps) {
         <div key={entry.userId} className="flex flex-col items-center">
           <span className="text-2xl mb-1">{[medals[1], medals[0], medals[2]][i]}</span>
           <div
-            className={`w-12 h-12 rounded-full bg-gradient-to-br ${displayColors[i]} border flex items-center justify-center text-sm font-bold shadow-lg ${displayGlows[i]}`}
+            className={`w-16 h-20 rounded-lg bg-gradient-to-br ${displayColors[i]} border overflow-hidden shadow-lg ${displayGlows[i]}`}
           >
-            {getInitials(entry.name)}
+            <Image
+              src={displayAvatars[i]}
+              alt=""
+              width={64}
+              height={80}
+              className="w-full h-full object-cover"
+            />
           </div>
           <p className="text-xs font-medium mt-1 text-center max-w-[80px] truncate">
             {entry.nickname}
