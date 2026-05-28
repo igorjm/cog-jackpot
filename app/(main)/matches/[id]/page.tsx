@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 import { BetForm } from "@/components/bet-form";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { Badge } from "@/components/ui/badge";
+import { Flag } from "@/components/ui/flag";
 import { isBeforeDeadline } from "@/lib/deadline";
 import { PHASE_LABELS } from "@/lib/constants";
+import Image from "next/image";
 
 export default async function MatchDetailPage({
   params,
@@ -27,93 +29,84 @@ export default async function MatchDetailPage({
   const isFinished = match.homeScore !== null && match.awayScore !== null;
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      {/* Back link */}
-      <a href="/matches" className="text-sm text-[#94B8D8] hover:text-white">
-        ← Voltar
-      </a>
-
-      {/* Match info card */}
-      <div className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-6 space-y-4">
-        {/* Phase + Date */}
-        <div className="flex items-center justify-between">
-          <Badge variant="info">{PHASE_LABELS[match.phase]}</Badge>
-          {match.multiplier > 1 && (
-            <Badge variant="warning">{match.multiplier}×</Badge>
-          )}
-        </div>
-
-        <div className="text-center text-xs text-[#94B8D8]">
-          {new Date(match.matchDate).toLocaleDateString("pt-BR", {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-          {match.venue && ` • ${match.venue}`}
-        </div>
-
-        {/* Teams */}
-        <div className="flex items-center justify-center gap-6 py-4">
-          <div className="text-center space-y-1">
-            {match.homeFlag !== "xx" ? (
-              <img
-                src={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png`}
-                srcSet={`https://flagcdn.com/w160/${match.homeFlag.toLowerCase()}.png 2x`}
-                width={64}
-                height={48}
-                alt={match.homeTeam}
-                className="inline-block rounded-sm"
-              />
-            ) : (
-              <span className="inline-block w-16 h-12 rounded-sm bg-[#1A3058] border border-[#1E3A6E] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
+    <div className="max-w-md mx-auto flex flex-col">
+      {/* ── Match Info Card ── */}
+      <div className="card-premium relative z-0 rounded-2xl px-5 pt-4 pb-10">
+        {/* Fase + countdown na mesma linha */}
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <Badge variant="info">{PHASE_LABELS[match.phase]}</Badge>
+            {match.multiplier > 1 && (
+              <Badge variant="warning">{match.multiplier}×</Badge>
             )}
-            <p className="text-sm font-medium">{match.homeTeam}</p>
           </div>
-
-          {isFinished ? (
-            <div className="text-center">
-              <div className="flex items-center gap-2">
-                <span className="text-3xl font-mono font-bold">{match.homeScore}</span>
-                <span className="text-xl text-[#FFD60A]">×</span>
-                <span className="text-3xl font-mono font-bold">{match.awayScore}</span>
-              </div>
-              <span className="text-xs text-[#94B8D8]">Final</span>
+          {!isFinished && (
+            <div className="shrink-0">
+              <CountdownTimer matchDate={match.matchDate} />
             </div>
-          ) : (
-            <span className="text-2xl font-bold text-[#FFD60A]">×</span>
           )}
-
-          <div className="text-center space-y-1">
-            {match.awayFlag !== "xx" ? (
-              <img
-                src={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png`}
-                srcSet={`https://flagcdn.com/w160/${match.awayFlag.toLowerCase()}.png 2x`}
-                width={64}
-                height={48}
-                alt={match.awayTeam}
-                className="inline-block rounded-sm"
-              />
-            ) : (
-              <span className="inline-block w-16 h-12 rounded-sm bg-[#1A3058] border border-[#1E3A6E] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
-            )}
-            <p className="text-sm font-medium">{match.awayTeam}</p>
-          </div>
         </div>
 
-        {/* Countdown */}
-        {!isFinished && (
-          <div className="text-center">
-            <CountdownTimer matchDate={match.matchDate} />
+
+        {/* Date */}
+        <div className="flex items-center justify-center gap-1.5 text-xs text-[#A8C3E8] mb-1">
+          <span>
+            {new Date(match.matchDate).toLocaleDateString("pt-BR", {
+              weekday: "long",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
+        </div>
+
+        {/* Venue */}
+        {match.venue && (
+          <div className="flex items-center justify-center gap-1.5 text-xs text-[#A8C3E8] mb-4">
+            <span>{match.venue}</span>
           </div>
         )}
 
+        {/* Teams */}
+        <div className="flex items-center justify-between px-4 py-2">
+          <div className="flex flex-col items-center gap-1.5 flex-1">
+            <Flag code={match.homeFlag} name={match.homeTeam} size="xl" />
+            <span className="text-xs font-semibold text-center leading-tight max-w-[80px]">
+              {match.homeTeam}
+            </span>
+          </div>
+
+          <div className="flex-shrink-0 px-3">
+            {isFinished ? (
+              <div className="text-center">
+                <div className="flex items-center gap-2">
+                  <span className="text-3xl font-mono font-bold">{match.homeScore}</span>
+                  <span className="text-xl font-bold text-[#FACC15]">×</span>
+                  <span className="text-3xl font-mono font-bold">{match.awayScore}</span>
+                </div>
+                <span className="text-xs text-[#A8C3E8]">Final</span>
+              </div>
+            ) : (
+              <span className="page-title text-2xl text-[#FACC15]">VS</span>
+            )}
+          </div>
+
+          <div className="flex flex-col items-center gap-1.5 flex-1">
+            <Flag code={match.awayFlag} name={match.awayTeam} size="xl" />
+            <span className="text-xs font-semibold text-center leading-tight max-w-[80px]">
+              {match.awayTeam}
+            </span>
+          </div>
+        </div>
+
+        
+
         {/* Result info if finished */}
         {isFinished && userBet && (
-          <div className="bg-[black] rounded-lg p-3 text-center">
-            <p className="text-xs text-[#94B8D8] mb-1">Seu palpite</p>
+          <div className="rounded-xl border border-[#FACC15]/20 bg-[#020810]/80 p-3 text-center mt-3">
+            <p className="mb-1 text-xs text-[#A8C3E8]">Seu palpite</p>
             <p className="font-mono font-bold">
               {userBet.homeScore} × {userBet.awayScore}
             </p>
@@ -127,10 +120,68 @@ export default async function MatchDetailPage({
         )}
       </div>
 
-      {/* Bet Form */}
+      {/* ── Derlis Hero (overlaps card above ~76px, sits below bet form) ── */}
       {!isFinished && (
-        <div className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-6">
-          <h2 className="text-sm font-bold uppercase text-[#94B8D8] tracking-wide mb-4 text-center">
+        <div className="group relative z-10 -mt-[76px] w-full">
+          {/* Flag overlays on crystal balls */}
+          {/* Left ball — home team */}
+          <div
+            className="absolute z-20 pointer-events-none"
+            style={{ left: "24%", top: "65%", transform: "translate(-50%, -50%)" }}
+          >
+            <Flag
+              code={match.homeFlag}
+              name={match.homeTeam}
+              className="!w-[3.33333em] !h-[2.5em]"
+            />
+          </div>
+
+          {/* Right ball — away team */}
+          <div
+            className="absolute z-20 pointer-events-none"
+            style={{ left: "79%", top: "66%", transform: "translate(-50%, -50%)" }}
+          >
+            <Flag
+              code={match.awayFlag}
+              name={match.awayTeam}
+              className="!w-[3.33333em] !h-[2.5em]"
+            />
+          </div>
+
+          {/* Hover aura */}
+          <div
+            className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            style={{
+              background:
+                "radial-gradient(ellipse 75% 60% at 50% 58%, rgb(255, 204, 0) 0%, rgba(250,160,21,0.15) 45%, transparent 75%)",
+            }}
+          />
+
+          <Image
+            src="/derlis-game.png"
+            alt="Derlis"
+            width={500}
+            height={500}
+            className="relative z-10 w-full object-cover"
+            priority
+          />
+
+          {/* Bottom depth shadow */}
+          <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+            style={{
+              background: "linear-gradient(to bottom, transparent 0%, rgba(2,8,16,0.7) 60%, rgba(2,8,16,0.97) 100%)",
+            }}
+          />
+        </div>
+      )}
+
+      {/* ── Bet Form ── */}
+      {!isFinished && (
+        <div
+          className="relative z-20 rounded-2xl border border-white/10 px-6 pt-5 pb-6 -mt-10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+          style={{ background: "linear-gradient(155deg, #0e2548 0%, #0c1e3d 100%)" }}
+        >
+          <h2 className="mb-5 text-center text-sm font-extrabold uppercase tracking-widest text-[#A8C3E8]">
             {isOpen ? "Seu Palpite" : "Palpite Encerrado"}
           </h2>
           <BetForm
@@ -149,5 +200,3 @@ export default async function MatchDetailPage({
     </div>
   );
 }
-
-

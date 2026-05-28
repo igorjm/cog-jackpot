@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Oswald, JetBrains_Mono } from "next/font/google";
+import { IntroOverlay } from "@/components/intro-overlay";
+import "flag-icons/css/flag-icons.min.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
@@ -39,7 +41,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://flagcdn.com" />
       </head>
       <body className="min-h-full flex flex-col bg-[#0A1A3A] text-white font-[var(--font-inter),system-ui,sans-serif]">
-        {children}
+         <IntroOverlay>{children}</IntroOverlay>
         <Analytics />
         <SpeedInsights />
       </body>

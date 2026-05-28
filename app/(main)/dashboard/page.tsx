@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MatchCard } from "@/components/match-card";
+import { DerlisHeroCard } from "@/components/derlis-hero-card";
+import { SectionTitle } from "@/components/page-title";
 import Link from "next/link";
 
 export default async function DashboardPage() {
@@ -8,7 +10,6 @@ export default async function DashboardPage() {
   const userId = session!.user!.id;
   const nickname = (session!.user as { nickname: string }).nickname;
 
-  // Get upcoming matches
   const upcomingMatches = await prisma.match.findMany({
     where: {
       homeScore: null,
@@ -18,7 +19,6 @@ export default async function DashboardPage() {
     take: 4,
   });
 
-  // Get recent finished matches
   const recentMatches = await prisma.match.findMany({
     where: {
       homeScore: { not: null },
@@ -27,18 +27,15 @@ export default async function DashboardPage() {
     take: 5,
   });
 
-  // Get user bets for these matches
   const matchIds = [...upcomingMatches, ...recentMatches].map((m) => m.id);
   const userBets = await prisma.bet.findMany({
     where: { userId, matchId: { in: matchIds } },
   });
   const betsMap = new Map(userBets.map((b) => [b.matchId, b]));
 
-  // Get user stats
   const totalPoints = userBets.reduce((sum, b) => sum + (b.points ?? 0), 0);
   const exactScores = userBets.filter((b) => b.rawPoints === 10).length;
 
-  // Get user position (simple count)
   const allUsers = await prisma.user.findMany({
     where: { status: "APPROVED", role: { not: "ADMIN" } },
     include: { bets: { where: { points: { not: null } } } },
@@ -52,44 +49,25 @@ export default async function DashboardPage() {
   const position = sortedUsers.findIndex((u) => u.id === userId) + 1;
 
   return (
-    <div className="space-y-6">
-      {/* Greeting */}
-      <div>
-        <h1 className="text-xl font-bold">
-          Fala, {nickname}! 👊
-        </h1>
-      </div>
+    <div className="space-y-5">
+      <DerlisHeroCard
+        nickname={nickname}
+        position={position}
+        totalPoints={totalPoints}
+        exactScores={exactScores}
+      />
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
-          <p className="text-2xl font-mono font-bold text-[#FFD60A]">
-            #{position || "—"}
-          </p>
-          <p className="text-[10px] text-[#94B8D8] mt-0.5">Posição</p>
-        </div>
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
-          <p className="text-2xl font-mono font-bold text-[#22C55E]">
-            {totalPoints}
-          </p>
-          <p className="text-[10px] text-[#94B8D8] mt-0.5">Pontos</p>
-        </div>
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
-          <p className="text-2xl font-mono font-bold text-white">
-            {exactScores}
-          </p>
-          <p className="text-[10px] text-[#94B8D8] mt-0.5">Exatos</p>
-        </div>
-      </div>
-
-      {/* Upcoming Matches */}
       {upcomingMatches.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold uppercase text-[#94B8D8] tracking-wide">
-              Próximos Jogos
-            </h2>
-            <Link href="/matches" className="text-xs text-[#38BDF8]">
+            <SectionTitle>
+              <span style={{ fontSize: "24px" }}>Próximos Jogos</span>
+            </SectionTitle>
+       
+            <Link
+              href="/matches"
+              className="text-xs font-semibold text-[#FACC15] hover:text-[#FDE047]"
+            >
               Ver todos →
             </Link>
           </div>
@@ -105,12 +83,9 @@ export default async function DashboardPage() {
         </section>
       )}
 
-      {/* Recent Results */}
       {recentMatches.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-sm font-bold uppercase text-[#94B8D8] tracking-wide">
-            Últimos Resultados
-          </h2>
+          <SectionTitle>Últimos Resultados</SectionTitle>
           <div className="grid gap-3 sm:grid-cols-2">
             {recentMatches.map((match) => (
               <MatchCard
@@ -124,12 +99,12 @@ export default async function DashboardPage() {
         </section>
       )}
 
-      {/* Empty state */}
       {upcomingMatches.length === 0 && recentMatches.length === 0 && (
-        <div className="text-center py-12 space-y-3">
+        <div className="card-premium space-y-3 py-12 text-center">
           <p className="text-4xl">⚽</p>
-          <p className="text-[#94B8D8]">
-            Nenhum jogo cadastrado ainda. Aguarde o admin popular os jogos da Copa!
+          <p className="text-sm text-[#A8C3E8]">
+            Nenhum jogo cadastrado ainda. Aguarde o admin popular os jogos da
+            Copa!
           </p>
         </div>
       )}

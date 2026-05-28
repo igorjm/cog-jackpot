@@ -1,7 +1,11 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
+import { StatCard } from "@/components/stat-card";
+import { PageTitle } from "@/components/page-title";
+import { PromoDerlisBanner } from "@/components/promo-derlis-banner";
 import { PHASE_LABELS } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 export default async function MyBetsPage() {
   const session = await auth();
@@ -18,64 +22,68 @@ export default async function MyBetsPage() {
   const totalBets = bets.length;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-bold font-[family-name:var(--font-oswald)] uppercase">
-        📋 Meus Palpites
-      </h1>
+    <div className="space-y-5">
+      <PageTitle icon="🔮">Meus Palpites</PageTitle>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
-          <p className="text-xl font-mono font-bold text-[#22C55E]">{totalPoints}</p>
-          <p className="text-[10px] text-[#94B8D8]">Total Pts</p>
-        </div>
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
-          <p className="text-xl font-mono font-bold text-[#FFD60A]">{exactScores}</p>
-          <p className="text-[10px] text-[#94B8D8]">Exatos</p>
-        </div>
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
-          <p className="text-xl font-mono font-bold">{totalBets}</p>
-          <p className="text-[10px] text-[#94B8D8]">Palpites</p>
-        </div>
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+        <StatCard
+          icon="⚽"
+          value={totalPoints}
+          label="Total Pts"
+          variant="green"
+        />
+        <StatCard
+          icon="🎯"
+          value={exactScores}
+          label="Exatos"
+          variant="gold"
+        />
+        <StatCard
+          icon="📋"
+          value={totalBets}
+          label="Palpites"
+          variant="white"
+        />
       </div>
 
-      {/* Bets list */}
       <div className="space-y-2">
         {bets.map((bet) => {
           const isFinished = bet.match.homeScore !== null;
           return (
             <div
               key={bet.id}
-              className={`bg-[#122448] rounded-xl border p-3 ${
-                bet.rawPoints === 10
-                  ? "border-[#FFD700]/30"
-                  : bet.rawPoints && bet.rawPoints >= 5
-                  ? "border-[#22C55E]/30"
-                  : "border-[#1E3A6E]"
-              }`}
+              className={cn(
+                "card-premium rounded-xl p-3",
+                bet.rawPoints === 10 && "card-premium-gold",
+                bet.rawPoints &&
+                  bet.rawPoints >= 5 &&
+                  bet.rawPoints !== 10 &&
+                  "border-[#FACC15]/35"
+              )}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="truncate">
-                      {bet.match.homeTeam} {bet.homeScore} × {bet.awayScore} {bet.match.awayTeam}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[10px] text-[#94B8D8]">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-white">
+                    {bet.match.homeTeam} {bet.homeScore} × {bet.awayScore}{" "}
+                    {bet.match.awayTeam}
+                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] text-[#A8C3E8]">
                       {PHASE_LABELS[bet.match.phase]}
                     </span>
                     {isFinished && (
-                      <span className="text-[10px] text-[#94B8D8]">
+                      <span className="text-[10px] text-[#5A7A9A]">
                         • Real: {bet.match.homeScore} × {bet.match.awayScore}
                       </span>
                     )}
                   </div>
                 </div>
-                <div>
+                <div className="shrink-0">
                   {isFinished ? (
                     <Badge
-                      variant={bet.points && bet.points > 0 ? "points" : "error"}
+                      variant={
+                        bet.points && bet.points > 0 ? "points" : "error"
+                      }
                     >
                       +{bet.points ?? 0}
                     </Badge>
@@ -90,10 +98,12 @@ export default async function MyBetsPage() {
       </div>
 
       {bets.length === 0 && (
-        <div className="text-center py-8 text-[#94B8D8]">
+        <div className="card-premium py-10 text-center text-sm text-[#A8C3E8]">
           Você ainda não fez nenhum palpite.
         </div>
       )}
+
+      <PromoDerlisBanner />
     </div>
   );
 }

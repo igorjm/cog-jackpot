@@ -51,7 +51,7 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form action={handleSubmit} className="space-y-4 bg-[#0A1A3A]/80 backdrop-blur-md rounded-2xl p-6 border border-[#FFD60A]/20 shadow-2xl">
+        <form action={handleSubmit} className="card-premium card-premium-gold space-y-4 rounded-2xl p-6 backdrop-blur-md">
           <Input
             name="email"
             type="email"
