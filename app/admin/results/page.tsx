@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { saveResult, syncScores } from "@/app/actions/admin";
 import { useEffect, useState } from "react";
@@ -33,12 +34,11 @@ const PHASE_OPTIONS = [
 
 function getFlagImg({ code, team }: { code: string; team: string }) {
   if (code === "xx") {
-    return <span className="inline-block w-7 h-5 rounded-sm bg-[#1A3058] border border-[#1E3A6E] text-center text-[9px] leading-5 text-[#5A7A9A]">?</span>;
+    return <span className="inline-block w-7 h-5 rounded-sm bg-[#1E3862] border border-[#2A4A7A] text-center text-[9px] leading-5 text-[#5A7A9A]">?</span>;
   }
   return (
-    <img
-      src={`https://flagcdn.com/w40/${code.toLowerCase()}.png`}
-      srcSet={`https://flagcdn.com/w80/${code.toLowerCase()}.png 2x`}
+    <Image
+      src={`https://flagcdn.com/w80/${code.toLowerCase()}.png`}
       width={28}
       height={21}
       alt={team}
@@ -134,7 +134,7 @@ export default function AdminResultsPage() {
     return (
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-32 bg-[#122448] rounded-xl animate-pulse" />
+          <div key={i} className="h-32 bg-[#162D54] rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -153,7 +153,7 @@ export default function AdminResultsPage() {
             className={cn(
               "text-xs px-3 py-1.5 rounded-lg font-medium transition-all",
               syncing
-                ? "bg-[#1A3058] text-[#5A7A9A] cursor-wait"
+                ? "bg-[#1E3862] text-[#5A7A9A] cursor-wait"
                 : "bg-[#38BDF8]/15 text-[#38BDF8] hover:bg-[#38BDF8]/25 border border-[#38BDF8]/30"
             )}
           >
@@ -186,7 +186,7 @@ export default function AdminResultsPage() {
               "px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
               activeFilter === phase.value
                 ? "bg-[#EF4444] text-white"
-                : "bg-[#122448] text-[#94B8D8] hover:text-white"
+                : "bg-[#162D54] text-[#94B8D8] hover:text-white"
             )}
           >
             {phase.label}
@@ -204,11 +204,11 @@ export default function AdminResultsPage() {
             <div
               key={match.id}
               className={cn(
-                "bg-[#122448] rounded-xl border p-4 transition-all",
+                "bg-[#162D54] rounded-xl border p-4 transition-all",
                 justSaved
                   ? "border-[#22C55E]/50 shadow-lg shadow-[#22C55E]/10"
                   : hasResult
-                  ? "border-[#1E3A6E]"
+                  ? "border-[#2A4A7A]"
                   : "border-[#FFD60A]/30"
               )}
             >
@@ -265,7 +265,7 @@ export default function AdminResultsPage() {
                         [match.id]: { ...prev[match.id], home: Number(e.target.value) },
                       }))
                     }
-                    className="w-12 h-11 sm:w-14 sm:h-12 text-center bg-[#0A1A3A] border border-[#1E3A6E] rounded-lg text-xl font-mono font-bold focus:border-[#22C55E] focus:outline-none focus:ring-1 focus:ring-[#22C55E]/50 transition-colors"
+                    className="w-12 h-11 sm:w-14 sm:h-12 text-center bg-[#0F2347] border border-[#2A4A7A] rounded-lg text-xl font-mono font-bold focus:border-[#22C55E] focus:outline-none focus:ring-1 focus:ring-[#22C55E]/50 transition-colors"
                   />
                   <span className="text-[#FFD60A] font-bold text-lg">×</span>
                   <input
@@ -279,7 +279,7 @@ export default function AdminResultsPage() {
                         [match.id]: { ...prev[match.id], away: Number(e.target.value) },
                       }))
                     }
-                    className="w-12 h-11 sm:w-14 sm:h-12 text-center bg-[#0A1A3A] border border-[#1E3A6E] rounded-lg text-xl font-mono font-bold focus:border-[#22C55E] focus:outline-none focus:ring-1 focus:ring-[#22C55E]/50 transition-colors"
+                    className="w-12 h-11 sm:w-14 sm:h-12 text-center bg-[#0F2347] border border-[#2A4A7A] rounded-lg text-xl font-mono font-bold focus:border-[#22C55E] focus:outline-none focus:ring-1 focus:ring-[#22C55E]/50 transition-colors"
                   />
                 </div>
 

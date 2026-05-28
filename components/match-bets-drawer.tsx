@@ -63,20 +63,20 @@ export function MatchBetsDrawer({ matchId, onClose }: MatchBetsDrawerProps) {
       />
 
       {/* Drawer */}
-      <div className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] flex flex-col bg-[#0A1A3A] rounded-t-2xl border-t border-[#1E3A6E] shadow-2xl animate-in slide-in-from-bottom duration-300 md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:w-[420px] md:max-h-none md:rounded-t-none md:rounded-l-2xl md:border-t-0 md:border-l">
+      <div className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] flex flex-col bg-[#0F2347] rounded-t-2xl border-t border-[#2A4A7A] shadow-2xl animate-in slide-in-from-bottom duration-300 md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:w-[420px] md:max-h-none md:rounded-t-none md:rounded-l-2xl md:border-t-0 md:border-l">
         {/* Handle (mobile) */}
         <div className="flex justify-center pt-3 pb-1 md:hidden">
-          <div className="w-10 h-1 rounded-full bg-[#1E3A6E]" />
+          <div className="w-10 h-1 rounded-full bg-[#2A4A7A]" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-[#1E3A6E]">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#2A4A7A]">
           <h2 className="text-base font-bold font-[family-name:var(--font-oswald)] uppercase text-[#FFD60A]">
             Palpites do Jogo
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-[#122448] text-[#94B8D8] hover:text-white transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-[#162D54] text-[#94B8D8] hover:text-white transition-colors"
           >
             ✕
           </button>
@@ -87,7 +87,7 @@ export function MatchBetsDrawer({ matchId, onClose }: MatchBetsDrawerProps) {
           {loading && (
             <div className="space-y-3">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-12 bg-[#122448] rounded-xl animate-pulse" />
+                <div key={i} className="h-12 bg-[#162D54] rounded-xl animate-pulse" />
               ))}
             </div>
           )}
@@ -103,8 +103,8 @@ export function MatchBetsDrawer({ matchId, onClose }: MatchBetsDrawerProps) {
                 <div className="text-right">
                   <p className="text-sm font-medium">{match.homeTeam}</p>
                   {match.homeFlag !== "xx" && (
-                    <img
-                      src={`https://flagcdn.com/w40/${match.homeFlag.toLowerCase()}.png`}
+                    <Image
+                      src={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png`}
                       width={24}
                       height={18}
                       alt={match.homeTeam}
@@ -124,8 +124,8 @@ export function MatchBetsDrawer({ matchId, onClose }: MatchBetsDrawerProps) {
                 <div className="text-left">
                   <p className="text-sm font-medium">{match.awayTeam}</p>
                   {match.awayFlag !== "xx" && (
-                    <img
-                      src={`https://flagcdn.com/w40/${match.awayFlag.toLowerCase()}.png`}
+                    <Image
+                      src={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png`}
                       width={24}
                       height={18}
                       alt={match.awayTeam}
@@ -144,10 +144,10 @@ export function MatchBetsDrawer({ matchId, onClose }: MatchBetsDrawerProps) {
                 {bets.map((bet, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-3 px-3 py-2.5 bg-[#122448] rounded-xl border border-[#1E3A6E]"
+                    className="flex items-center gap-3 px-3 py-2.5 bg-[#162D54] rounded-xl border border-[#2A4A7A]"
                   >
                     {/* Avatar */}
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-[#1A3058] flex-shrink-0 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-[#1E3862] flex-shrink-0 flex items-center justify-center">
                       {bet.user.avatar ? (
                         <Image
                           src={bet.user.avatar}

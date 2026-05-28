@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { CountdownTimer } from "./countdown-timer";
 import { Badge } from "./ui/badge";
 import { isBeforeDeadline } from "@/lib/deadline";
@@ -35,12 +36,12 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
 
   return (
     <div
-      className={`bg-[#122448] rounded-2xl border p-4 transition-all ${
+      className={`bg-[#162D54] rounded-2xl border p-4 transition-all ${
         isExactScore
           ? "border-[#FFD60A]/40 shadow-lg shadow-[#FFD60A]/10"
           : userBet && userBet.rawPoints && userBet.rawPoints >= 5
           ? "border-[#22C55E]/30"
-          : "border-[#1E3A6E]"
+          : "border-[#2A4A7A]"
       }`}
     >
       {/* Header: date + venue + multiplier */}
@@ -67,16 +68,15 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
             <p className="text-[10px] text-[#5A7A9A] leading-tight mt-0.5 line-clamp-2">{homeHint}</p>
           )}
           {match.homeFlag !== "xx" ? (
-            <img
-              src={`https://flagcdn.com/w40/${match.homeFlag.toLowerCase()}.png`}
-              srcSet={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png 2x`}
+            <Image
+              src={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png`}
               width={32}
               height={24}
               alt={match.homeTeam}
               className="inline-block rounded-sm mt-1"
             />
           ) : (
-            <span className="inline-block w-8 h-6 rounded-sm bg-[#1A3058] border border-[#1E3A6E] mt-1 text-center text-[10px] leading-6 text-[#5A7A9A]">?</span>
+            <span className="inline-block w-8 h-6 rounded-sm bg-[#1E3862] border border-[#2A4A7A] mt-1 text-center text-[10px] leading-6 text-[#5A7A9A]">?</span>
           )}
         </div>
 
@@ -107,22 +107,21 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
             <p className="text-[10px] text-[#5A7A9A] leading-tight mt-0.5 line-clamp-2">{awayHint}</p>
           )}
           {match.awayFlag !== "xx" ? (
-            <img
-              src={`https://flagcdn.com/w40/${match.awayFlag.toLowerCase()}.png`}
-              srcSet={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png 2x`}
+            <Image
+              src={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png`}
               width={32}
               height={24}
               alt={match.awayTeam}
               className="inline-block rounded-sm mt-1"
             />
           ) : (
-            <span className="inline-block w-8 h-6 rounded-sm bg-[#1A3058] border border-[#1E3A6E] mt-1 text-center text-[10px] leading-6 text-[#5A7A9A]">?</span>
+            <span className="inline-block w-8 h-6 rounded-sm bg-[#1E3862] border border-[#2A4A7A] mt-1 text-center text-[10px] leading-6 text-[#5A7A9A]">?</span>
           )}
         </div>
       </div>
 
       {/* Status / Bet info */}
-      <div className="mt-3 pt-3 border-t border-[#1E3A6E]">
+      <div className="mt-3 pt-3 border-t border-[#2A4A7A]">
         {isFinished && userBet ? (
           <div className="flex items-center justify-between">
             <span className="text-xs text-[#94B8D8]">

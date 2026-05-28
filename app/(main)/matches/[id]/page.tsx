@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -34,7 +35,7 @@ export default async function MatchDetailPage({
       </a>
 
       {/* Match info card */}
-      <div className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-6 space-y-4">
+      <div className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-6 space-y-4">
         {/* Phase + Date */}
         <div className="flex items-center justify-between">
           <Badge variant="info">{PHASE_LABELS[match.phase]}</Badge>
@@ -59,16 +60,15 @@ export default async function MatchDetailPage({
         <div className="flex items-center justify-center gap-6 py-4">
           <div className="text-center space-y-1">
             {match.homeFlag !== "xx" ? (
-              <img
-                src={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png`}
-                srcSet={`https://flagcdn.com/w160/${match.homeFlag.toLowerCase()}.png 2x`}
+              <Image
+                src={`https://flagcdn.com/w160/${match.homeFlag.toLowerCase()}.png`}
                 width={64}
                 height={48}
                 alt={match.homeTeam}
                 className="inline-block rounded-sm"
               />
             ) : (
-              <span className="inline-block w-16 h-12 rounded-sm bg-[#1A3058] border border-[#1E3A6E] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
+              <span className="inline-block w-16 h-12 rounded-sm bg-[#1E3862] border border-[#2A4A7A] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
             )}
             <p className="text-sm font-medium">{match.homeTeam}</p>
           </div>
@@ -88,16 +88,15 @@ export default async function MatchDetailPage({
 
           <div className="text-center space-y-1">
             {match.awayFlag !== "xx" ? (
-              <img
-                src={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png`}
-                srcSet={`https://flagcdn.com/w160/${match.awayFlag.toLowerCase()}.png 2x`}
+              <Image
+                src={`https://flagcdn.com/w160/${match.awayFlag.toLowerCase()}.png`}
                 width={64}
                 height={48}
                 alt={match.awayTeam}
                 className="inline-block rounded-sm"
               />
             ) : (
-              <span className="inline-block w-16 h-12 rounded-sm bg-[#1A3058] border border-[#1E3A6E] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
+              <span className="inline-block w-16 h-12 rounded-sm bg-[#1E3862] border border-[#2A4A7A] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
             )}
             <p className="text-sm font-medium">{match.awayTeam}</p>
           </div>
@@ -129,7 +128,7 @@ export default async function MatchDetailPage({
 
       {/* Bet Form */}
       {!isFinished && (
-        <div className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-6">
+        <div className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-6">
           <h2 className="text-sm font-bold uppercase text-[#94B8D8] tracking-wide mb-4 text-center">
             {isOpen ? "Seu Palpite" : "Palpite Encerrado"}
           </h2>
