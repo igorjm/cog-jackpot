@@ -16,7 +16,21 @@ export default async function MainLayout({
   const isAdmin = (user as { role?: string }).role === "ADMIN";
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
+    <div className="min-h-screen flex flex-col md:flex-row relative">
+      {/* Diagonal background split */}
+      <div
+        className="fixed inset-0 -z-10 pointer-events-none"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-[0.07]"
+          style={{
+            backgroundImage: "url('/background-app.png')",
+            clipPath: "polygon(100% 0, 100% 100%, 0 100%, 40% 0)",
+          }}
+        />
+      </div>
+
       {/* Desktop sidebar - hidden on mobile */}
       <aside className="hidden md:flex md:flex-col md:w-56 md:fixed md:inset-y-0 bg-[#0A1A3A]/95 border-r border-[#1E3A6E]">
         {/* Logo */}
