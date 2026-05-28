@@ -1,5 +1,6 @@
 import { CountdownTimer } from "./countdown-timer";
 import { Badge } from "./ui/badge";
+import { Flag } from "./ui/flag";
 import { isBeforeDeadline } from "@/lib/deadline";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -63,13 +64,11 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
       </div>
 
       <div className="flex items-center justify-between gap-2">
-        <div className="min-w-0 flex-1 text-right">
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
           <p className="truncate text-sm font-semibold text-white">
             {match.homeTeam}
           </p>
-          <p className="mt-0.5 text-xl leading-none">
-            {getFlagEmoji(match.homeFlag)}
-          </p>
+          <Flag code={match.homeFlag} name={match.homeTeam} size="md" />
         </div>
 
         <div className="shrink-0 px-2 text-center">
@@ -93,12 +92,10 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
           )}
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <Flag code={match.awayFlag} name={match.awayTeam} size="md" />
           <p className="truncate text-sm font-semibold text-white">
             {match.awayTeam}
-          </p>
-          <p className="mt-0.5 text-xl leading-none">
-            {getFlagEmoji(match.awayFlag)}
           </p>
         </div>
       </div>
@@ -147,10 +144,4 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
   );
 }
 
-function getFlagEmoji(countryCode: string): string {
-  const codePoints = countryCode
-    .toUpperCase()
-    .split("")
-    .map((char) => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-}
+

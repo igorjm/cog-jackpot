@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Oswald, JetBrains_Mono } from "next/font/google";
 import { IntroOverlay } from "@/components/intro-overlay";
+import "flag-icons/css/flag-icons.min.css";
 import "./globals.css";
 
 const inter = Inter({

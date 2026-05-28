@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { BetForm } from "@/components/bet-form";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { Badge } from "@/components/ui/badge";
+import { Flag } from "@/components/ui/flag";
 import { isBeforeDeadline } from "@/lib/deadline";
 import { PHASE_LABELS } from "@/lib/constants";
 import Image from "next/image";
@@ -26,9 +27,6 @@ export default async function MatchDetailPage({
 
   const isOpen = isBeforeDeadline(match.matchDate);
   const isFinished = match.homeScore !== null && match.awayScore !== null;
-
-  const homeFlag = getFlagEmoji(match.homeFlag);
-  const awayFlag = getFlagEmoji(match.awayFlag);
 
   return (
     <div className="max-w-md mx-auto flex flex-col">
@@ -74,7 +72,7 @@ export default async function MatchDetailPage({
         {/* Teams */}
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex flex-col items-center gap-1.5 flex-1">
-            <span className="text-4xl leading-none">{homeFlag}</span>
+            <Flag code={match.homeFlag} name={match.homeTeam} size="xl" withShadow />
             <span className="text-xs font-semibold text-center leading-tight max-w-[80px]">
               {match.homeTeam}
             </span>
@@ -96,7 +94,7 @@ export default async function MatchDetailPage({
           </div>
 
           <div className="flex flex-col items-center gap-1.5 flex-1">
-            <span className="text-4xl leading-none">{awayFlag}</span>
+            <Flag code={match.awayFlag} name={match.awayTeam} size="xl" withShadow />
             <span className="text-xs font-semibold text-center leading-tight max-w-[80px]">
               {match.awayTeam}
             </span>
@@ -129,17 +127,25 @@ export default async function MatchDetailPage({
           {/* Left ball — home team */}
           <div
             className="absolute z-20 pointer-events-none"
-            style={{ left: "24%", top: "66%", transform: "translate(-50%, -50%)" }}
+            style={{ left: "24%", top: "65%", transform: "translate(-50%, -50%)" }}
           >
-            <span className="text-5xl drop-shadow-lg leading-none">{homeFlag}</span>
+            <Flag
+              code={match.homeFlag}
+              name={match.homeTeam}
+              className="!w-[3.33333em] !h-[2.5em]"
+            />
           </div>
 
           {/* Right ball — away team */}
           <div
             className="absolute z-20 pointer-events-none"
-            style={{ left: "79%", top: "67%", transform: "translate(-50%, -50%)" }}
+            style={{ left: "79%", top: "66%", transform: "translate(-50%, -50%)" }}
           >
-            <span className="text-5xl drop-shadow-lg leading-none">{awayFlag}</span>
+            <Flag
+              code={match.awayFlag}
+              name={match.awayTeam}
+              className="!w-[3.33333em] !h-[2.5em]"
+            />
           </div>
 
           {/* Hover aura */}
@@ -171,7 +177,10 @@ export default async function MatchDetailPage({
 
       {/* ── Bet Form ── */}
       {!isFinished && (
-        <div className="card-premium relative z-20 rounded-2xl px-6 pt-5 pb-6 -mt-10">
+        <div
+          className="relative z-20 rounded-2xl border border-white/10 px-6 pt-5 pb-6 -mt-10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+          style={{ background: "linear-gradient(155deg, #0e2548 0%, #0c1e3d 100%)" }}
+        >
           <h2 className="mb-5 text-center text-sm font-extrabold uppercase tracking-widest text-[#A8C3E8]">
             {isOpen ? "Seu Palpite" : "Palpite Encerrado"}
           </h2>
@@ -192,10 +201,3 @@ export default async function MatchDetailPage({
   );
 }
 
-function getFlagEmoji(countryCode: string): string {
-  const codePoints = countryCode
-    .toUpperCase()
-    .split("")
-    .map((char) => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-}
