@@ -18,8 +18,8 @@ Create a new component at `components/${input:fileName}.tsx`.
 ## Palette Quick Reference
 
 ```
-Elevated bg:   #122448
-Borders:       #1E3A6E
+Elevated bg:   #162D54
+Borders:       #2A4A7A
 Muted text:    #94B8D8
 Gold:          #FFD60A
 Green:         #22C55E

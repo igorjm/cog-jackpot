@@ -14,7 +14,7 @@ Create a new page at `app/(main)/${input:pagePath}/page.tsx` for the Bolão Copa
 - Use `font-[family-name:var(--font-oswald)]` for the page title
 - All text in Portuguese (pt-BR)
 - Mobile-first responsive design
-- Cards use `bg-[#122448] rounded-2xl border border-[#1E3A6E]`
+- Cards use `bg-[#162D54] rounded-2xl border border-[#2A4A7A]`
 - Muted text uses `text-[#94B8D8]`
 
 ## Template

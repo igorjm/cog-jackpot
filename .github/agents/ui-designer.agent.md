@@ -20,10 +20,10 @@ You are a specialist agent for UI/styling work in the Bolão Copa 2026 app.
 ### Color Palette (World Cup 2026 / Panini Album inspired)
 
 ```
-Background:    #0A1A3A (deep navy)
-Elevated:      #122448 (cards)
+Background:    #0F2347 (navy)
+Elevated:      #162D54 (cards)
 Secondary:     #1A3058 (secondary surfaces)
-Separator:     #1E3A6E (borders)
+Separator:     #2A4A7A (borders)
 Text muted:    #94B8D8 (secondary text)
 Text dimmed:   #5A7A9A (tertiary text)
 Gold:          #FFD60A (branding, titles)

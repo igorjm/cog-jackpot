@@ -26,10 +26,10 @@ This is a fullstack World Cup 2026 betting pool app ("Bolão") built for a group
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| bg-primary | `#0A1A3A` | Page background (deep navy) |
-| bg-elevated | `#122448` | Cards, modals |
-| bg-secondary | `#1A3058` | Secondary surfaces |
-| separator | `#1E3A6E` | Borders, dividers |
+| bg-primary | `#0F2347` | Page background (navy) |
+| bg-elevated | `#162D54` | Cards, modals |
+| bg-secondary | `#1E3862` | Secondary surfaces |
+| separator | `#2A4A7A` | Borders, dividers |
 | text-secondary | `#94B8D8` | Muted text |
 | text-tertiary | `#5A7A9A` | Very muted text |
 | yellow/gold | `#FFD60A` | Branding, highlights, titles |
