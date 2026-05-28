@@ -17,7 +17,7 @@ export default async function AdminLayout({
     <div className="min-h-screen flex flex-col relative">
       {/* Diagonal background split */}
       <div
-        className="fixed inset-0 -z-10 pointer-events-none"
+        className="fixed inset-0 z-0 pointer-events-none"
         aria-hidden="true"
       >
         <div
@@ -45,7 +45,7 @@ export default async function AdminLayout({
         <AdminNav />
       </header>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 relative z-10">
         {children}
       </main>
     </div>

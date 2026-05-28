@@ -19,7 +19,7 @@ export default async function MainLayout({
     <div className="min-h-screen flex flex-col md:flex-row relative">
       {/* Diagonal background split */}
       <div
-        className="fixed inset-0 -z-10 pointer-events-none"
+        className="fixed inset-0 z-0 pointer-events-none"
         aria-hidden="true"
       >
         <div
@@ -117,7 +117,7 @@ export default async function MainLayout({
       </header>
 
       {/* Main content */}
-      <main className="flex-1 md:ml-56">
+      <main className="flex-1 md:ml-56 relative z-10">
         <div className="max-w-5xl mx-auto w-full px-4 py-6">
           {children}
         </div>
