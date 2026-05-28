@@ -1,6 +1,7 @@
 import { getInitials } from "@/lib/utils";
 import { RankingEntry } from "@/lib/ranking";
 import { PositionChange } from "./position-change";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 interface RankingTableProps {
@@ -11,11 +12,10 @@ interface RankingTableProps {
 export function RankingTable({ entries, currentUserId }: RankingTableProps) {
   return (
     <div className="space-y-1">
-      {/* Header */}
-      <div className="grid grid-cols-[40px_1fr_60px_40px_40px] gap-2 px-3 py-2 text-xs text-[#94B8D8] font-medium">
+      <div className="grid grid-cols-[40px_1fr_60px_40px_40px] gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-[#A8C3E8]">
         <span>#</span>
         <span>Jogador</span>
-        <span className="text-right">Pts</span>
+        <span className="text-right text-[#22C55E]">Pts</span>
         <span className="text-center">🎯</span>
         <span className="text-center">Δ</span>
       </div>
@@ -47,15 +47,6 @@ export function RankingTable({ entries, currentUserId }: RankingTableProps) {
               </div>
             )}
             <span className="text-sm truncate">{entry.nickname}</span>
-          </div>
-          <span className="text-sm font-mono font-bold text-right text-[#FFD60A] tabular-nums">
-            {entry.totalPoints}
-          </span>
-          <span className="text-xs text-center tabular-nums">
-            {entry.exactScores}
-          </span>
-          <div className="text-center">
-            <PositionChange change={entry.positionChange ?? 0} />
           </div>
         </div>
       ))}

@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { MatchCard } from "@/components/match-card";
 import { PhaseTabs } from "@/components/phase-tabs";
+import { PageTitle } from "@/components/page-title";
+import { PromoDerlisBanner } from "@/components/promo-derlis-banner";
 import { Phase } from "@prisma/client";
 
 interface MatchWithBet {
@@ -56,10 +58,14 @@ export default function MatchesPage() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-10 bg-[#122448] rounded-lg animate-pulse" />
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="h-10 animate-pulse rounded-xl bg-[#0c1e3d]" />
+        <div className="h-12 animate-pulse rounded-xl bg-[#0c1e3d]" />
+        <div className="grid gap-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-40 bg-[#122448] rounded-2xl animate-pulse" />
+            <div
+              key={i}
+              className="h-44 animate-pulse rounded-2xl bg-[#0c1e3d]"
+            />
           ))}
         </div>
       </div>
@@ -67,10 +73,8 @@ export default function MatchesPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-bold font-[family-name:var(--font-oswald)] uppercase">
-        Jogos
-      </h1>
+    <div className="space-y-5">
+      <PageTitle icon="⚽">Jogos</PageTitle>
 
       <PhaseTabs
         activePhase={activePhase}
@@ -91,10 +95,12 @@ export default function MatchesPage() {
       </div>
 
       {filteredMatches.length === 0 && (
-        <div className="text-center py-8 text-[#94B8D8]">
+        <div className="card-premium py-10 text-center text-sm text-[#A8C3E8]">
           Nenhum jogo nesta fase/grupo.
         </div>
       )}
+
+      <PromoDerlisBanner />
     </div>
   );
 }

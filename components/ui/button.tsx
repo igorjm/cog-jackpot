@@ -12,17 +12,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          "inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.97]",
+          "inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 active:scale-[0.97]",
           {
-            "bg-[#22C55E] text-black hover:bg-[#34D65C] shadow-lg shadow-[#22C55E]/25":
+            "bg-[#22C55E] text-[#020810] shadow-lg shadow-[#22C55E]/30 hover:bg-[#34D65C]":
               variant === "primary",
-            "bg-[#FFD60A] text-black hover:bg-[#FFE03A] shadow-lg shadow-[#FFD60A]/25":
+            "bg-gradient-to-b from-[#FDE68A] to-[#FACC15] text-[#020810] shadow-lg shadow-[#FACC15]/25 hover:from-[#FEF08A] hover:to-[#FDE047]":
               variant === "secondary",
-            "bg-transparent text-[#38BDF8] hover:bg-[#38BDF8]/10":
+            "bg-transparent text-[#A8C3E8] hover:bg-white/5 hover:text-white":
               variant === "ghost",
-            "bg-transparent border border-[#1E3A6E] text-white hover:bg-[#122448]":
+            "border border-white/15 bg-transparent text-white hover:border-white/25 hover:bg-[#0c1e3d]":
               variant === "outline",
-            "bg-[#EF4444] text-white hover:bg-[#FF5E55] shadow-lg shadow-[#EF4444]/25":
+            "bg-[#EF4444] text-white shadow-lg shadow-[#EF4444]/25 hover:bg-[#FF5E55]":
               variant === "danger",
           },
           {

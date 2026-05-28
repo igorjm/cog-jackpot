@@ -4,6 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { AppHeader } from "@/components/app-header";
+import { BottomNav } from "@/components/bottom-nav";
+import { CrystalBallIcon } from "@/components/icons/crystal-ball";
+import { cn } from "@/lib/utils";
 
 export default async function MainLayout({
   children,
@@ -51,12 +55,11 @@ export default async function MainLayout({
           </Link>
         </div>
 
-        {/* Nav links */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 space-y-1 px-3 py-4">
           <SidebarLink href="/dashboard" icon="🏠" label="Início" />
           <SidebarLink href="/matches" icon="⚽" label="Jogos" />
           <SidebarLink href="/ranking" icon="🏆" label="Ranking" />
-          <SidebarLink href="/my-bets" icon="📋" label="Meus Palpites" />
+          <SidebarLink href="/my-bets" icon="🔮" label="Meus Palpites" />
           <SidebarLink href="/rules" icon="📖" label="Regras" />
           {isAdmin && <SidebarLink href="/admin" icon="⚙️" label="Admin" />}
         </nav>
@@ -87,7 +90,7 @@ export default async function MainLayout({
           >
             <button
               type="submit"
-              className="w-full text-xs text-[#5A7A9A] hover:text-white transition-colors text-left"
+              className="text-xs text-[#A8C3E8] transition-colors hover:text-white"
             >
               ← Sair
             </button>
@@ -152,16 +155,7 @@ export default async function MainLayout({
         </div>
       </main>
 
-      {/* Mobile bottom nav - hidden on desktop */}
-      <nav className="sticky bottom-0 z-50 bg-[#0A1A3A]/90 backdrop-blur-xl border-t border-[#1E3A6E] md:hidden">
-        <div className="flex items-center justify-around py-2">
-          <NavLink href="/dashboard" icon="🏠" label="Início" />
-          <NavLink href="/matches" icon="⚽" label="Jogos" />
-          <NavLink href="/ranking" icon="🏆" label="Ranking" />
-          <NavLink href="/my-bets" icon="📋" label="Palpites" />
-          <NavLink href="/rules" icon="📖" label="Regras" />
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   );
 }
@@ -178,30 +172,13 @@ function SidebarLink({
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#94B8D8] hover:text-white hover:bg-[#122448] transition-colors"
+      className={cn(
+        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#A8C3E8] transition-all",
+        "hover:border hover:border-white/10 hover:bg-[#0c1e3d] hover:text-white"
+      )}
     >
       <span className="text-base">{icon}</span>
       <span>{label}</span>
-    </Link>
-  );
-}
-
-function NavLink({
-  href,
-  icon,
-  label,
-}: {
-  href: string;
-  icon: string;
-  label: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex flex-col items-center gap-0.5 text-[#5A7A9A] hover:text-[#38BDF8] transition-colors"
-    >
-      <span className="text-lg">{icon}</span>
-      <span className="text-[10px]">{label}</span>
     </Link>
   );
 }

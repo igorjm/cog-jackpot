@@ -1,6 +1,9 @@
 import { CountdownTimer } from "./countdown-timer";
 import { Badge } from "./ui/badge";
+import { Flag } from "./ui/flag";
 import { isBeforeDeadline } from "@/lib/deadline";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { getKnockoutHint } from "@/lib/knockout-hints";
 
 interface MatchCardProps {
@@ -29,37 +32,41 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
   const isFinished = match.homeScore !== null && match.awayScore !== null;
   const isOpen = isBeforeDeadline(match.matchDate);
   const isExactScore = userBet?.rawPoints === 10;
+  const hasGoodScore = userBet?.rawPoints && userBet.rawPoints >= 5;
+
+  const dateStr = new Date(match.matchDate).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   const isTbd = match.homeFlag === "xx";
   const homeHint = isTbd ? getKnockoutHint(match.homeTeam) : null;
   const awayHint = isTbd ? getKnockoutHint(match.awayTeam) : null;
 
   return (
     <div
-      className={`bg-[#122448] rounded-2xl border p-4 transition-all ${
-        isExactScore
-          ? "border-[#FFD60A]/40 shadow-lg shadow-[#FFD60A]/10"
-          : userBet && userBet.rawPoints && userBet.rawPoints >= 5
-          ? "border-[#22C55E]/30"
-          : "border-[#1E3A6E]"
-      }`}
+      className={cn(
+        "card-match p-4",
+        isExactScore && "card-match-exact",
+        hasGoodScore && !isExactScore && "border-[#FACC15]/35"
+      )}
     >
-      {/* Header: date + venue + multiplier */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-xs text-[#94B8D8]">
-          {new Date(match.matchDate).toLocaleDateString("pt-BR", {
-            day: "2-digit",
-            month: "short",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-          {match.venue && ` • ${match.venue}`}
-        </div>
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <p className="text-xs leading-snug text-[#A8C3E8]">
+          {dateStr}
+          {match.venue && (
+            <>
+              <span className="text-[#5A7A9A]"> • </span>
+              <span className="text-[#94B8D8]">{match.venue}</span>
+            </>
+          )}
+        </p>
         {match.multiplier > 1 && (
           <Badge variant="warning">{match.multiplier}×</Badge>
         )}
       </div>
 
-      {/* Teams + Score */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 text-right">
           <p className="text-sm font-medium leading-tight line-clamp-2">{match.homeTeam}</p>
@@ -80,24 +87,24 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
           )}
         </div>
 
-        <div className="flex items-center gap-2 px-3">
+        <div className="shrink-0 px-2 text-center">
           {isFinished ? (
-            <div className="text-center">
+            <div>
               <div className="flex items-center gap-1">
-                <span className="text-2xl font-mono font-bold tabular-nums">
+                <span className="font-mono text-2xl font-bold tabular-nums text-white">
                   {match.homeScore}
                 </span>
-                <span className="text-[#FFD60A] font-bold">×</span>
-                <span className="text-2xl font-mono font-bold tabular-nums">
+                <span className="font-bold text-[#FACC15]">×</span>
+                <span className="font-mono text-2xl font-bold tabular-nums text-white">
                   {match.awayScore}
                 </span>
               </div>
-              <span className="text-[10px] text-[#94B8D8] uppercase">Final</span>
+              <span className="text-[10px] font-medium uppercase tracking-wide text-[#A8C3E8]">
+                Final
+              </span>
             </div>
           ) : (
-            <div className="text-center">
-              <span className="text-lg text-[#FFD60A] font-bold">vs</span>
-            </div>
+            <span className="page-title text-lg text-[#FACC15]">VS</span>
           )}
         </div>
 
@@ -121,11 +128,10 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
         </div>
       </div>
 
-      {/* Status / Bet info */}
-      <div className="mt-3 pt-3 border-t border-[#1E3A6E]">
+      <div className="mt-3 border-t border-white/10 pt-3">
         {isFinished && userBet ? (
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[#94B8D8]">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-[#A8C3E8]">
               Seu palpite: {userBet.homeScore} × {userBet.awayScore}
             </span>
             <Badge variant={userBet.points && userBet.points > 0 ? "points" : "error"}>
@@ -135,7 +141,7 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
         ) : isFinished && !userBet ? (
           <div className="flex items-center justify-between">
             <Badge variant="error">Não palpitou</Badge>
-            <span className="text-xs text-[#94B8D8]">0 pts</span>
+            <span className="text-xs text-[#A8C3E8]">0 pts</span>
           </div>
         ) : isOpen ? (
           <div className="space-y-2">
@@ -161,9 +167,11 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            <span className="text-xs text-[#94B8D8]">🔒 Palpite encerrado</span>
+            <span className="text-xs font-medium text-[#A8C3E8]">
+              🔒 Palpite encerrado
+            </span>
             {userBet && (
-              <span className="text-xs text-[#94B8D8]">
+              <span className="text-xs text-[#A8C3E8]">
                 {userBet.homeScore} × {userBet.awayScore}
               </span>
             )}

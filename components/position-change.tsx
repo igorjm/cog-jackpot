@@ -9,7 +9,7 @@ export function PositionChange({ change }: PositionChangeProps) {
 
   if (change > 0) {
     return (
-      <span className="text-xs text-[#22C55E] font-medium">
+      <span className="text-xs font-medium text-[#FACC15]">
         ↑{change}
       </span>
     );
