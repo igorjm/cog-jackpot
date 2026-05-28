@@ -72,7 +72,7 @@ export default async function MatchDetailPage({
         {/* Teams */}
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex flex-col items-center gap-1.5 flex-1">
-            <Flag code={match.homeFlag} name={match.homeTeam} size="xl" withShadow />
+            <Flag code={match.homeFlag} name={match.homeTeam} size="xl" />
             <span className="text-xs font-semibold text-center leading-tight max-w-[80px]">
               {match.homeTeam}
             </span>
@@ -94,7 +94,7 @@ export default async function MatchDetailPage({
           </div>
 
           <div className="flex flex-col items-center gap-1.5 flex-1">
-            <Flag code={match.awayFlag} name={match.awayTeam} size="xl" withShadow />
+            <Flag code={match.awayFlag} name={match.awayTeam} size="xl" />
             <span className="text-xs font-semibold text-center leading-tight max-w-[80px]">
               {match.awayTeam}
             </span>

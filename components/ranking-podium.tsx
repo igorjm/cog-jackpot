@@ -44,8 +44,8 @@ export function RankingPodium({ top3 }: RankingPodiumProps) {
               className="w-full h-full object-cover"
             />
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }

@@ -50,8 +50,8 @@ export function RankingTable({ entries, currentUserId }: RankingTableProps) {
             )}
             <span className="text-sm truncate">{entry.nickname}</span>
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 }
