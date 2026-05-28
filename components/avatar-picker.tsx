@@ -14,14 +14,14 @@ interface AvatarGroup {
 }
 
 const COUNTRY_FLAGS: Record<string, string> = {
-  brazil: "🇧🇷",
-  france: "🇫🇷",
-  argentina: "🇦🇷",
-  germany: "🇩🇪",
-  spain: "🇪🇸",
-  italy: "🇮🇹",
-  england: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
-  portugal: "🇵🇹",
+  brazil: "br",
+  france: "fr",
+  argentina: "ar",
+  germany: "de",
+  spain: "es",
+  italy: "it",
+  england: "gb-eng",
+  portugal: "pt",
 };
 
 const COUNTRY_LABELS: Record<string, string> = {
@@ -93,7 +93,12 @@ export function AvatarPicker({ value, onChange }: AvatarPickerProps) {
                 : "border-[#1E3A6E] hover:border-[#94B8D8]/50 bg-[#122448]"
             }`}
           >
-            <span className="text-2xl">{COUNTRY_FLAGS[group.country] || "🏳️"}</span>
+            <img
+              src={`https://flagcdn.com/${COUNTRY_FLAGS[group.country] || group.country}.svg`}
+              alt={COUNTRY_LABELS[group.country] || group.country}
+              className="w-8 h-6 object-cover rounded-sm"
+              loading="eager"
+            />
             <span className="text-[9px] text-[#94B8D8] truncate w-full text-center">
               {COUNTRY_LABELS[group.country] || group.country}
             </span>
@@ -105,7 +110,7 @@ export function AvatarPicker({ value, onChange }: AvatarPickerProps) {
       {selectedGroup && (
         <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
           <p className="text-xs text-[#94B8D8] font-medium">
-            {COUNTRY_FLAGS[selectedGroup.country]} Selecione um jogador de {COUNTRY_LABELS[selectedGroup.country] || selectedGroup.country}:
+            Selecione um jogador de {COUNTRY_LABELS[selectedGroup.country] || selectedGroup.country}:
           </p>
           <div className="grid grid-cols-6 gap-2">
             {selectedGroup.players.map((player) => (

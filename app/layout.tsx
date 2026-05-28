@@ -34,6 +34,10 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${inter.variable} ${oswald.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
     >
+      <head>
+        <link rel="preconnect" href="https://flagcdn.com" />
+        <link rel="dns-prefetch" href="https://flagcdn.com" />
+      </head>
       <body className="min-h-full flex flex-col bg-[#0A1A3A] text-white font-[var(--font-inter),system-ui,sans-serif]">
         {children}
         <Analytics />
