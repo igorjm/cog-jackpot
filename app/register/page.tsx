@@ -4,6 +4,7 @@ import { useState } from "react";
 import { registerAction } from "@/app/actions/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { BackgroundMusic } from "@/components/background-music";
 import Link from "next/link";
 
 export default function RegisterPage() {
@@ -83,6 +84,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
+      <BackgroundMusic src="/background-music.m4a" />
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="text-center space-y-2">

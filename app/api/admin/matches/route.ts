@@ -21,6 +21,7 @@ export async function GET() {
       awayScore: true,
       matchNumber: true,
       phase: true,
+      group: true,
     },
   });
 

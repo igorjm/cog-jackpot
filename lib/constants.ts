@@ -11,6 +11,7 @@ export const POINTS = {
 
 export const MULTIPLIERS: Record<Phase, number> = {
   GROUP: 1,
+  ROUND_OF_32: 1.25,
   ROUND_OF_16: 1.5,
   QUARTER_FINAL: 2,
   SEMI_FINAL: 2.5,
@@ -24,6 +25,7 @@ export const DEADLINE_HOURS_BEFORE = 1;
 
 export const PHASE_LABELS: Record<Phase, string> = {
   GROUP: "Fase de Grupos",
+  ROUND_OF_32: "32 Avos de Final",
   ROUND_OF_16: "Oitavas de Final",
   QUARTER_FINAL: "Quartas de Final",
   SEMI_FINAL: "Semifinais",

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { loginAction } from "@/app/actions/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { BackgroundMusic } from "@/components/background-music";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -22,6 +23,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center px-4 py-8 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/derlis.png')" }}>
+      <BackgroundMusic src="/background-music.m4a" />
       {/* Dark overlay for readability */}
       <div className="absolute inset-0 bg-black/60" />
 

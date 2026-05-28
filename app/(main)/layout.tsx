@@ -25,11 +25,29 @@ export default async function MainLayout({
   }
 
   return (
-    <div className="app-shell min-h-screen flex flex-col md:flex-row">
-      <aside className="hidden md:flex md:fixed md:inset-y-0 md:w-56 md:flex-col border-r border-white/10 bg-[#020810]/95 backdrop-blur-xl">
-        <div className="border-b border-white/10 px-4 py-5">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="page-title text-lg text-gold-gradient">Bolão Copa 2026</span>
+    <div className="min-h-screen flex flex-col md:flex-row relative">
+      {/* Diagonal background split */}
+      <div
+        className="fixed inset-0 -z-10 pointer-events-none"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-[0.07]"
+          style={{
+            backgroundImage: "url('/background-app.png')",
+            clipPath: "polygon(100% 0, 100% 100%, 0 100%, 40% 0)",
+          }}
+        />
+      </div>
+
+      {/* Desktop sidebar - hidden on mobile */}
+      <aside className="hidden md:flex md:flex-col md:w-56 md:fixed md:inset-y-0 bg-[#0A1A3A]/95 border-r border-[#1E3A6E]">
+        {/* Logo */}
+        <div className="px-4 py-5 border-b border-[#1E3A6E]">
+          <Link href="/dashboard">
+            <span className="text-lg font-[family-name:var(--font-oswald)] font-bold text-[#FFD60A] uppercase">
+              ⚽ Copa 2026
+            </span>
           </Link>
         </div>
 

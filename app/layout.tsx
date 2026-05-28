@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Oswald, JetBrains_Mono } from "next/font/google";
 import { IntroOverlay } from "@/components/intro-overlay";
 import "flag-icons/css/flag-icons.min.css";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -36,6 +38,8 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col text-white font-[var(--font-inter),system-ui,sans-serif]">
         <IntroOverlay>{children}</IntroOverlay>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

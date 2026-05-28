@@ -5,6 +5,7 @@ import ws from "ws";
 import { hash } from "bcryptjs";
 import { MULTIPLIERS } from "../lib/constants";
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 neonConfig.webSocketConstructor = ws;
 
 function createPrisma() {
@@ -28,318 +29,248 @@ interface MatchSeed {
   matchNumber: number;
   matchDate: Date;
   venue: string;
+  isLocked?: boolean;
 }
 
-// FIFA World Cup 2026 - 48 teams, 12 groups of 4
-// Tournament dates: June 11 - July 19, 2026
-// Venues in USA, Canada, and Mexico
+// FIFA World Cup 2026 — Official draw Dec 5, 2025
+// 48 teams, 12 groups of 4 — 104 total matches
+// June 11 – July 19, 2026 | USA, Canada, Mexico
 
-const teams: Record<string, { name: string; flag: string }> = {
-  // Group A
-  USA: { name: "Estados Unidos", flag: "US" },
-  MEX: { name: "México", flag: "MX" },
-  COL: { name: "Colômbia", flag: "CO" },
-  NZL: { name: "Nova Zelândia", flag: "NZ" },
-  // Group B
-  ARG: { name: "Argentina", flag: "AR" },
-  CAN: { name: "Canadá", flag: "CA" },
-  AUS: { name: "Austrália", flag: "AU" },
-  PER: { name: "Peru", flag: "PE" },
-  // Group C
-  FRA: { name: "França", flag: "FR" },
-  ECU: { name: "Equador", flag: "EC" },
-  URU: { name: "Uruguai", flag: "UY" },
-  UAE: { name: "Emirados Árabes", flag: "AE" },
-  // Group D
-  BRA: { name: "Brasil", flag: "BR" },
-  JPN: { name: "Japão", flag: "JP" },
-  NGA: { name: "Nigéria", flag: "NG" },
-  CRI: { name: "Costa Rica", flag: "CR" },
-  // Group E
-  ENG: { name: "Inglaterra", flag: "GB" },
-  SEN: { name: "Senegal", flag: "SN" },
-  CHI: { name: "Chile", flag: "CL" },
-  BAH: { name: "Bahrein", flag: "BH" },
-  // Group F
-  GER: { name: "Alemanha", flag: "DE" },
-  MAR: { name: "Marrocos", flag: "MA" },
-  KOR: { name: "Coreia do Sul", flag: "KR" },
-  TRI: { name: "Trinidad e Tobago", flag: "TT" },
-  // Group G
-  ESP: { name: "Espanha", flag: "ES" },
-  CMR: { name: "Camarões", flag: "CM" },
-  PAR: { name: "Paraguai", flag: "PY" },
-  IRN: { name: "Irã", flag: "IR" },
-  // Group H
-  POR: { name: "Portugal", flag: "PT" },
-  DEN: { name: "Dinamarca", flag: "DK" },
-  GHA: { name: "Gana", flag: "GH" },
-  SAU: { name: "Arábia Saudita", flag: "SA" },
-  // Group I
-  NED: { name: "Holanda", flag: "NL" },
-  SUI: { name: "Suíça", flag: "CH" },
-  CIV: { name: "Costa do Marfim", flag: "CI" },
-  JAM: { name: "Jamaica", flag: "JM" },
-  // Group J
-  BEL: { name: "Bélgica", flag: "BE" },
-  SRB: { name: "Sérvia", flag: "RS" },
-  EGY: { name: "Egito", flag: "EG" },
-  HON: { name: "Honduras", flag: "HN" },
-  // Group K
-  ITA: { name: "Itália", flag: "IT" },
-  CRO: { name: "Croácia", flag: "HR" },
-  TUN: { name: "Tunísia", flag: "TN" },
-  PAN: { name: "Panamá", flag: "PA" },
-  // Group L
-  POL: { name: "Polônia", flag: "PL" },
-  SWE: { name: "Suécia", flag: "SE" },
-  ALG: { name: "Argélia", flag: "DZ" },
-  CRC: { name: "Curaçao", flag: "CW" },
-};
+// ─── GROUP STAGE MATCHES (72) ──────────────────────────────────────────────────
 
-const venues = [
-  "MetLife Stadium, New Jersey",
-  "AT&T Stadium, Dallas",
-  "SoFi Stadium, Los Angeles",
-  "Hard Rock Stadium, Miami",
-  "Lumen Field, Seattle",
-  "Gillette Stadium, Boston",
-  "Lincoln Financial Field, Philadelphia",
-  "Mercedes-Benz Stadium, Atlanta",
-  "NRG Stadium, Houston",
-  "Arrowhead Stadium, Kansas City",
-  "BMO Field, Toronto",
-  "Estadio Azteca, Cidade do México",
-  "Estadio BBVA, Monterrey",
-  "BC Place, Vancouver",
-  "Levi's Stadium, San Francisco",
-  "Camping World Stadium, Orlando",
+const groupMatches: MatchSeed[] = [
+  // ══════ GROUP A ══════
+  // Matchday 1 — Jun 11
+  { matchNumber: 1, homeTeam: "México", awayTeam: "África do Sul", homeFlag: "mx", awayFlag: "za", phase: "GROUP", group: "A", matchDate: new Date("2026-06-11T19:00:00Z"), venue: "Estadio Azteca, Cidade do México" },
+  { matchNumber: 2, homeTeam: "Coreia do Sul", awayTeam: "República Tcheca", homeFlag: "kr", awayFlag: "cz", phase: "GROUP", group: "A", matchDate: new Date("2026-06-12T02:00:00Z"), venue: "Estadio Akron, Zapopan" },
+  // Matchday 2 — Jun 18
+  { matchNumber: 25, homeTeam: "República Tcheca", awayTeam: "África do Sul", homeFlag: "cz", awayFlag: "za", phase: "GROUP", group: "A", matchDate: new Date("2026-06-18T16:00:00Z"), venue: "Mercedes-Benz Stadium, Atlanta" },
+  { matchNumber: 28, homeTeam: "México", awayTeam: "Coreia do Sul", homeFlag: "mx", awayFlag: "kr", phase: "GROUP", group: "A", matchDate: new Date("2026-06-19T01:00:00Z"), venue: "Estadio Akron, Zapopan" },
+  // Matchday 3 — Jun 24
+  { matchNumber: 53, homeTeam: "República Tcheca", awayTeam: "México", homeFlag: "cz", awayFlag: "mx", phase: "GROUP", group: "A", matchDate: new Date("2026-06-25T01:00:00Z"), venue: "Estadio Azteca, Cidade do México" },
+  { matchNumber: 54, homeTeam: "África do Sul", awayTeam: "Coreia do Sul", homeFlag: "za", awayFlag: "kr", phase: "GROUP", group: "A", matchDate: new Date("2026-06-25T01:00:00Z"), venue: "Estadio BBVA, Guadalupe" },
+
+  // ══════ GROUP B ══════
+  // Matchday 1
+  { matchNumber: 3, homeTeam: "Canadá", awayTeam: "Bósnia e Herzegovina", homeFlag: "ca", awayFlag: "ba", phase: "GROUP", group: "B", matchDate: new Date("2026-06-12T19:00:00Z"), venue: "BMO Field, Toronto" },
+  { matchNumber: 8, homeTeam: "Catar", awayTeam: "Suíça", homeFlag: "qa", awayFlag: "ch", phase: "GROUP", group: "B", matchDate: new Date("2026-06-13T19:00:00Z"), venue: "Levi's Stadium, Santa Clara" },
+  // Matchday 2 — Jun 18
+  { matchNumber: 26, homeTeam: "Suíça", awayTeam: "Bósnia e Herzegovina", homeFlag: "ch", awayFlag: "ba", phase: "GROUP", group: "B", matchDate: new Date("2026-06-18T19:00:00Z"), venue: "SoFi Stadium, Inglewood" },
+  { matchNumber: 27, homeTeam: "Canadá", awayTeam: "Catar", homeFlag: "ca", awayFlag: "qa", phase: "GROUP", group: "B", matchDate: new Date("2026-06-18T22:00:00Z"), venue: "BC Place, Vancouver" },
+  // Matchday 3 — Jun 24
+  { matchNumber: 51, homeTeam: "Suíça", awayTeam: "Canadá", homeFlag: "ch", awayFlag: "ca", phase: "GROUP", group: "B", matchDate: new Date("2026-06-24T19:00:00Z"), venue: "BC Place, Vancouver" },
+  { matchNumber: 52, homeTeam: "Bósnia e Herzegovina", awayTeam: "Catar", homeFlag: "ba", awayFlag: "qa", phase: "GROUP", group: "B", matchDate: new Date("2026-06-24T19:00:00Z"), venue: "Lumen Field, Seattle" },
+
+  // ══════ GROUP C ══════
+  // Matchday 1 — Jun 13
+  { matchNumber: 7, homeTeam: "Brasil", awayTeam: "Marrocos", homeFlag: "br", awayFlag: "ma", phase: "GROUP", group: "C", matchDate: new Date("2026-06-13T22:00:00Z"), venue: "MetLife Stadium, East Rutherford" },
+  { matchNumber: 5, homeTeam: "Haiti", awayTeam: "Escócia", homeFlag: "ht", awayFlag: "gb-sct", phase: "GROUP", group: "C", matchDate: new Date("2026-06-14T01:00:00Z"), venue: "Gillette Stadium, Foxborough" },
+  // Matchday 2 — Jun 19
+  { matchNumber: 30, homeTeam: "Escócia", awayTeam: "Marrocos", homeFlag: "gb-sct", awayFlag: "ma", phase: "GROUP", group: "C", matchDate: new Date("2026-06-19T22:00:00Z"), venue: "Gillette Stadium, Foxborough" },
+  { matchNumber: 29, homeTeam: "Brasil", awayTeam: "Haiti", homeFlag: "br", awayFlag: "ht", phase: "GROUP", group: "C", matchDate: new Date("2026-06-20T00:30:00Z"), venue: "Lincoln Financial Field, Filadélfia" },
+  // Matchday 3 — Jun 24
+  { matchNumber: 49, homeTeam: "Escócia", awayTeam: "Brasil", homeFlag: "gb-sct", awayFlag: "br", phase: "GROUP", group: "C", matchDate: new Date("2026-06-24T22:00:00Z"), venue: "Hard Rock Stadium, Miami Gardens" },
+  { matchNumber: 50, homeTeam: "Marrocos", awayTeam: "Haiti", homeFlag: "ma", awayFlag: "ht", phase: "GROUP", group: "C", matchDate: new Date("2026-06-24T22:00:00Z"), venue: "Mercedes-Benz Stadium, Atlanta" },
+
+  // ══════ GROUP D ══════
+  // Matchday 1
+  { matchNumber: 4, homeTeam: "Estados Unidos", awayTeam: "Paraguai", homeFlag: "us", awayFlag: "py", phase: "GROUP", group: "D", matchDate: new Date("2026-06-13T01:00:00Z"), venue: "SoFi Stadium, Inglewood" },
+  { matchNumber: 6, homeTeam: "Austrália", awayTeam: "Turquia", homeFlag: "au", awayFlag: "tr", phase: "GROUP", group: "D", matchDate: new Date("2026-06-14T04:00:00Z"), venue: "BC Place, Vancouver" },
+  // Matchday 2 — Jun 19
+  { matchNumber: 32, homeTeam: "Estados Unidos", awayTeam: "Austrália", homeFlag: "us", awayFlag: "au", phase: "GROUP", group: "D", matchDate: new Date("2026-06-19T19:00:00Z"), venue: "Lumen Field, Seattle" },
+  { matchNumber: 31, homeTeam: "Turquia", awayTeam: "Paraguai", homeFlag: "tr", awayFlag: "py", phase: "GROUP", group: "D", matchDate: new Date("2026-06-20T03:00:00Z"), venue: "Levi's Stadium, Santa Clara" },
+  // Matchday 3 — Jun 25
+  { matchNumber: 59, homeTeam: "Turquia", awayTeam: "Estados Unidos", homeFlag: "tr", awayFlag: "us", phase: "GROUP", group: "D", matchDate: new Date("2026-06-26T02:00:00Z"), venue: "SoFi Stadium, Inglewood" },
+  { matchNumber: 60, homeTeam: "Paraguai", awayTeam: "Austrália", homeFlag: "py", awayFlag: "au", phase: "GROUP", group: "D", matchDate: new Date("2026-06-26T02:00:00Z"), venue: "Levi's Stadium, Santa Clara" },
+
+  // ══════ GROUP E ══════
+  // Matchday 1 — Jun 14
+  { matchNumber: 10, homeTeam: "Alemanha", awayTeam: "Curaçao", homeFlag: "de", awayFlag: "cw", phase: "GROUP", group: "E", matchDate: new Date("2026-06-14T17:00:00Z"), venue: "NRG Stadium, Houston" },
+  { matchNumber: 9, homeTeam: "Costa do Marfim", awayTeam: "Equador", homeFlag: "ci", awayFlag: "ec", phase: "GROUP", group: "E", matchDate: new Date("2026-06-14T23:00:00Z"), venue: "Lincoln Financial Field, Filadélfia" },
+  // Matchday 2 — Jun 20
+  { matchNumber: 33, homeTeam: "Alemanha", awayTeam: "Costa do Marfim", homeFlag: "de", awayFlag: "ci", phase: "GROUP", group: "E", matchDate: new Date("2026-06-20T20:00:00Z"), venue: "BMO Field, Toronto" },
+  { matchNumber: 34, homeTeam: "Equador", awayTeam: "Curaçao", homeFlag: "ec", awayFlag: "cw", phase: "GROUP", group: "E", matchDate: new Date("2026-06-21T00:00:00Z"), venue: "Arrowhead Stadium, Kansas City" },
+  // Matchday 3 — Jun 25
+  { matchNumber: 55, homeTeam: "Curaçao", awayTeam: "Costa do Marfim", homeFlag: "cw", awayFlag: "ci", phase: "GROUP", group: "E", matchDate: new Date("2026-06-25T20:00:00Z"), venue: "Lincoln Financial Field, Filadélfia" },
+  { matchNumber: 56, homeTeam: "Equador", awayTeam: "Alemanha", homeFlag: "ec", awayFlag: "de", phase: "GROUP", group: "E", matchDate: new Date("2026-06-25T20:00:00Z"), venue: "MetLife Stadium, East Rutherford" },
+
+  // ══════ GROUP F ══════
+  // Matchday 1 — Jun 14
+  { matchNumber: 11, homeTeam: "Holanda", awayTeam: "Japão", homeFlag: "nl", awayFlag: "jp", phase: "GROUP", group: "F", matchDate: new Date("2026-06-14T20:00:00Z"), venue: "AT&T Stadium, Arlington" },
+  { matchNumber: 12, homeTeam: "Suécia", awayTeam: "Tunísia", homeFlag: "se", awayFlag: "tn", phase: "GROUP", group: "F", matchDate: new Date("2026-06-15T02:00:00Z"), venue: "Estadio BBVA, Guadalupe" },
+  // Matchday 2 — Jun 20
+  { matchNumber: 35, homeTeam: "Holanda", awayTeam: "Suécia", homeFlag: "nl", awayFlag: "se", phase: "GROUP", group: "F", matchDate: new Date("2026-06-20T17:00:00Z"), venue: "NRG Stadium, Houston" },
+  { matchNumber: 36, homeTeam: "Tunísia", awayTeam: "Japão", homeFlag: "tn", awayFlag: "jp", phase: "GROUP", group: "F", matchDate: new Date("2026-06-21T04:00:00Z"), venue: "Estadio BBVA, Guadalupe" },
+  // Matchday 3 — Jun 25
+  { matchNumber: 57, homeTeam: "Japão", awayTeam: "Suécia", homeFlag: "jp", awayFlag: "se", phase: "GROUP", group: "F", matchDate: new Date("2026-06-25T23:00:00Z"), venue: "AT&T Stadium, Arlington" },
+  { matchNumber: 58, homeTeam: "Tunísia", awayTeam: "Holanda", homeFlag: "tn", awayFlag: "nl", phase: "GROUP", group: "F", matchDate: new Date("2026-06-25T23:00:00Z"), venue: "Arrowhead Stadium, Kansas City" },
+
+  // ══════ GROUP G ══════
+  // Matchday 1 — Jun 15
+  { matchNumber: 16, homeTeam: "Bélgica", awayTeam: "Egito", homeFlag: "be", awayFlag: "eg", phase: "GROUP", group: "G", matchDate: new Date("2026-06-15T19:00:00Z"), venue: "Lumen Field, Seattle" },
+  { matchNumber: 15, homeTeam: "Irã", awayTeam: "Nova Zelândia", homeFlag: "ir", awayFlag: "nz", phase: "GROUP", group: "G", matchDate: new Date("2026-06-16T01:00:00Z"), venue: "SoFi Stadium, Inglewood" },
+  // Matchday 2 — Jun 21
+  { matchNumber: 39, homeTeam: "Bélgica", awayTeam: "Irã", homeFlag: "be", awayFlag: "ir", phase: "GROUP", group: "G", matchDate: new Date("2026-06-21T19:00:00Z"), venue: "SoFi Stadium, Inglewood" },
+  { matchNumber: 40, homeTeam: "Nova Zelândia", awayTeam: "Egito", homeFlag: "nz", awayFlag: "eg", phase: "GROUP", group: "G", matchDate: new Date("2026-06-22T01:00:00Z"), venue: "BC Place, Vancouver" },
+  // Matchday 3 — Jun 26
+  { matchNumber: 63, homeTeam: "Egito", awayTeam: "Irã", homeFlag: "eg", awayFlag: "ir", phase: "GROUP", group: "G", matchDate: new Date("2026-06-27T03:00:00Z"), venue: "Lumen Field, Seattle" },
+  { matchNumber: 64, homeTeam: "Nova Zelândia", awayTeam: "Bélgica", homeFlag: "nz", awayFlag: "be", phase: "GROUP", group: "G", matchDate: new Date("2026-06-27T03:00:00Z"), venue: "BC Place, Vancouver" },
+
+  // ══════ GROUP H ══════
+  // Matchday 1 — Jun 15
+  { matchNumber: 14, homeTeam: "Espanha", awayTeam: "Cabo Verde", homeFlag: "es", awayFlag: "cv", phase: "GROUP", group: "H", matchDate: new Date("2026-06-15T16:00:00Z"), venue: "Mercedes-Benz Stadium, Atlanta" },
+  { matchNumber: 13, homeTeam: "Arábia Saudita", awayTeam: "Uruguai", homeFlag: "sa", awayFlag: "uy", phase: "GROUP", group: "H", matchDate: new Date("2026-06-15T22:00:00Z"), venue: "Hard Rock Stadium, Miami Gardens" },
+  // Matchday 2 — Jun 21
+  { matchNumber: 38, homeTeam: "Espanha", awayTeam: "Arábia Saudita", homeFlag: "es", awayFlag: "sa", phase: "GROUP", group: "H", matchDate: new Date("2026-06-21T16:00:00Z"), venue: "Mercedes-Benz Stadium, Atlanta" },
+  { matchNumber: 37, homeTeam: "Uruguai", awayTeam: "Cabo Verde", homeFlag: "uy", awayFlag: "cv", phase: "GROUP", group: "H", matchDate: new Date("2026-06-21T22:00:00Z"), venue: "Hard Rock Stadium, Miami Gardens" },
+  // Matchday 3 — Jun 26
+  { matchNumber: 65, homeTeam: "Cabo Verde", awayTeam: "Arábia Saudita", homeFlag: "cv", awayFlag: "sa", phase: "GROUP", group: "H", matchDate: new Date("2026-06-27T00:00:00Z"), venue: "NRG Stadium, Houston" },
+  { matchNumber: 66, homeTeam: "Uruguai", awayTeam: "Espanha", homeFlag: "uy", awayFlag: "es", phase: "GROUP", group: "H", matchDate: new Date("2026-06-27T00:00:00Z"), venue: "Estadio Akron, Zapopan" },
+
+  // ══════ GROUP I ══════
+  // Matchday 1 — Jun 16
+  { matchNumber: 17, homeTeam: "França", awayTeam: "Senegal", homeFlag: "fr", awayFlag: "sn", phase: "GROUP", group: "I", matchDate: new Date("2026-06-16T19:00:00Z"), venue: "MetLife Stadium, East Rutherford" },
+  { matchNumber: 18, homeTeam: "Iraque", awayTeam: "Noruega", homeFlag: "iq", awayFlag: "no", phase: "GROUP", group: "I", matchDate: new Date("2026-06-16T22:00:00Z"), venue: "Gillette Stadium, Foxborough" },
+  // Matchday 2 — Jun 22
+  { matchNumber: 42, homeTeam: "França", awayTeam: "Iraque", homeFlag: "fr", awayFlag: "iq", phase: "GROUP", group: "I", matchDate: new Date("2026-06-22T21:00:00Z"), venue: "Lincoln Financial Field, Filadélfia" },
+  { matchNumber: 41, homeTeam: "Noruega", awayTeam: "Senegal", homeFlag: "no", awayFlag: "sn", phase: "GROUP", group: "I", matchDate: new Date("2026-06-23T00:00:00Z"), venue: "MetLife Stadium, East Rutherford" },
+  // Matchday 3 — Jun 26
+  { matchNumber: 61, homeTeam: "Noruega", awayTeam: "França", homeFlag: "no", awayFlag: "fr", phase: "GROUP", group: "I", matchDate: new Date("2026-06-26T19:00:00Z"), venue: "Gillette Stadium, Foxborough" },
+  { matchNumber: 62, homeTeam: "Senegal", awayTeam: "Iraque", homeFlag: "sn", awayFlag: "iq", phase: "GROUP", group: "I", matchDate: new Date("2026-06-26T19:00:00Z"), venue: "BMO Field, Toronto" },
+
+  // ══════ GROUP J ══════
+  // Matchday 1 — Jun 16
+  { matchNumber: 19, homeTeam: "Argentina", awayTeam: "Argélia", homeFlag: "ar", awayFlag: "dz", phase: "GROUP", group: "J", matchDate: new Date("2026-06-17T01:00:00Z"), venue: "Arrowhead Stadium, Kansas City" },
+  { matchNumber: 20, homeTeam: "Áustria", awayTeam: "Jordânia", homeFlag: "at", awayFlag: "jo", phase: "GROUP", group: "J", matchDate: new Date("2026-06-17T04:00:00Z"), venue: "Levi's Stadium, Santa Clara" },
+  // Matchday 2 — Jun 22
+  { matchNumber: 43, homeTeam: "Argentina", awayTeam: "Áustria", homeFlag: "ar", awayFlag: "at", phase: "GROUP", group: "J", matchDate: new Date("2026-06-22T17:00:00Z"), venue: "AT&T Stadium, Arlington" },
+  { matchNumber: 44, homeTeam: "Jordânia", awayTeam: "Argélia", homeFlag: "jo", awayFlag: "dz", phase: "GROUP", group: "J", matchDate: new Date("2026-06-23T03:00:00Z"), venue: "Levi's Stadium, Santa Clara" },
+  // Matchday 3 — Jun 27
+  { matchNumber: 69, homeTeam: "Argélia", awayTeam: "Áustria", homeFlag: "dz", awayFlag: "at", phase: "GROUP", group: "J", matchDate: new Date("2026-06-28T02:00:00Z"), venue: "Arrowhead Stadium, Kansas City" },
+  { matchNumber: 70, homeTeam: "Jordânia", awayTeam: "Argentina", homeFlag: "jo", awayFlag: "ar", phase: "GROUP", group: "J", matchDate: new Date("2026-06-28T02:00:00Z"), venue: "AT&T Stadium, Arlington" },
+
+  // ══════ GROUP K ══════
+  // Matchday 1 — Jun 17
+  { matchNumber: 23, homeTeam: "Portugal", awayTeam: "RD Congo", homeFlag: "pt", awayFlag: "cd", phase: "GROUP", group: "K", matchDate: new Date("2026-06-17T17:00:00Z"), venue: "NRG Stadium, Houston" },
+  { matchNumber: 24, homeTeam: "Uzbequistão", awayTeam: "Colômbia", homeFlag: "uz", awayFlag: "co", phase: "GROUP", group: "K", matchDate: new Date("2026-06-18T02:00:00Z"), venue: "Estadio Azteca, Cidade do México" },
+  // Matchday 2 — Jun 23
+  { matchNumber: 47, homeTeam: "Portugal", awayTeam: "Uzbequistão", homeFlag: "pt", awayFlag: "uz", phase: "GROUP", group: "K", matchDate: new Date("2026-06-23T17:00:00Z"), venue: "NRG Stadium, Houston" },
+  { matchNumber: 48, homeTeam: "Colômbia", awayTeam: "RD Congo", homeFlag: "co", awayFlag: "cd", phase: "GROUP", group: "K", matchDate: new Date("2026-06-24T02:00:00Z"), venue: "Estadio Akron, Zapopan" },
+  // Matchday 3 — Jun 27
+  { matchNumber: 71, homeTeam: "Colômbia", awayTeam: "Portugal", homeFlag: "co", awayFlag: "pt", phase: "GROUP", group: "K", matchDate: new Date("2026-06-27T23:30:00Z"), venue: "Hard Rock Stadium, Miami Gardens" },
+  { matchNumber: 72, homeTeam: "RD Congo", awayTeam: "Uzbequistão", homeFlag: "cd", awayFlag: "uz", phase: "GROUP", group: "K", matchDate: new Date("2026-06-27T23:30:00Z"), venue: "Mercedes-Benz Stadium, Atlanta" },
+
+  // ══════ GROUP L ══════
+  // Matchday 1 — Jun 17
+  { matchNumber: 22, homeTeam: "Inglaterra", awayTeam: "Croácia", homeFlag: "gb-eng", awayFlag: "hr", phase: "GROUP", group: "L", matchDate: new Date("2026-06-17T20:00:00Z"), venue: "AT&T Stadium, Arlington" },
+  { matchNumber: 21, homeTeam: "Gana", awayTeam: "Panamá", homeFlag: "gh", awayFlag: "pa", phase: "GROUP", group: "L", matchDate: new Date("2026-06-17T23:00:00Z"), venue: "BMO Field, Toronto" },
+  // Matchday 2 — Jun 23
+  { matchNumber: 45, homeTeam: "Inglaterra", awayTeam: "Gana", homeFlag: "gb-eng", awayFlag: "gh", phase: "GROUP", group: "L", matchDate: new Date("2026-06-23T20:00:00Z"), venue: "Gillette Stadium, Foxborough" },
+  { matchNumber: 46, homeTeam: "Panamá", awayTeam: "Croácia", homeFlag: "pa", awayFlag: "hr", phase: "GROUP", group: "L", matchDate: new Date("2026-06-23T23:00:00Z"), venue: "BMO Field, Toronto" },
+  // Matchday 3 — Jun 27
+  { matchNumber: 67, homeTeam: "Panamá", awayTeam: "Inglaterra", homeFlag: "pa", awayFlag: "gb-eng", phase: "GROUP", group: "L", matchDate: new Date("2026-06-27T21:00:00Z"), venue: "MetLife Stadium, East Rutherford" },
+  { matchNumber: 68, homeTeam: "Croácia", awayTeam: "Gana", homeFlag: "hr", awayFlag: "gh", phase: "GROUP", group: "L", matchDate: new Date("2026-06-27T21:00:00Z"), venue: "Lincoln Financial Field, Filadélfia" },
 ];
 
-function createGroupMatches(): MatchSeed[] {
-  const groups: Record<string, string[]> = {
-    A: ["USA", "MEX", "COL", "NZL"],
-    B: ["ARG", "CAN", "AUS", "PER"],
-    C: ["FRA", "ECU", "URU", "UAE"],
-    D: ["BRA", "JPN", "NGA", "CRI"],
-    E: ["ENG", "SEN", "CHI", "BAH"],
-    F: ["GER", "MAR", "KOR", "TRI"],
-    G: ["ESP", "CMR", "PAR", "IRN"],
-    H: ["POR", "DEN", "GHA", "SAU"],
-    I: ["NED", "SUI", "CIV", "JAM"],
-    J: ["BEL", "SRB", "EGY", "HON"],
-    K: ["ITA", "CRO", "TUN", "PAN"],
-    L: ["POL", "SWE", "ALG", "CRC"],
-  };
+// ─── KNOCKOUT STAGE MATCHES (32) ───────────────────────────────────────────────
+// Teams TBD — locked until group stage concludes
 
-  const matches: MatchSeed[] = [];
-  let matchNumber = 1;
-  let dayOffset = 0;
+const knockoutMatches: MatchSeed[] = [
+  // Round of 32 (16 matches)
+  { matchNumber: 73, homeTeam: "2º Grupo A", awayTeam: "2º Grupo B", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-06-28T19:00:00Z"), venue: "SoFi Stadium, Inglewood", isLocked: true },
+  { matchNumber: 74, homeTeam: "1º Grupo E", awayTeam: "3º ABCDF", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-06-29T20:30:00Z"), venue: "Gillette Stadium, Foxborough", isLocked: true },
+  { matchNumber: 75, homeTeam: "1º Grupo F", awayTeam: "2º Grupo C", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-06-30T01:00:00Z"), venue: "Estadio BBVA, Guadalupe", isLocked: true },
+  { matchNumber: 76, homeTeam: "1º Grupo C", awayTeam: "2º Grupo F", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-06-29T17:00:00Z"), venue: "NRG Stadium, Houston", isLocked: true },
+  { matchNumber: 77, homeTeam: "1º Grupo I", awayTeam: "3º CDFGH", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-06-30T21:00:00Z"), venue: "MetLife Stadium, East Rutherford", isLocked: true },
+  { matchNumber: 78, homeTeam: "2º Grupo E", awayTeam: "2º Grupo I", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-06-30T17:00:00Z"), venue: "AT&T Stadium, Arlington", isLocked: true },
+  { matchNumber: 79, homeTeam: "1º Grupo A", awayTeam: "3º CEFHI", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-07-01T01:00:00Z"), venue: "Estadio Azteca, Cidade do México", isLocked: true },
+  { matchNumber: 80, homeTeam: "1º Grupo L", awayTeam: "3º EHIJK", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-07-01T16:00:00Z"), venue: "Mercedes-Benz Stadium, Atlanta", isLocked: true },
+  { matchNumber: 81, homeTeam: "1º Grupo D", awayTeam: "3º BEFIJ", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-07-02T00:00:00Z"), venue: "Levi's Stadium, Santa Clara", isLocked: true },
+  { matchNumber: 82, homeTeam: "1º Grupo G", awayTeam: "3º AEHIJ", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-07-01T20:00:00Z"), venue: "Lumen Field, Seattle", isLocked: true },
+  { matchNumber: 83, homeTeam: "2º Grupo K", awayTeam: "2º Grupo L", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-07-02T23:00:00Z"), venue: "BMO Field, Toronto", isLocked: true },
+  { matchNumber: 84, homeTeam: "1º Grupo H", awayTeam: "2º Grupo J", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-07-02T19:00:00Z"), venue: "SoFi Stadium, Inglewood", isLocked: true },
+  { matchNumber: 85, homeTeam: "1º Grupo B", awayTeam: "3º EFGIJ", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-07-03T03:00:00Z"), venue: "BC Place, Vancouver", isLocked: true },
+  { matchNumber: 86, homeTeam: "1º Grupo J", awayTeam: "2º Grupo H", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-07-03T22:00:00Z"), venue: "Hard Rock Stadium, Miami Gardens", isLocked: true },
+  { matchNumber: 87, homeTeam: "1º Grupo K", awayTeam: "3º DEIJL", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-07-04T01:30:00Z"), venue: "Arrowhead Stadium, Kansas City", isLocked: true },
+  { matchNumber: 88, homeTeam: "2º Grupo D", awayTeam: "2º Grupo G", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_32", matchDate: new Date("2026-07-03T18:00:00Z"), venue: "AT&T Stadium, Arlington", isLocked: true },
 
-  // Group stage: June 11 - June 28, 2026
-  const baseDate = new Date("2026-06-11T16:00:00Z");
+  // Round of 16 (8 matches)
+  { matchNumber: 89, homeTeam: "Venc. Jogo 74", awayTeam: "Venc. Jogo 77", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_16", matchDate: new Date("2026-07-04T21:00:00Z"), venue: "Lincoln Financial Field, Filadélfia", isLocked: true },
+  { matchNumber: 90, homeTeam: "Venc. Jogo 73", awayTeam: "Venc. Jogo 75", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_16", matchDate: new Date("2026-07-04T17:00:00Z"), venue: "NRG Stadium, Houston", isLocked: true },
+  { matchNumber: 91, homeTeam: "Venc. Jogo 76", awayTeam: "Venc. Jogo 78", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_16", matchDate: new Date("2026-07-05T20:00:00Z"), venue: "MetLife Stadium, East Rutherford", isLocked: true },
+  { matchNumber: 92, homeTeam: "Venc. Jogo 79", awayTeam: "Venc. Jogo 80", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_16", matchDate: new Date("2026-07-06T00:00:00Z"), venue: "Estadio Azteca, Cidade do México", isLocked: true },
+  { matchNumber: 93, homeTeam: "Venc. Jogo 83", awayTeam: "Venc. Jogo 84", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_16", matchDate: new Date("2026-07-06T19:00:00Z"), venue: "AT&T Stadium, Arlington", isLocked: true },
+  { matchNumber: 94, homeTeam: "Venc. Jogo 81", awayTeam: "Venc. Jogo 82", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_16", matchDate: new Date("2026-07-07T00:00:00Z"), venue: "Lumen Field, Seattle", isLocked: true },
+  { matchNumber: 95, homeTeam: "Venc. Jogo 86", awayTeam: "Venc. Jogo 88", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_16", matchDate: new Date("2026-07-07T16:00:00Z"), venue: "Mercedes-Benz Stadium, Atlanta", isLocked: true },
+  { matchNumber: 96, homeTeam: "Venc. Jogo 85", awayTeam: "Venc. Jogo 87", homeFlag: "xx", awayFlag: "xx", phase: "ROUND_OF_16", matchDate: new Date("2026-07-07T20:00:00Z"), venue: "BC Place, Vancouver", isLocked: true },
 
-  for (const [group, teamCodes] of Object.entries(groups)) {
-    // Each group has 6 matches (round-robin 4 teams)
-    const groupMatches = [
-      [0, 1], [2, 3], // Round 1
-      [0, 2], [1, 3], // Round 2
-      [0, 3], [1, 2], // Round 3
-    ];
+  // Quarterfinals (4 matches)
+  { matchNumber: 97, homeTeam: "Venc. Jogo 89", awayTeam: "Venc. Jogo 90", homeFlag: "xx", awayFlag: "xx", phase: "QUARTER_FINAL", matchDate: new Date("2026-07-09T20:00:00Z"), venue: "Gillette Stadium, Foxborough", isLocked: true },
+  { matchNumber: 98, homeTeam: "Venc. Jogo 93", awayTeam: "Venc. Jogo 94", homeFlag: "xx", awayFlag: "xx", phase: "QUARTER_FINAL", matchDate: new Date("2026-07-10T19:00:00Z"), venue: "SoFi Stadium, Inglewood", isLocked: true },
+  { matchNumber: 99, homeTeam: "Venc. Jogo 91", awayTeam: "Venc. Jogo 92", homeFlag: "xx", awayFlag: "xx", phase: "QUARTER_FINAL", matchDate: new Date("2026-07-11T21:00:00Z"), venue: "Hard Rock Stadium, Miami Gardens", isLocked: true },
+  { matchNumber: 100, homeTeam: "Venc. Jogo 95", awayTeam: "Venc. Jogo 96", homeFlag: "xx", awayFlag: "xx", phase: "QUARTER_FINAL", matchDate: new Date("2026-07-12T01:00:00Z"), venue: "Arrowhead Stadium, Kansas City", isLocked: true },
 
-    for (let i = 0; i < groupMatches.length; i++) {
-      const [home, away] = groupMatches[i];
-      const homeTeam = teams[teamCodes[home]];
-      const awayTeam = teams[teamCodes[away]];
-      const venue = venues[matchNumber % venues.length];
+  // Semifinals (2 matches)
+  { matchNumber: 101, homeTeam: "Venc. Jogo 97", awayTeam: "Venc. Jogo 98", homeFlag: "xx", awayFlag: "xx", phase: "SEMI_FINAL", matchDate: new Date("2026-07-14T19:00:00Z"), venue: "AT&T Stadium, Arlington", isLocked: true },
+  { matchNumber: 102, homeTeam: "Venc. Jogo 99", awayTeam: "Venc. Jogo 100", homeFlag: "xx", awayFlag: "xx", phase: "SEMI_FINAL", matchDate: new Date("2026-07-15T19:00:00Z"), venue: "Mercedes-Benz Stadium, Atlanta", isLocked: true },
 
-      // Distribute matches: ~4 per day
-      const matchDate = new Date(baseDate);
-      matchDate.setDate(matchDate.getDate() + dayOffset);
-      // Alternate times: 13:00, 16:00, 19:00, 22:00
-      const timeSlots = [13, 16, 19, 22];
-      matchDate.setHours(timeSlots[matchNumber % 4], 0, 0, 0);
+  // Third Place
+  { matchNumber: 103, homeTeam: "Perd. Jogo 101", awayTeam: "Perd. Jogo 102", homeFlag: "xx", awayFlag: "xx", phase: "THIRD_PLACE", matchDate: new Date("2026-07-18T21:00:00Z"), venue: "Hard Rock Stadium, Miami Gardens", isLocked: true },
 
-      matches.push({
-        homeTeam: homeTeam.name,
-        awayTeam: awayTeam.name,
-        homeFlag: homeTeam.flag,
-        awayFlag: awayTeam.flag,
-        phase: "GROUP",
-        group,
-        matchNumber,
-        matchDate,
-        venue,
-      });
+  // Final
+  { matchNumber: 104, homeTeam: "Venc. Jogo 101", awayTeam: "Venc. Jogo 102", homeFlag: "xx", awayFlag: "xx", phase: "FINAL", matchDate: new Date("2026-07-19T19:00:00Z"), venue: "MetLife Stadium, East Rutherford", isLocked: true },
+];
 
-      matchNumber++;
-      if (matchNumber % 4 === 0) dayOffset++;
-    }
-  }
-
-  return matches;
-}
-
-function createKnockoutMatches(startMatchNumber: number): MatchSeed[] {
-  const matches: MatchSeed[] = [];
-  let matchNumber = startMatchNumber;
-
-  // Round of 32 (16 matches): July 1-4, 2026
-  const ro32Start = new Date("2026-07-01T16:00:00Z");
-  for (let i = 0; i < 16; i++) {
-    const matchDate = new Date(ro32Start);
-    matchDate.setDate(matchDate.getDate() + Math.floor(i / 4));
-    matchDate.setHours([13, 16, 19, 22][i % 4], 0, 0, 0);
-
-    matches.push({
-      homeTeam: `Vencedor Jogo R32-${i * 2 + 1}`,
-      awayTeam: `Vencedor Jogo R32-${i * 2 + 2}`,
-      homeFlag: "XX",
-      awayFlag: "XX",
-      phase: "ROUND_OF_16",
-      matchNumber,
-      matchDate,
-      venue: venues[i % venues.length],
-    });
-    matchNumber++;
-  }
-
-  // Quarter Finals (8 matches): July 7-8, 2026
-  const qfStart = new Date("2026-07-07T16:00:00Z");
-  for (let i = 0; i < 8; i++) {
-    const matchDate = new Date(qfStart);
-    matchDate.setDate(matchDate.getDate() + Math.floor(i / 4));
-    matchDate.setHours([13, 16, 19, 22][i % 4], 0, 0, 0);
-
-    matches.push({
-      homeTeam: `QF ${i + 1} - Casa`,
-      awayTeam: `QF ${i + 1} - Fora`,
-      homeFlag: "XX",
-      awayFlag: "XX",
-      phase: "QUARTER_FINAL",
-      matchNumber,
-      matchDate,
-      venue: venues[i % venues.length],
-    });
-    matchNumber++;
-  }
-
-  // Semi Finals (4 matches): July 12-13, 2026
-  const sfStart = new Date("2026-07-12T19:00:00Z");
-  for (let i = 0; i < 4; i++) {
-    const matchDate = new Date(sfStart);
-    matchDate.setDate(matchDate.getDate() + Math.floor(i / 2));
-    matchDate.setHours(i % 2 === 0 ? 16 : 20, 0, 0, 0);
-
-    matches.push({
-      homeTeam: `SF ${i + 1} - Casa`,
-      awayTeam: `SF ${i + 1} - Fora`,
-      homeFlag: "XX",
-      awayFlag: "XX",
-      phase: "SEMI_FINAL",
-      matchNumber,
-      matchDate,
-      venue: venues[i % 4],
-    });
-    matchNumber++;
-  }
-
-  // Third place: July 18, 2026
-  matches.push({
-    homeTeam: "3º Lugar - Casa",
-    awayTeam: "3º Lugar - Fora",
-    homeFlag: "XX",
-    awayFlag: "XX",
-    phase: "THIRD_PLACE",
-    matchNumber,
-    matchDate: new Date("2026-07-18T16:00:00Z"),
-    venue: "Hard Rock Stadium, Miami",
-  });
-  matchNumber++;
-
-  // Final: July 19, 2026
-  matches.push({
-    homeTeam: "Final - Casa",
-    awayTeam: "Final - Fora",
-    homeFlag: "XX",
-    awayFlag: "XX",
-    phase: "FINAL",
-    matchNumber,
-    matchDate: new Date("2026-07-19T16:00:00Z"),
-    venue: "MetLife Stadium, New Jersey",
-  });
-
-  return matches;
-}
+// ─── SEED FUNCTION ──────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log("🌱 Seeding database...");
-
-  // Clear existing data
-  await prisma.bonusBet.deleteMany();
-  await prisma.bet.deleteMany();
-  await prisma.match.deleteMany();
-  await prisma.config.deleteMany();
+  console.log("🏆 Seeding FIFA World Cup 2026...");
 
   // Create admin user
-  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@bolao.com";
-  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
+  const adminPassword = await hash(process.env.ADMIN_PASSWORD || "admin123", 12);
+  await prisma.user.upsert({
+    where: { email: "admin@bolao.com" },
+    update: {},
+    create: {
+      name: "Admin",
+      email: "admin@bolao.com",
+      password: adminPassword,
+      nickname: "Admin",
+      role: "ADMIN",
+      status: "APPROVED",
+    },
+  });
+  console.log("✅ Admin user created");
 
-  if (!existingAdmin) {
-    const hashedPassword = await hash("admin123", 12);
-    await prisma.user.create({
-      data: {
-        name: "Administrador",
-        email: adminEmail,
-        password: hashedPassword,
-        nickname: "admin",
-        role: "ADMIN",
-        status: "APPROVED",
-      },
-    });
-    console.log(`✅ Admin user created: ${adminEmail} / admin123`);
-  }
-
-  // Seed group matches
-  const groupMatches = createGroupMatches();
-  console.log(`📋 Created ${groupMatches.length} group stage matches`);
-
-  // Seed knockout matches
-  const knockoutMatches = createKnockoutMatches(groupMatches.length + 1);
-  console.log(`📋 Created ${knockoutMatches.length} knockout stage matches`);
-
+  // Seed all matches
   const allMatches = [...groupMatches, ...knockoutMatches];
+  console.log(`📋 Seeding ${allMatches.length} matches...`);
 
-  // Insert matches with multipliers
   for (const match of allMatches) {
     await prisma.match.create({
       data: {
-        ...match,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        homeFlag: match.homeFlag,
+        awayFlag: match.awayFlag,
+        phase: match.phase,
+        group: match.group || null,
+        matchNumber: match.matchNumber,
+        matchDate: match.matchDate,
+        venue: match.venue,
         multiplier: MULTIPLIERS[match.phase],
+        isLocked: match.isLocked || false,
       },
     });
   }
 
-  console.log(`✅ Total matches seeded: ${allMatches.length}`);
-
-  // Seed config
-  await prisma.config.createMany({
-    data: [
-      { key: "entry_fee", value: "50" },
-      { key: "pix_key", value: process.env.NEXT_PUBLIC_PIX_KEY ?? "sua-chave-pix" },
-      { key: "prize_1st", value: "60" },
-      { key: "prize_2nd", value: "25" },
-      { key: "prize_3rd", value: "15" },
-    ],
-  });
-
-  console.log("✅ Config seeded");
+  console.log(`✅ ${allMatches.length} matches seeded successfully`);
   console.log("🎉 Seed complete!");
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Seed error:", e);
     process.exit(1);
   })
   .finally(async () => {

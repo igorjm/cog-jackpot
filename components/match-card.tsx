@@ -4,6 +4,7 @@ import { Flag } from "./ui/flag";
 import { isBeforeDeadline } from "@/lib/deadline";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { getKnockoutHint } from "@/lib/knockout-hints";
 
 interface MatchCardProps {
   match: {
@@ -39,6 +40,9 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
     hour: "2-digit",
     minute: "2-digit",
   });
+  const isTbd = match.homeFlag === "xx";
+  const homeHint = isTbd ? getKnockoutHint(match.homeTeam) : null;
+  const awayHint = isTbd ? getKnockoutHint(match.awayTeam) : null;
 
   return (
     <div
@@ -64,11 +68,23 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
       </div>
 
       <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
-          <p className="truncate text-sm font-semibold text-white">
-            {match.homeTeam}
-          </p>
-          <Flag code={match.homeFlag} name={match.homeTeam} size="md" />
+        <div className="flex-1 text-right">
+          <p className="text-sm font-medium leading-tight line-clamp-2">{match.homeTeam}</p>
+          {homeHint && (
+            <p className="text-[10px] text-[#5A7A9A] leading-tight mt-0.5 line-clamp-2">{homeHint}</p>
+          )}
+          {match.homeFlag !== "xx" ? (
+            <img
+              src={`https://flagcdn.com/w40/${match.homeFlag.toLowerCase()}.png`}
+              srcSet={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png 2x`}
+              width={32}
+              height={24}
+              alt={match.homeTeam}
+              className="inline-block rounded-sm mt-1"
+            />
+          ) : (
+            <span className="inline-block w-8 h-6 rounded-sm bg-[#1A3058] border border-[#1E3A6E] mt-1 text-center text-[10px] leading-6 text-[#5A7A9A]">?</span>
+          )}
         </div>
 
         <div className="shrink-0 px-2 text-center">
@@ -92,11 +108,23 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
           )}
         </div>
 
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Flag code={match.awayFlag} name={match.awayTeam} size="md" />
-          <p className="truncate text-sm font-semibold text-white">
-            {match.awayTeam}
-          </p>
+        <div className="flex-1">
+          <p className="text-sm font-medium leading-tight line-clamp-2">{match.awayTeam}</p>
+          {awayHint && (
+            <p className="text-[10px] text-[#5A7A9A] leading-tight mt-0.5 line-clamp-2">{awayHint}</p>
+          )}
+          {match.awayFlag !== "xx" ? (
+            <img
+              src={`https://flagcdn.com/w40/${match.awayFlag.toLowerCase()}.png`}
+              srcSet={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png 2x`}
+              width={32}
+              height={24}
+              alt={match.awayTeam}
+              className="inline-block rounded-sm mt-1"
+            />
+          ) : (
+            <span className="inline-block w-8 h-6 rounded-sm bg-[#1A3058] border border-[#1E3A6E] mt-1 text-center text-[10px] leading-6 text-[#5A7A9A]">?</span>
+          )}
         </div>
       </div>
 
@@ -116,16 +144,26 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
             <span className="text-xs text-[#A8C3E8]">0 pts</span>
           </div>
         ) : isOpen ? (
-          <div className="flex items-center justify-between gap-2">
-            <CountdownTimer matchDate={new Date(match.matchDate)} />
-            {showBetLink && (
-              <Link
-                href={`/matches/${match.id}`}
-                className="shrink-0 rounded-lg bg-[#22C55E] px-3 py-1.5 text-xs font-semibold text-[#020810] shadow-md shadow-[#22C55E]/30 transition-all hover:bg-[#34D65C] hover:shadow-[#22C55E]/40 active:scale-[0.97]"
-              >
-                {userBet ? "Editar →" : "Palpitar →"}
-              </Link>
+          <div className="space-y-2">
+            {userBet && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[#94B8D8]">
+                  Seu palpite: <span className="font-mono font-bold text-white">{userBet.homeScore} × {userBet.awayScore}</span>
+                </span>
+                <Badge variant="success">✓</Badge>
+              </div>
             )}
+            <div className="flex items-center justify-between">
+              <CountdownTimer matchDate={new Date(match.matchDate)} />
+              {showBetLink && (
+                <a
+                  href={`/matches/${match.id}`}
+                  className="text-xs font-medium text-[#22C55E] hover:text-[#22C55E]/80 transition-colors"
+                >
+                  {userBet ? "Editar →" : "Palpitar →"}
+                </a>
+              )}
+            </div>
           </div>
         ) : (
           <div className="flex items-center justify-between">

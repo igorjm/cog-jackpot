@@ -1,16 +1,26 @@
 import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
+import { calculateRanking } from "@/lib/ranking";
+import { PRIZE_DISTRIBUTION } from "@/lib/constants";
 
 export default async function AdminDashboard() {
-  const totalUsers = await prisma.user.count();
-  const approvedUsers = await prisma.user.count({ where: { status: "APPROVED" } });
-  const pendingUsers = await prisma.user.count({ where: { status: "PENDING_PAYMENT" } });
+  const totalUsers = await prisma.user.count({ where: { role: { not: "ADMIN" } } });
+  const approvedUsers = await prisma.user.count({ where: { status: "APPROVED", role: { not: "ADMIN" } } });
+  const pendingUsers = await prisma.user.count({ where: { status: "PENDING_PAYMENT", role: { not: "ADMIN" } } });
   const entryFee = parseFloat(process.env.NEXT_PUBLIC_ENTRY_FEE ?? "50");
   const totalAmount = approvedUsers * entryFee;
 
   const matchesWithoutResult = await prisma.match.count({
     where: { homeScore: null, matchDate: { lt: new Date() } },
   });
+
+  const ranking = await calculateRanking();
+
+  const prizes = [
+    { label: "🥇 1º Lugar", pct: PRIZE_DISTRIBUTION.first, amount: totalAmount * PRIZE_DISTRIBUTION.first },
+    { label: "🥈 2º Lugar", pct: PRIZE_DISTRIBUTION.second, amount: totalAmount * PRIZE_DISTRIBUTION.second },
+    { label: "🥉 3º Lugar", pct: PRIZE_DISTRIBUTION.third, amount: totalAmount * PRIZE_DISTRIBUTION.third },
+  ];
 
   return (
     <div className="space-y-6">
@@ -33,6 +43,91 @@ export default async function AdminDashboard() {
           </p>
         </div>
       )}
+
+      {/* Prize Distribution */}
+      <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-4">
+        <h2 className="text-sm font-bold font-[family-name:var(--font-oswald)] uppercase text-[#FFD60A] mb-3">
+          Distribuição de Prêmios
+        </h2>
+        <div className="grid grid-cols-3 gap-2">
+          {prizes.map((p) => (
+            <div key={p.label} className="text-center">
+              <p className="text-xs text-[#94B8D8]">{p.label}</p>
+              <p className="text-sm font-mono font-bold text-white">{formatCurrency(p.amount)}</p>
+              <p className="text-[10px] text-[#5A7A9A]">{(p.pct * 100).toFixed(0)}%</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Ranking Table */}
+      <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-4">
+        <h2 className="text-sm font-bold font-[family-name:var(--font-oswald)] uppercase text-[#FFD60A] mb-3">
+          Ranking Atual
+        </h2>
+        {ranking.length === 0 ? (
+          <p className="text-sm text-[#94B8D8] text-center py-4">
+            Nenhum resultado registrado ainda.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-[#5A7A9A] text-xs border-b border-[#1E3A6E]">
+                  <th className="text-left py-2 pr-2">#</th>
+                  <th className="text-left py-2">Jogador</th>
+                  <th className="text-right py-2">Pts</th>
+                  <th className="text-right py-2">CE</th>
+                  <th className="text-right py-2 hidden sm:table-cell">Prêmio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ranking.map((entry) => {
+                  const prize =
+                    entry.position === 1
+                      ? prizes[0].amount
+                      : entry.position === 2
+                        ? prizes[1].amount
+                        : entry.position === 3
+                          ? prizes[2].amount
+                          : null;
+
+                  return (
+                    <tr
+                      key={entry.userId}
+                      className={`border-b border-[#1E3A6E]/50 ${entry.position <= 3 ? "text-white" : "text-[#94B8D8]"}`}
+                    >
+                      <td className="py-2 pr-2 font-mono text-xs">
+                        {entry.position <= 3
+                          ? ["🥇", "🥈", "🥉"][entry.position - 1]
+                          : entry.position}
+                      </td>
+                      <td className="py-2 font-medium truncate max-w-[120px]">
+                        {entry.nickname}
+                      </td>
+                      <td className="py-2 text-right font-mono font-bold">
+                        {entry.totalPoints}
+                      </td>
+                      <td className="py-2 text-right font-mono text-xs">
+                        {entry.exactScores}
+                      </td>
+                      <td className="py-2 text-right font-mono text-xs hidden sm:table-cell">
+                        {prize ? (
+                          <span className="text-[#22C55E] font-bold">
+                            {formatCurrency(prize)}
+                          </span>
+                        ) : (
+                          <span className="text-[#5A7A9A]">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
