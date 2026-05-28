@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { MatchCard } from "@/components/match-card";
 import { PhaseTabs } from "@/components/phase-tabs";
+import { MatchBetsDrawer } from "@/components/match-bets-drawer";
 import { Phase } from "@prisma/client";
 
 interface MatchWithBet {
@@ -18,6 +19,7 @@ interface MatchWithBet {
   multiplier: number;
   phase: Phase;
   group: string | null;
+  isLocked: boolean;
   userBet: {
     homeScore: number;
     awayScore: number;
@@ -31,6 +33,7 @@ export default function MatchesPage() {
   const [activePhase, setActivePhase] = useState<Phase>("GROUP");
   const [activeGroup, setActiveGroup] = useState<string>("A");
   const [loading, setLoading] = useState(true);
+  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/matches")
@@ -82,11 +85,16 @@ export default function MatchesPage() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         {filteredMatches.map((match) => (
-          <MatchCard
+          <div
             key={match.id}
-            match={{ ...match, matchDate: new Date(match.matchDate) }}
-            userBet={match.userBet}
-          />
+            onClick={() => match.isLocked ? setSelectedMatchId(match.id) : undefined}
+            className={match.isLocked ? "cursor-pointer" : ""}
+          >
+            <MatchCard
+              match={{ ...match, matchDate: new Date(match.matchDate) }}
+              userBet={match.userBet}
+            />
+          </div>
         ))}
       </div>
 
@@ -94,6 +102,14 @@ export default function MatchesPage() {
         <div className="text-center py-8 text-[#94B8D8]">
           Nenhum jogo nesta fase/grupo.
         </div>
+      )}
+
+      {/* Drawer for viewing all bets after deadline */}
+      {selectedMatchId && (
+        <MatchBetsDrawer
+          matchId={selectedMatchId}
+          onClose={() => setSelectedMatchId(null)}
+        />
       )}
     </div>
   );

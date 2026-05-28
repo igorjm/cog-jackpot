@@ -128,14 +128,20 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
             <span className="text-xs text-[#94B8D8]">
               Seu palpite: {userBet.homeScore} × {userBet.awayScore}
             </span>
-            <Badge variant={userBet.points && userBet.points > 0 ? "points" : "error"}>
-              +{userBet.points ?? 0} pts
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant={userBet.points && userBet.points > 0 ? "points" : "error"}>
+                +{userBet.points ?? 0} pts
+              </Badge>
+              <span className="text-xs text-[#38BDF8]">Ver →</span>
+            </div>
           </div>
         ) : isFinished && !userBet ? (
           <div className="flex items-center justify-between">
             <Badge variant="error">Não palpitou</Badge>
-            <span className="text-xs text-[#94B8D8]">0 pts</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[#94B8D8]">0 pts</span>
+              <span className="text-xs text-[#38BDF8]">Ver →</span>
+            </div>
           </div>
         ) : isOpen ? (
           <div className="space-y-2">
@@ -162,11 +168,14 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
         ) : (
           <div className="flex items-center justify-between">
             <span className="text-xs text-[#94B8D8]">🔒 Palpite encerrado</span>
-            {userBet && (
-              <span className="text-xs text-[#94B8D8]">
-                {userBet.homeScore} × {userBet.awayScore}
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {userBet && (
+                <span className="text-xs text-[#94B8D8]">
+                  {userBet.homeScore} × {userBet.awayScore}
+                </span>
+              )}
+              <span className="text-xs text-[#38BDF8]">Ver palpites →</span>
+            </div>
           </div>
         )}
       </div>
