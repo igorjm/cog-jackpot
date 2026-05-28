@@ -30,7 +30,7 @@ export default async function AdminLayout({
       </div>
 
       {/* Admin header */}
-      <header className="sticky top-0 z-50 bg-[#0A1A3A]/95 backdrop-blur-xl border-b border-[#EF4444]/30">
+      <header className="sticky top-0 z-50 bg-[#0F2347]/95 backdrop-blur-xl border-b border-[#EF4444]/30">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
           <Link
             href="/dashboard"

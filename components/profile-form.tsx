@@ -49,7 +49,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
   return (
     <div className="space-y-6">
       {/* Profile Info */}
-      <div className="bg-[#122448] border border-[#1E3A6E] rounded-2xl p-5 space-y-4">
+      <div className="bg-[#162D54] border border-[#2A4A7A] rounded-2xl p-5 space-y-4">
         <h2 className="text-lg font-[family-name:var(--font-oswald)] font-bold text-white uppercase">
           Informações
         </h2>
@@ -71,7 +71,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               type="email"
               value={user.email}
               disabled
-              className="w-full px-4 py-3 bg-[#0A1A3A] border border-[#1E3A6E] rounded-xl text-[#5A7A9A] cursor-not-allowed"
+              className="w-full px-4 py-3 bg-[#0F2347] border border-[#2A4A7A] rounded-xl text-[#5A7A9A] cursor-not-allowed"
             />
             <p className="mt-1 text-xs text-[#5A7A9A]">Email não pode ser alterado</p>
           </div>
@@ -101,7 +101,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
       </div>
 
       {/* Change Password */}
-      <div className="bg-[#122448] border border-[#1E3A6E] rounded-2xl p-5 space-y-4">
+      <div className="bg-[#162D54] border border-[#2A4A7A] rounded-2xl p-5 space-y-4">
         <h2 className="text-lg font-[family-name:var(--font-oswald)] font-bold text-white uppercase">
           Alterar Senha
         </h2>

@@ -62,19 +62,19 @@ export default async function DashboardPage() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
+        <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-3 text-center">
           <p className="text-2xl font-mono font-bold text-[#FFD60A]">
             #{position || "—"}
           </p>
           <p className="text-[10px] text-[#94B8D8] mt-0.5">Posição</p>
         </div>
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
+        <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-3 text-center">
           <p className="text-2xl font-mono font-bold text-[#22C55E]">
             {totalPoints}
           </p>
           <p className="text-[10px] text-[#94B8D8] mt-0.5">Pontos</p>
         </div>
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
+        <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-3 text-center">
           <p className="text-2xl font-mono font-bold text-white">
             {exactScores}
           </p>

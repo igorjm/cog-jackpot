@@ -90,7 +90,7 @@ export function AvatarPicker({ value, onChange }: AvatarPickerProps) {
             className={`flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all ${
               selectedCountry === group.country
                 ? "border-[#FFD60A] bg-[#FFD60A]/10 scale-105"
-                : "border-[#1E3A6E] hover:border-[#94B8D8]/50 bg-[#122448]"
+                : "border-[#2A4A7A] hover:border-[#94B8D8]/50 bg-[#162D54]"
             }`}
           >
             <img
@@ -121,7 +121,7 @@ export function AvatarPicker({ value, onChange }: AvatarPickerProps) {
                 className={`relative w-full aspect-[4/5] rounded-lg overflow-hidden border-2 transition-all ${
                   value === player.path
                     ? "border-[#FFD60A] shadow-lg shadow-[#FFD60A]/20 scale-105"
-                    : "border-[#1E3A6E] hover:border-[#94B8D8]/50"
+                    : "border-[#2A4A7A] hover:border-[#94B8D8]/50"
                 }`}
               >
                 <Image
@@ -133,7 +133,7 @@ export function AvatarPicker({ value, onChange }: AvatarPickerProps) {
                 />
                 {value === player.path && (
                   <div className="absolute inset-0 bg-[#FFD60A]/10 flex items-end justify-center">
-                    <span className="text-[10px] bg-[#FFD60A] text-[#0A1A3A] font-bold px-1.5 py-0.5 rounded-t-md">
+                    <span className="text-[10px] bg-[#FFD60A] text-[#0F2347] font-bold px-1.5 py-0.5 rounded-t-md">
                       ✓
                     </span>
                   </div>

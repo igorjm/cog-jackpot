@@ -42,7 +42,7 @@ export default function AdminUsersPage() {
   };
 
   if (loading) {
-    return <div className="animate-pulse h-40 bg-[#122448] rounded-xl" />;
+    return <div className="animate-pulse h-40 bg-[#162D54] rounded-xl" />;
   }
 
   return (
@@ -55,7 +55,7 @@ export default function AdminUsersPage() {
         {users.map((user) => (
           <div
             key={user.id}
-            className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-4 flex items-center justify-between gap-3"
+            className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-4 flex items-center justify-between gap-3"
           >
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">

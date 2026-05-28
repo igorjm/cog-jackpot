@@ -36,7 +36,7 @@ export default async function AdminDashboard() {
       </div>
 
       {matchesWithoutResult > 0 && (
-        <div className="bg-[#122448] rounded-xl border border-[#FFD60A]/30 p-4">
+        <div className="bg-[#162D54] rounded-xl border border-[#FFD60A]/30 p-4">
           <p className="text-sm">
             ⚠️ <span className="font-medium">{matchesWithoutResult} jogo(s)</span> já
             aconteceram mas ainda não têm resultado inserido.
@@ -45,7 +45,7 @@ export default async function AdminDashboard() {
       )}
 
       {/* Prize Distribution */}
-      <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-4">
+      <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-4">
         <h2 className="text-sm font-bold font-[family-name:var(--font-oswald)] uppercase text-[#FFD60A] mb-3">
           Distribuição de Prêmios
         </h2>
@@ -61,7 +61,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Ranking Table */}
-      <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-4">
+      <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-4">
         <h2 className="text-sm font-bold font-[family-name:var(--font-oswald)] uppercase text-[#FFD60A] mb-3">
           Ranking Atual
         </h2>
@@ -73,7 +73,7 @@ export default async function AdminDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-[#5A7A9A] text-xs border-b border-[#1E3A6E]">
+                <tr className="text-[#5A7A9A] text-xs border-b border-[#2A4A7A]">
                   <th className="text-left py-2 pr-2">#</th>
                   <th className="text-left py-2">Jogador</th>
                   <th className="text-right py-2">Pts</th>
@@ -95,7 +95,7 @@ export default async function AdminDashboard() {
                   return (
                     <tr
                       key={entry.userId}
-                      className={`border-b border-[#1E3A6E]/50 ${entry.position <= 3 ? "text-white" : "text-[#94B8D8]"}`}
+                      className={`border-b border-[#2A4A7A]/50 ${entry.position <= 3 ? "text-white" : "text-[#94B8D8]"}`}
                     >
                       <td className="py-2 pr-2 font-mono text-xs">
                         {entry.position <= 3
@@ -142,7 +142,7 @@ function StatCard({
   color?: string;
 }) {
   return (
-    <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-4 text-center">
+    <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-4 text-center">
       <p className={`text-2xl font-mono font-bold ${color}`}>{value}</p>
       <p className="text-xs text-[#94B8D8] mt-1">{label}</p>
     </div>

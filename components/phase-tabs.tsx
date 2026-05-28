@@ -39,7 +39,7 @@ export function PhaseTabs({
               "px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
               activePhase === phase
                 ? "bg-[#22C55E] text-white"
-                : "bg-[#122448] text-[#94B8D8] hover:text-white"
+                : "bg-[#162D54] text-[#94B8D8] hover:text-white"
             )}
           >
             {PHASE_LABELS[phase]}
@@ -57,7 +57,7 @@ export function PhaseTabs({
                 "px-3 py-1.5 rounded-md text-xs font-medium transition-all",
                 activeGroup === group
                   ? "bg-[#FFD60A] text-black"
-                  : "bg-[#122448] text-[#94B8D8] hover:text-white"
+                  : "bg-[#162D54] text-[#94B8D8] hover:text-white"
               )}
             >
               Grupo {group}

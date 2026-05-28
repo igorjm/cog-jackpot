@@ -29,14 +29,14 @@ export default async function RankingPage() {
 
       {/* Prize pool */}
       {totalPrize > 0 && (
-        <div className="flex items-center justify-center gap-4 sm:gap-6 py-3 px-4 bg-[#122448] rounded-xl border border-[#1E3A6E]">
+        <div className="flex items-center justify-center gap-4 sm:gap-6 py-3 px-4 bg-[#162D54] rounded-xl border border-[#2A4A7A]">
           <div className="text-center">
             <p className="text-[10px] uppercase text-[#5A7A9A] tracking-wide">Prêmio Total</p>
             <p className="text-sm font-mono font-bold text-[#FFD60A]">
               R$ {totalPrize.toLocaleString("pt-BR")}
             </p>
           </div>
-          <div className="w-px h-8 bg-[#1E3A6E]" />
+          <div className="w-px h-8 bg-[#2A4A7A]" />
           <div className="text-center">
             <p className="text-[10px] uppercase text-[#5A7A9A]">🥇</p>
             <p className="text-sm font-mono font-bold text-white">

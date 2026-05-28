@@ -26,7 +26,7 @@ export function RankingTable({ entries, currentUserId }: RankingTableProps) {
           className={`grid grid-cols-[40px_1fr_60px_40px_40px] gap-2 px-3 py-2.5 rounded-lg items-center ${
             entry.userId === currentUserId
               ? "bg-[#22C55E]/10 border border-[#22C55E]/20"
-              : "bg-[#122448]"
+              : "bg-[#162D54]"
           }`}
         >
           <span className="text-sm font-mono font-bold text-white">
@@ -42,7 +42,7 @@ export function RankingTable({ entries, currentUserId }: RankingTableProps) {
                 className="w-8 h-10 rounded-md object-cover shrink-0"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-[#1A3058] flex items-center justify-center text-xs font-bold shrink-0">
+              <div className="w-8 h-8 rounded-full bg-[#1E3862] flex items-center justify-center text-xs font-bold shrink-0">
                 {getInitials(entry.name)}
               </div>
             )}

@@ -10,7 +10,7 @@ export default function RulesPage() {
       </h1>
 
       {/* Scoring */}
-      <section className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-5 space-y-3">
+      <section className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-5 space-y-3">
         <h2 className="text-sm font-bold uppercase text-[#FFD60A] tracking-wide">
           Sistema de Pontuação
         </h2>
@@ -23,7 +23,7 @@ export default function RulesPage() {
             { label: "Acertou 1 placar (errou vencedor)", points: POINTS.ONE_SCORE_CORRECT, example: "Palpitou 0×1, resultado 3×1" },
             { label: "Errou tudo / não palpitou", points: POINTS.NONE, example: "" },
           ].map((item) => (
-            <div key={item.label} className="flex items-center justify-between py-2 border-b border-[#1E3A6E] last:border-0">
+            <div key={item.label} className="flex items-center justify-between py-2 border-b border-[#2A4A7A] last:border-0">
               <div>
                 <p className="text-sm">{item.label}</p>
                 {item.example && (
@@ -39,13 +39,13 @@ export default function RulesPage() {
       </section>
 
       {/* Multipliers */}
-      <section className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-5 space-y-3">
+      <section className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-5 space-y-3">
         <h2 className="text-sm font-bold uppercase text-[#FFD60A] tracking-wide">
           Multiplicadores por Fase
         </h2>
         <div className="space-y-2">
           {(Object.entries(MULTIPLIERS) as [string, number][]).map(([phase, mult]) => (
-            <div key={phase} className="flex items-center justify-between py-2 border-b border-[#1E3A6E] last:border-0">
+            <div key={phase} className="flex items-center justify-between py-2 border-b border-[#2A4A7A] last:border-0">
               <span className="text-sm">{PHASE_LABELS[phase as keyof typeof PHASE_LABELS]}</span>
               <span className="font-mono font-bold text-[#FFD60A]">{mult}×</span>
             </div>
@@ -57,7 +57,7 @@ export default function RulesPage() {
       </section>
 
       {/* Tiebreakers */}
-      <section className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-5 space-y-3">
+      <section className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-5 space-y-3">
         <h2 className="text-sm font-bold uppercase text-[#FFD60A] tracking-wide">
           Critérios de Desempate
         </h2>
@@ -70,7 +70,7 @@ export default function RulesPage() {
       </section>
 
       {/* Prizes */}
-      <section className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-5 space-y-3">
+      <section className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-5 space-y-3">
         <h2 className="text-sm font-bold uppercase text-[#FFD60A] tracking-wide">
           Premiação
         </h2>
@@ -78,11 +78,11 @@ export default function RulesPage() {
           Cota de participação: <span className="text-[#FFD60A] font-bold">R$ {entryFee}</span>
         </p>
         <div className="space-y-2">
-          <div className="flex items-center justify-between py-2 border-b border-[#1E3A6E]">
+          <div className="flex items-center justify-between py-2 border-b border-[#2A4A7A]">
             <span className="text-sm">🥇 1º lugar</span>
             <span className="font-bold text-[#FFD60A]">{PRIZE_DISTRIBUTION.first * 100}%</span>
           </div>
-          <div className="flex items-center justify-between py-2 border-b border-[#1E3A6E]">
+          <div className="flex items-center justify-between py-2 border-b border-[#2A4A7A]">
             <span className="text-sm">🥈 2º lugar</span>
             <span className="font-bold text-[#94B8D8]">{PRIZE_DISTRIBUTION.second * 100}%</span>
           </div>
@@ -94,7 +94,7 @@ export default function RulesPage() {
       </section>
 
       {/* Rules */}
-      <section className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-5 space-y-3">
+      <section className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-5 space-y-3">
         <h2 className="text-sm font-bold uppercase text-[#FFD60A] tracking-wide">
           Regras Gerais
         </h2>

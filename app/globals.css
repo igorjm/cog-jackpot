@@ -2,12 +2,12 @@
 
 :root {
   /* FIFA World Cup 2026 Palette — inspired by Panini sticker album */
-  --bg-primary: #0A1A3A;
-  --bg-elevated: #122448;
-  --bg-secondary: #1A3058;
-  --bg-tertiary: #223C68;
-  --separator: #1E3A6E;
-  --separator-light: #2A4A7A;
+  --bg-primary: #0F2347;
+  --bg-elevated: #162D54;
+  --bg-secondary: #1E3862;
+  --bg-tertiary: #264472;
+  --separator: #2A4A7A;
+  --separator-light: #366090;
 
   /* Vivid World Cup Colors */
   --blue: #38BDF8;

@@ -76,7 +76,7 @@ export function BetForm({
             <button
               type="button"
               onClick={() => setHomeScore(Math.max(0, homeScore - 1))}
-              className="w-8 h-8 rounded-full border border-[#1E3A6E] text-[white] hover:border-[#22C55E] transition-colors flex items-center justify-center"
+              className="w-8 h-8 rounded-full border border-[#2A4A7A] text-[white] hover:border-[#22C55E] transition-colors flex items-center justify-center"
             >
               -
             </button>
@@ -86,7 +86,7 @@ export function BetForm({
             <button
               type="button"
               onClick={() => setHomeScore(Math.min(20, homeScore + 1))}
-              className="w-8 h-8 rounded-full border border-[#1E3A6E] text-[white] hover:border-[#22C55E] transition-colors flex items-center justify-center"
+              className="w-8 h-8 rounded-full border border-[#2A4A7A] text-[white] hover:border-[#22C55E] transition-colors flex items-center justify-center"
             >
               +
             </button>
@@ -101,7 +101,7 @@ export function BetForm({
             <button
               type="button"
               onClick={() => setAwayScore(Math.max(0, awayScore - 1))}
-              className="w-8 h-8 rounded-full border border-[#1E3A6E] text-[white] hover:border-[#22C55E] transition-colors flex items-center justify-center"
+              className="w-8 h-8 rounded-full border border-[#2A4A7A] text-[white] hover:border-[#22C55E] transition-colors flex items-center justify-center"
             >
               -
             </button>
@@ -111,7 +111,7 @@ export function BetForm({
             <button
               type="button"
               onClick={() => setAwayScore(Math.min(20, awayScore + 1))}
-              className="w-8 h-8 rounded-full border border-[#1E3A6E] text-[white] hover:border-[#22C55E] transition-colors flex items-center justify-center"
+              className="w-8 h-8 rounded-full border border-[#2A4A7A] text-[white] hover:border-[#22C55E] transition-colors flex items-center justify-center"
             >
               +
             </button>

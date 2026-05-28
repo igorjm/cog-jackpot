@@ -48,7 +48,7 @@ export function BackgroundMusic({ src }: { src: string }) {
       <button
         type="button"
         onClick={toggle}
-        className="fixed bottom-4 right-4 z-50 w-10 h-10 rounded-full bg-[#122448]/80 backdrop-blur border border-[#1E3A6E] flex items-center justify-center text-lg hover:border-[#FFD60A]/50 transition-colors"
+        className="fixed bottom-4 right-4 z-50 w-10 h-10 rounded-full bg-[#162D54]/80 backdrop-blur border border-[#2A4A7A] flex items-center justify-center text-lg hover:border-[#FFD60A]/50 transition-colors"
         aria-label={playing ? "Pausar música" : "Tocar música"}
         title={playing ? "Pausar música" : "Tocar música"}
       >

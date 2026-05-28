@@ -12,7 +12,7 @@ export default function RejectedPage() {
           ❌ ACESSO NEGADO
         </Badge>
 
-        <div className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-6 space-y-4">
+        <div className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-6 space-y-4">
           <h2 className="text-lg font-medium">Sua inscrição foi rejeitada</h2>
           <p className="text-sm text-[#94B8D8]">
             Caso acredite que houve um erro, entre em contato com o administrador do bolão.

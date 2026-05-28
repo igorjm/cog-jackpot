@@ -25,15 +25,15 @@ export default async function MyBetsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
+        <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-3 text-center">
           <p className="text-xl font-mono font-bold text-[#22C55E]">{totalPoints}</p>
           <p className="text-[10px] text-[#94B8D8]">Total Pts</p>
         </div>
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
+        <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-3 text-center">
           <p className="text-xl font-mono font-bold text-[#FFD60A]">{exactScores}</p>
           <p className="text-[10px] text-[#94B8D8]">Exatos</p>
         </div>
-        <div className="bg-[#122448] rounded-xl border border-[#1E3A6E] p-3 text-center">
+        <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-3 text-center">
           <p className="text-xl font-mono font-bold">{totalBets}</p>
           <p className="text-[10px] text-[#94B8D8]">Palpites</p>
         </div>
@@ -46,12 +46,12 @@ export default async function MyBetsPage() {
           return (
             <div
               key={bet.id}
-              className={`bg-[#122448] rounded-xl border p-3 ${
+              className={`bg-[#162D54] rounded-xl border p-3 ${
                 bet.rawPoints === 10
                   ? "border-[#FFD700]/30"
                   : bet.rawPoints && bet.rawPoints >= 5
                   ? "border-[#22C55E]/30"
-                  : "border-[#1E3A6E]"
+                  : "border-[#2A4A7A]"
               }`}
             >
               <div className="flex items-center justify-between">

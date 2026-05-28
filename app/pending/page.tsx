@@ -27,7 +27,7 @@ export default function PendingPage() {
         </div>
 
         {/* Payment card */}
-        <div className="bg-[#122448] rounded-2xl border border-[#1E3A6E] p-6 space-y-5">
+        <div className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-6 space-y-5">
           <h2 className="text-lg font-medium text-center">
             Realize o pagamento via PIX
           </h2>
@@ -55,13 +55,13 @@ export default function PendingPage() {
           </div>
 
           {/* Divider */}
-          <div className="border-t border-[#1E3A6E]" />
+          <div className="border-t border-[#2A4A7A]" />
 
           {/* PIX Key */}
           <div className="space-y-2">
             <p className="text-xs text-[#94B8D8]">Chave PIX:</p>
             <div className="flex items-center gap-2">
-              <code className="flex-1 text-sm bg-[#0A1A3A] px-3 py-2 rounded-lg text-white overflow-hidden text-ellipsis">
+              <code className="flex-1 text-sm bg-[#0F2347] px-3 py-2 rounded-lg text-white overflow-hidden text-ellipsis">
                 {pixKey}
               </code>
               <Button variant="ghost" size="sm" onClick={copyPixKey}>
@@ -84,7 +84,7 @@ export default function PendingPage() {
         {/* Logout */}
         <Button
           variant="outline"
-          className="w-full text-white border-[#1E3A6E]"
+          className="w-full text-white border-[#2A4A7A]"
           onClick={() => signOut({ callbackUrl: "/login" })}
         >
           Sair

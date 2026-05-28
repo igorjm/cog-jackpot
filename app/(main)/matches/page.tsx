@@ -59,10 +59,10 @@ export default function MatchesPage() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-10 bg-[#122448] rounded-lg animate-pulse" />
+        <div className="h-10 bg-[#162D54] rounded-lg animate-pulse" />
         <div className="grid gap-3 sm:grid-cols-2">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-40 bg-[#122448] rounded-2xl animate-pulse" />
+            <div key={i} className="h-40 bg-[#162D54] rounded-2xl animate-pulse" />
           ))}
         </div>
       </div>

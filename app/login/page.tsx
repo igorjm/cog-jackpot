@@ -23,7 +23,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4 py-8 bg-[#0A1A3A]">
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-8 bg-[#0F2347]">
       <BackgroundMusic src="/background-music.m4a" />
       {/* Tiled background pattern — keeps image crisp on all screen sizes */}
       <div
@@ -36,7 +36,7 @@ export default function LoginPage() {
         }}
       />
       {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-[#0A1A3A]/70" />
+      <div className="absolute inset-0 bg-[#0F2347]/70" />
 
       <div className="relative z-10 w-full max-w-sm space-y-8">
         {/* Logo */}
@@ -51,7 +51,7 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form action={handleSubmit} className="space-y-4 bg-[#0A1A3A]/80 backdrop-blur-md rounded-2xl p-6 border border-[#FFD60A]/20 shadow-2xl">
+        <form action={handleSubmit} className="space-y-4 bg-[#0F2347]/80 backdrop-blur-md rounded-2xl p-6 border border-[#FFD60A]/20 shadow-2xl">
           <Input
             name="email"
             type="email"

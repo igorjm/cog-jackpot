@@ -41,9 +41,9 @@ export default async function MainLayout({
       </div>
 
       {/* Desktop sidebar - hidden on mobile */}
-      <aside className="hidden md:flex md:flex-col md:w-56 md:fixed md:inset-y-0 bg-[#0A1A3A]/95 border-r border-[#1E3A6E]">
+      <aside className="hidden md:flex md:flex-col md:w-56 md:fixed md:inset-y-0 bg-[#0F2347]/95 border-r border-[#2A4A7A]">
         {/* Logo */}
-        <div className="px-4 py-4 border-b border-[#1E3A6E]">
+        <div className="px-4 py-4 border-b border-[#2A4A7A]">
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <Image src="/logo-fifa.png" alt="FIFA World Cup 2026" width={44} height={44} className="h-11 w-auto" />
             <span className="text-base font-[family-name:var(--font-oswald)] font-bold text-[#FFD60A] uppercase tracking-wide">
@@ -63,7 +63,7 @@ export default async function MainLayout({
         </nav>
 
         {/* User section at bottom */}
-        <div className="px-4 py-4 border-t border-[#1E3A6E]">
+        <div className="px-4 py-4 border-t border-[#2A4A7A]">
           <Link href="/profile" className="flex items-center gap-2 mb-3 hover:opacity-80 transition-opacity">
             {avatar ? (
               <Image
@@ -74,7 +74,7 @@ export default async function MainLayout({
                 className="w-8 h-8 rounded-full object-cover"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-[#1E3A6E] flex items-center justify-center text-xs font-bold text-[#FFD60A]">
+              <div className="w-8 h-8 rounded-full bg-[#2A4A7A] flex items-center justify-center text-xs font-bold text-[#FFD60A]">
                 {nickname?.charAt(0).toUpperCase()}
               </div>
             )}
@@ -97,7 +97,7 @@ export default async function MainLayout({
       </aside>
 
       {/* Mobile top header - hidden on desktop */}
-      <header className="sticky top-0 z-50 bg-[#0A1A3A]/90 backdrop-blur-xl border-b border-[#1E3A6E] md:hidden">
+      <header className="sticky top-0 z-50 bg-[#0F2347]/90 backdrop-blur-xl border-b border-[#2A4A7A] md:hidden">
         <div className="px-4 py-3 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
             <Image src="/logo-fifa.png" alt="FIFA World Cup 2026" width={36} height={36} className="h-9 w-auto" />
@@ -106,7 +106,7 @@ export default async function MainLayout({
             </span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link href="/profile" className="flex items-center gap-1.5 bg-[#122448] px-2.5 py-1.5 rounded-full hover:bg-[#1A3058] transition-colors">
+            <Link href="/profile" className="flex items-center gap-1.5 bg-[#162D54] px-2.5 py-1.5 rounded-full hover:bg-[#1E3862] transition-colors">
               {avatar ? (
                 <Image
                   src={avatar}
@@ -116,7 +116,7 @@ export default async function MainLayout({
                   className="w-5 h-5 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-[#1E3A6E] flex items-center justify-center text-[10px] font-bold text-[#FFD60A]">
+                <div className="w-5 h-5 rounded-full bg-[#2A4A7A] flex items-center justify-center text-[10px] font-bold text-[#FFD60A]">
                   {nickname?.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -138,7 +138,7 @@ export default async function MainLayout({
             >
               <button
                 type="submit"
-                className="text-xs px-2 py-1.5 rounded-full bg-[#122448] text-[#5A7A9A] hover:text-white transition-colors"
+                className="text-xs px-2 py-1.5 rounded-full bg-[#162D54] text-[#5A7A9A] hover:text-white transition-colors"
               >
                 Sair
               </button>
@@ -155,7 +155,7 @@ export default async function MainLayout({
       </main>
 
       {/* Mobile bottom nav - hidden on desktop */}
-      <nav className="sticky bottom-0 z-50 bg-[#0A1A3A]/90 backdrop-blur-xl border-t border-[#1E3A6E] md:hidden">
+      <nav className="sticky bottom-0 z-50 bg-[#0F2347]/90 backdrop-blur-xl border-t border-[#2A4A7A] md:hidden">
         <div className="flex items-center justify-around py-2">
           <NavLink href="/dashboard" icon="🏠" label="Início" />
           <NavLink href="/matches" icon="⚽" label="Jogos" />
@@ -180,7 +180,7 @@ function SidebarLink({
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#94B8D8] hover:text-white hover:bg-[#122448] transition-colors"
+      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#94B8D8] hover:text-white hover:bg-[#162D54] transition-colors"
     >
       <span className="text-base">{icon}</span>
       <span>{label}</span>

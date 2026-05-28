@@ -38,7 +38,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://flagcdn.com" />
         <link rel="dns-prefetch" href="https://flagcdn.com" />
       </head>
-      <body className="min-h-full flex flex-col bg-[#0A1A3A] text-white font-[var(--font-inter),system-ui,sans-serif]">
+      <body className="min-h-full flex flex-col bg-[#0F2347] text-white font-[var(--font-inter),system-ui,sans-serif]">
         {children}
         <Analytics />
         <SpeedInsights />
