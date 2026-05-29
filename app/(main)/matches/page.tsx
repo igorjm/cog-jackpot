@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { MatchCard } from "@/components/match-card";
 import { PhaseTabs } from "@/components/phase-tabs";
 import { MatchBetsDrawer } from "@/components/match-bets-drawer";
@@ -29,9 +30,14 @@ interface MatchWithBet {
 }
 
 export default function MatchesPage() {
+  const searchParams = useSearchParams();
   const [matches, setMatches] = useState<MatchWithBet[]>([]);
-  const [activePhase, setActivePhase] = useState<Phase>("GROUP");
-  const [activeGroup, setActiveGroup] = useState<string>("A");
+  const [activePhase, setActivePhase] = useState<Phase>(
+    (searchParams.get("phase") as Phase) || "GROUP"
+  );
+  const [activeGroup, setActiveGroup] = useState<string>(
+    searchParams.get("group") || "A"
+  );
   const [loading, setLoading] = useState(true);
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
 

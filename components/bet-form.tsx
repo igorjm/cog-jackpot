@@ -13,6 +13,8 @@ interface BetFormProps {
   awayFlag: string;
   existingBet?: { homeScore: number; awayScore: number };
   isLocked: boolean;
+  phase?: string;
+  group?: string | null;
 }
 
 export function BetForm({
@@ -21,6 +23,8 @@ export function BetForm({
   awayTeam,
   existingBet,
   isLocked,
+  phase,
+  group,
 }: BetFormProps) {
   const router = useRouter();
   const [homeScore, setHomeScore] = useState(existingBet?.homeScore ?? 0);
@@ -42,7 +46,11 @@ export function BetForm({
       setMessage(result.error);
       setLoading(false);
     } else {
-      router.push("/matches");
+      const params = new URLSearchParams();
+      if (phase) params.set("phase", phase);
+      if (group) params.set("group", group);
+      const query = params.toString();
+      router.push(`/matches${query ? `?${query}` : ""}`);
     }
   };
 

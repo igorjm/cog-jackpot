@@ -30,7 +30,10 @@ export default async function MatchDetailPage({
   return (
     <div className="max-w-md mx-auto space-y-6">
       {/* Back link */}
-      <a href="/matches" className="text-sm text-[#94B8D8] hover:text-white">
+      <a
+        href={`/matches?phase=${match.phase}${match.group ? `&group=${match.group}` : ""}`}
+        className="text-sm text-[#94B8D8] hover:text-white"
+      >
         ← Voltar
       </a>
 
@@ -142,6 +145,8 @@ export default async function MatchDetailPage({
               userBet ? { homeScore: userBet.homeScore, awayScore: userBet.awayScore } : undefined
             }
             isLocked={!isOpen}
+            phase={match.phase}
+            group={match.group}
           />
         </div>
       )}
