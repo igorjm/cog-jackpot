@@ -9,7 +9,10 @@ export async function GET() {
   }
 
   const users = await prisma.user.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: [
+      { status: "asc" }, // PENDING_PAYMENT first (alphabetically before APPROVED/REJECTED)
+      { createdAt: "desc" },
+    ],
     select: {
       id: true,
       name: true,
