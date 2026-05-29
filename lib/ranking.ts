@@ -20,7 +20,11 @@ export async function calculateRanking(): Promise<RankingEntry[]> {
     where: { status: "APPROVED", role: { not: "ADMIN" } },
     include: {
       bets: {
-        where: { points: { not: null } },
+        where: {
+          points: { not: null },
+          match: { phase: { not: "FRIENDLY" } },
+        },
+        include: { match: { select: { phase: true } } },
       },
     },
   });

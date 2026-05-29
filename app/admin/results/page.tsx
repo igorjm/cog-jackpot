@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { saveResult, syncScores } from "@/app/actions/admin";
+import { getFlagSrc, isClubFlag } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ interface Match {
 const PHASE_OPTIONS = [
   { value: "ALL", label: "Todos" },
   { value: "PENDING", label: "Pendentes" },
+  { value: "FRIENDLY", label: "Especiais" },
   { value: "GROUP", label: "Grupos" },
   { value: "ROUND_OF_32", label: "32 Avos" },
   { value: "ROUND_OF_16", label: "Oitavas" },
@@ -36,13 +38,14 @@ function getFlagImg({ code, team }: { code: string; team: string }) {
   if (code === "xx") {
     return <span className="inline-block w-7 h-5 rounded-sm bg-[#1E3862] border border-[#2A4A7A] text-center text-[9px] leading-5 text-[#5A7A9A]">?</span>;
   }
+  const club = isClubFlag(code);
   return (
     <Image
-      src={`https://flagcdn.com/w80/${code.toLowerCase()}.png`}
-      width={28}
-      height={21}
+      src={getFlagSrc(code)}
+      width={club ? 22 : 28}
+      height={club ? 22 : 21}
       alt={team}
-      className="inline-block rounded-sm"
+      className={`inline-block ${club ? "w-[22px] h-[22px] object-contain" : "rounded-sm"}`}
     />
   );
 }

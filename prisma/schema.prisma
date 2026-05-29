@@ -54,6 +54,7 @@ model Match {
 }
 
 enum Phase {
+  FRIENDLY
   GROUP
   ROUND_OF_32
   ROUND_OF_16

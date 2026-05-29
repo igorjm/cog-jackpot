@@ -50,7 +50,10 @@ export default function MatchesPage() {
       });
   }, []);
 
+  const friendlyMatches = matches.filter((m) => m.phase === "FRIENDLY");
+
   const filteredMatches = matches.filter((m) => {
+    if (m.phase === "FRIENDLY") return false;
     if (m.phase !== activePhase) return false;
     if (activePhase === "GROUP" && m.group !== activeGroup) return false;
     return true;
@@ -80,6 +83,35 @@ export default function MatchesPage() {
       <h1 className="text-xl font-bold font-[family-name:var(--font-oswald)] uppercase">
         Jogos
       </h1>
+
+      {/* Special matches section */}
+      {friendlyMatches.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold uppercase text-[#FFD60A] tracking-wide">
+              ⭐ Jogos Especiais
+            </span>
+            <span className="text-[10px] text-[#94B8D8] bg-[#1E3862] px-2 py-0.5 rounded-full">
+              Não contam no ranking
+            </span>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {friendlyMatches.map((match) => (
+              <div
+                key={match.id}
+                onClick={() => match.isLocked ? setSelectedMatchId(match.id) : undefined}
+                className={match.isLocked ? "cursor-pointer" : ""}
+              >
+                <MatchCard
+                  match={{ ...match, matchDate: new Date(match.matchDate) }}
+                  userBet={match.userBet}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-[#2A4A7A]" />
+        </section>
+      )}
 
       <PhaseTabs
         activePhase={activePhase}

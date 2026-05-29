@@ -60,6 +60,21 @@ export async function saveResult(formData: FormData) {
     });
   }
 
+  // If this is a FRIENDLY match, check if ALL friendly matches now have results.
+  // If yes, zero out all friendly bet points (they don't count long-term).
+  if (match.phase === "FRIENDLY") {
+    const pendingFriendlies = await prisma.match.count({
+      where: { phase: "FRIENDLY", homeScore: null },
+    });
+    if (pendingFriendlies === 0) {
+      // All friendlies have results — zero out points
+      await prisma.bet.updateMany({
+        where: { match: { phase: "FRIENDLY" } },
+        data: { points: 0, rawPoints: 0 },
+      });
+    }
+  }
+
   revalidatePath("/admin/results");
   revalidatePath("/ranking");
   revalidatePath("/matches");

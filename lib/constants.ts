@@ -10,6 +10,7 @@ export const POINTS = {
 } as const;
 
 export const MULTIPLIERS: Record<Phase, number> = {
+  FRIENDLY: 1,
   GROUP: 1,
   ROUND_OF_32: 1.25,
   ROUND_OF_16: 1.5,
@@ -24,6 +25,7 @@ export const BONUS_POINTS = 3;
 export const DEADLINE_HOURS_BEFORE = 1;
 
 export const PHASE_LABELS: Record<Phase, string> = {
+  FRIENDLY: "Jogo Especial",
   GROUP: "Fase de Grupos",
   ROUND_OF_32: "32 Avos de Final",
   ROUND_OF_16: "Oitavas de Final",

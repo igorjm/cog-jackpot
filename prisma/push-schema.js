@@ -10,7 +10,12 @@ DO $$ BEGIN CREATE TYPE "UserStatus" AS ENUM ('PENDING_PAYMENT', 'APPROVED', 'RE
 
 DO $$ BEGIN CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN'); EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-DO $$ BEGIN CREATE TYPE "Phase" AS ENUM ('GROUP', 'ROUND_OF_32', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'THIRD_PLACE', 'FINAL'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE "Phase" AS ENUM ('FRIENDLY', 'GROUP', 'ROUND_OF_32', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'THIRD_PLACE', 'FINAL'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+-- Add FRIENDLY to existing Phase enum if not present
+DO $$ BEGIN
+  ALTER TYPE "Phase" ADD VALUE IF NOT EXISTS 'FRIENDLY' BEFORE 'GROUP';
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- Add ROUND_OF_32 to existing Phase enum if not present
 DO $$ BEGIN
