@@ -77,7 +77,12 @@ export function PushToggle() {
   };
 
   if (!supported) {
-    return null;
+    return (
+      <p className="text-xs text-[#5A7A9A]">
+        📱 No iOS, adicione o app à Tela Inicial para receber notificações.
+        No Android, use Chrome.
+      </p>
+    );
   }
   if (permission === "denied") {
     return (
