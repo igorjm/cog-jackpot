@@ -3,6 +3,7 @@ import { calculateRanking } from "@/lib/ranking";
 import { prisma } from "@/lib/prisma";
 import { RankingPodium } from "@/components/ranking-podium";
 import { RankingTable } from "@/components/ranking-table";
+import Link from "next/link";
 
 const ENTRY_FEE = 50;
 const SPLIT = { first: 0.6, second: 0.25, third: 0.15 };
@@ -20,9 +21,17 @@ export default async function RankingPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold font-[family-name:var(--font-oswald)] uppercase">
-        🏆 Ranking
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold font-[family-name:var(--font-oswald)] uppercase">
+          🏆 Ranking
+        </h1>
+        <Link
+          href="/stats"
+          className="text-xs font-semibold px-3 py-1.5 rounded-full border border-[#38BDF8]/30 text-[#38BDF8] hover:bg-[#38BDF8]/10 transition-all"
+        >
+          📊 Estatísticas
+        </Link>
+      </div>
 
       {/* Podium */}
       {ranking.length >= 3 && <RankingPodium top3={ranking.slice(0, 3)} />}
