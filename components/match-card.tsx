@@ -35,6 +35,11 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
   const homeHint = isTbd ? getKnockoutHint(match.homeTeam) : null;
   const awayHint = isTbd ? getKnockoutHint(match.awayTeam) : null;
 
+  const now = new Date();
+  const matchStart = new Date(match.matchDate);
+  const matchEnd = new Date(matchStart.getTime() + 150 * 60 * 1000); // ~2.5h
+  const isLive = !isFinished && now >= matchStart && now <= matchEnd;
+
   return (
     <div
       className={`bg-[#162D54] rounded-2xl border p-4 transition-all ${
@@ -56,9 +61,16 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
           })}
           {match.venue && ` • ${match.venue}`}
         </div>
-        {match.multiplier > 1 && (
-          <Badge variant="warning">{match.multiplier}×</Badge>
-        )}
+        <div className="flex items-center gap-2">
+          {isLive && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-400 bg-red-500/10 border border-red-500/30 px-2 py-0.5 rounded-full animate-pulse">
+              🔴 AO VIVO
+            </span>
+          )}
+          {match.multiplier > 1 && (
+            <Badge variant="warning">{match.multiplier}×</Badge>
+          )}
+        </div>
       </div>
 
       {/* Teams + Score */}
