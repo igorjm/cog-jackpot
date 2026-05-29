@@ -79,7 +79,7 @@ export default async function MyBetsPage() {
                   {canEdit && (
                     <Link
                       href={`/matches/${bet.matchId}`}
-                      className="text-xs font-medium text-[#22C55E] hover:text-[#22C55E]/80 transition-colors"
+                      className="text-xs font-semibold px-3 py-1 rounded-full border border-[#22C55E]/30 text-[#22C55E] hover:bg-[#22C55E]/10 transition-all active:scale-95"
                     >
                       Editar
                     </Link>

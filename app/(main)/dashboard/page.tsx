@@ -89,8 +89,8 @@ export default async function DashboardPage() {
             <h2 className="text-sm font-bold uppercase text-[#94B8D8] tracking-wide">
               Próximos Jogos
             </h2>
-            <Link href="/matches" className="text-xs text-[#38BDF8]">
-              Ver todos →
+            <Link href="/matches" className="text-xs font-medium px-3 py-1 rounded-full border border-[#38BDF8]/30 text-[#38BDF8] hover:bg-[#38BDF8]/10 transition-all active:scale-95">
+              Ver todos
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
