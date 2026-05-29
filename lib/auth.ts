@@ -40,4 +40,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    ...authConfig.callbacks,
+    async jwt({ token, user, trigger }) {
+      if (user) {
+        token.id = user.id;
+        token.role = (user as { role: string }).role;
+        token.status = (user as { status: string }).status;
+        token.nickname = (user as { nickname: string }).nickname;
+        token.avatar = (user as { avatar: string | null }).avatar;
+      }
+      // Always refresh from DB if status is pending (so approval is picked up)
+      // Also refresh on explicit session update trigger
+      if (
+        token.id &&
+        (token.status === "PENDING_PAYMENT" || trigger === "update")
+      ) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { status: true, role: true, nickname: true, avatar: true },
+        });
+        if (dbUser) {
+          token.status = dbUser.status;
+          token.role = dbUser.role;
+          token.nickname = dbUser.nickname;
+          token.avatar = dbUser.avatar;
+        }
+      }
+      return token;
+    },
+  },
 });

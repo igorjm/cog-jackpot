@@ -1,14 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
 
 export default function PendingPage() {
   const [copied, setCopied] = useState(false);
+  const [checking, setChecking] = useState(false);
   const pixKey = process.env.NEXT_PUBLIC_PIX_KEY ?? "chave-pix-nao-configurada";
   const entryFee = process.env.NEXT_PUBLIC_ENTRY_FEE ?? "50.00";
+
+  const checkStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/me/status");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.status === "APPROVED") {
+        // The API already updated the session cookie, just navigate
+        window.location.href = "/dashboard";
+      }
+    } catch {
+      // silently ignore network errors
+    }
+  }, []);
+
+  // Auto-poll every 15 seconds
+  useEffect(() => {
+    const interval = setInterval(checkStatus, 15000);
+    return () => clearInterval(interval);
+  }, [checkStatus]);
+
+  const handleManualCheck = async () => {
+    setChecking(true);
+    await checkStatus();
+    setChecking(false);
+  };
 
   const copyPixKey = () => {
     navigator.clipboard.writeText(pixKey);
@@ -77,9 +104,18 @@ export default function PendingPage() {
             Após o pagamento, o administrador liberará seu acesso em até 24h.
           </p>
           <p className="text-xs text-[#5A7A9A]">
-            Dúvidas? Fale com o administrador.
+            Esta página verifica automaticamente a cada 15 segundos.
           </p>
         </div>
+
+        {/* Check status */}
+        <Button
+          className="w-full bg-[#22C55E] hover:bg-[#16A34A] text-white font-medium"
+          onClick={handleManualCheck}
+          disabled={checking}
+        >
+          {checking ? "Verificando..." : "🔄 Verificar liberação"}
+        </Button>
 
         {/* Logout */}
         <Button
