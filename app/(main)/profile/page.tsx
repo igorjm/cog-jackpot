@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { ProfileForm } from "@/components/profile-form";
+import { PushToggle } from "@/components/push-toggle";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -26,6 +27,17 @@ export default async function ProfilePage() {
       </div>
 
       <ProfileForm user={user} />
+
+      {/* Push Notifications */}
+      <div className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-4 space-y-3">
+        <h2 className="text-sm font-bold text-[#FFD60A] font-[family-name:var(--font-oswald)] uppercase">
+          Notificações
+        </h2>
+        <p className="text-xs text-[#94B8D8]">
+          Receba alertas quando os palpites fecharem, resultados saírem ou o ranking mudar.
+        </p>
+        <PushToggle />
+      </div>
     </div>
   );
 }
