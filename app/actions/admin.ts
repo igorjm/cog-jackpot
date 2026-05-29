@@ -212,3 +212,24 @@ export async function syncScores() {
     return { error: `Falha na sincronização: ${msg}` };
   }
 }
+
+export async function sendTestNotification() {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { error: "Acesso negado" };
+  }
+
+  const count = await prisma.pushSubscription.count();
+  if (count === 0) {
+    return { error: "Nenhum dispositivo com notificação ativa" };
+  }
+
+  await sendPushToAll({
+    title: "🔔 Teste de notificação",
+    body: "Se você recebeu isso, as notificações estão funcionando!",
+    icon: "/icons/icon-192.png",
+    url: "/dashboard",
+  });
+
+  return { success: true, message: `Enviado para ${count} dispositivo(s)` };
+}
