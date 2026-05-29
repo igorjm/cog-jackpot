@@ -7,6 +7,7 @@ import { resultSchema } from "@/lib/validations";
 import { calculatePoints, calculateFinalPoints } from "@/lib/scoring";
 import { fetchFinishedMatches } from "@/lib/football-api";
 import { revalidatePath } from "next/cache";
+import { sendPushToAll, sendPushToUser } from "@/lib/push";
 
 const userIdSchema = z.string().cuid("ID de usuário inválido");
 
@@ -78,6 +79,15 @@ export async function saveResult(formData: FormData) {
   revalidatePath("/admin/results");
   revalidatePath("/ranking");
   revalidatePath("/matches");
+
+  // Send push notification to all users
+  sendPushToAll({
+    title: "⚽ Resultado registrado!",
+    body: `${match.homeTeam} ${parsed.data.homeScore} x ${parsed.data.awayScore} ${match.awayTeam}`,
+    icon: "/icons/icon-192.png",
+    url: "/matches",
+  }).catch(() => {});
+
   return { success: true };
 }
 
@@ -94,6 +104,14 @@ export async function approveUser(userId: string) {
     where: { id: parsed.data },
     data: { status: "APPROVED" },
   });
+
+  // Notify the approved user
+  sendPushToUser(parsed.data, {
+    title: "✅ Cadastro aprovado!",
+    body: "Seu pagamento foi confirmado. Bora fazer seus palpites!",
+    icon: "/icons/icon-192.png",
+    url: "/dashboard",
+  }).catch(() => {});
 
   revalidatePath("/admin/users");
   return { success: true };
@@ -178,6 +196,16 @@ export async function syncScores() {
     revalidatePath("/admin/results");
     revalidatePath("/ranking");
     revalidatePath("/matches");
+
+    if (synced > 0) {
+      sendPushToAll({
+        title: "⚽ Resultados atualizados!",
+        body: `${synced} resultado(s) sincronizado(s). Confira sua pontuação!`,
+        icon: "/icons/icon-192.png",
+        url: "/ranking",
+      }).catch(() => {});
+    }
+
     return { success: true, synced, message: `${synced} resultado(s) sincronizado(s)` };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Erro desconhecido";
