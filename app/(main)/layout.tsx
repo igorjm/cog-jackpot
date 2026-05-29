@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { SidebarLink, NavLink } from "@/components/nav-links";
 
 export default async function MainLayout({
   children,
@@ -166,45 +167,5 @@ export default async function MainLayout({
         </div>
       </nav>
     </div>
-  );
-}
-
-function SidebarLink({
-  href,
-  icon,
-  label,
-}: {
-  href: string;
-  icon: string;
-  label: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#94B8D8] hover:text-white hover:bg-[#162D54] transition-colors"
-    >
-      <span className="text-base">{icon}</span>
-      <span>{label}</span>
-    </Link>
-  );
-}
-
-function NavLink({
-  href,
-  icon,
-  label,
-}: {
-  href: string;
-  icon: string;
-  label: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex flex-col items-center gap-0.5 text-[#5A7A9A] hover:text-[#38BDF8] transition-colors"
-    >
-      <span className="text-lg">{icon}</span>
-      <span className="text-[10px]">{label}</span>
-    </Link>
   );
 }
