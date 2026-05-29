@@ -98,7 +98,7 @@ export default async function MainLayout({
       </aside>
 
       {/* Mobile top header - hidden on desktop */}
-      <header className="sticky top-0 z-50 bg-[#0F2347]/90 backdrop-blur-xl border-b border-[#2A4A7A] md:hidden">
+      <header className="sticky top-0 z-50 bg-[#0F2347]/90 backdrop-blur-xl border-b border-[#2A4A7A] md:hidden pt-[env(safe-area-inset-top)]">
         <div className="px-4 py-3 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
             <Image src="/logo-fifa.png" alt="FIFA World Cup 2026" width={36} height={36} className="h-9 w-auto" />
@@ -156,7 +156,7 @@ export default async function MainLayout({
       </main>
 
       {/* Mobile bottom nav - hidden on desktop */}
-      <nav className="sticky bottom-0 z-50 bg-[#0F2347]/90 backdrop-blur-xl border-t border-[#2A4A7A] md:hidden">
+      <nav className="sticky bottom-0 z-50 bg-[#0F2347]/90 backdrop-blur-xl border-t border-[#2A4A7A] md:hidden pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around py-2">
           <NavLink href="/dashboard" icon="🏠" label="Início" />
           <NavLink href="/matches" icon="⚽" label="Jogos" />
