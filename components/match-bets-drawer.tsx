@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { getFlagSrc, isClubFlag } from "@/lib/utils";
 
 interface BetEntry {
   homeScore: number;
@@ -104,11 +105,11 @@ export function MatchBetsDrawer({ matchId, onClose }: MatchBetsDrawerProps) {
                   <p className="text-sm font-medium">{match.homeTeam}</p>
                   {match.homeFlag !== "xx" && (
                     <Image
-                      src={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png`}
-                      width={24}
-                      height={18}
+                      src={getFlagSrc(match.homeFlag)}
+                      width={isClubFlag(match.homeFlag) ? 20 : 24}
+                      height={isClubFlag(match.homeFlag) ? 20 : 18}
                       alt={match.homeTeam}
-                      className="inline-block rounded-sm mt-0.5"
+                      className={`inline-block mt-0.5 ${isClubFlag(match.homeFlag) ? "w-5 h-5 object-contain" : "rounded-sm"}`}
                     />
                   )}
                 </div>
@@ -125,11 +126,11 @@ export function MatchBetsDrawer({ matchId, onClose }: MatchBetsDrawerProps) {
                   <p className="text-sm font-medium">{match.awayTeam}</p>
                   {match.awayFlag !== "xx" && (
                     <Image
-                      src={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png`}
-                      width={24}
-                      height={18}
+                      src={getFlagSrc(match.awayFlag)}
+                      width={isClubFlag(match.awayFlag) ? 20 : 24}
+                      height={isClubFlag(match.awayFlag) ? 20 : 18}
                       alt={match.awayTeam}
-                      className="inline-block rounded-sm mt-0.5"
+                      className={`inline-block mt-0.5 ${isClubFlag(match.awayFlag) ? "w-5 h-5 object-contain" : "rounded-sm"}`}
                     />
                   )}
                 </div>

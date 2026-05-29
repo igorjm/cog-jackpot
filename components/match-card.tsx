@@ -3,6 +3,7 @@ import { CountdownTimer } from "./countdown-timer";
 import { Badge } from "./ui/badge";
 import { isBeforeDeadline } from "@/lib/deadline";
 import { getKnockoutHint } from "@/lib/knockout-hints";
+import { getFlagSrc, isClubFlag } from "@/lib/utils";
 
 interface MatchCardProps {
   match: {
@@ -69,11 +70,11 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
           )}
           {match.homeFlag !== "xx" ? (
             <Image
-              src={`https://flagcdn.com/w80/${match.homeFlag.toLowerCase()}.png`}
-              width={32}
+              src={getFlagSrc(match.homeFlag)}
+              width={isClubFlag(match.homeFlag) ? 24 : 32}
               height={24}
               alt={match.homeTeam}
-              className="inline-block rounded-sm mt-1"
+              className={`inline-block mt-1 ${isClubFlag(match.homeFlag) ? "w-6 h-6 object-contain" : "rounded-sm"}`}
             />
           ) : (
             <span className="inline-block w-8 h-6 rounded-sm bg-[#1E3862] border border-[#2A4A7A] mt-1 text-center text-[10px] leading-6 text-[#5A7A9A]">?</span>
@@ -108,11 +109,11 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
           )}
           {match.awayFlag !== "xx" ? (
             <Image
-              src={`https://flagcdn.com/w80/${match.awayFlag.toLowerCase()}.png`}
-              width={32}
+              src={getFlagSrc(match.awayFlag)}
+              width={isClubFlag(match.awayFlag) ? 24 : 32}
               height={24}
               alt={match.awayTeam}
-              className="inline-block rounded-sm mt-1"
+              className={`inline-block mt-1 ${isClubFlag(match.awayFlag) ? "w-6 h-6 object-contain" : "rounded-sm"}`}
             />
           ) : (
             <span className="inline-block w-8 h-6 rounded-sm bg-[#1E3862] border border-[#2A4A7A] mt-1 text-center text-[10px] leading-6 text-[#5A7A9A]">?</span>

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { BetForm } from "@/components/bet-form";
+import { getFlagSrc, isClubFlag } from "@/lib/utils";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { Badge } from "@/components/ui/badge";
 import { isBeforeDeadline } from "@/lib/deadline";
@@ -64,11 +65,11 @@ export default async function MatchDetailPage({
           <div className="text-center space-y-1">
             {match.homeFlag !== "xx" ? (
               <Image
-                src={`https://flagcdn.com/w160/${match.homeFlag.toLowerCase()}.png`}
-                width={64}
+                src={getFlagSrc(match.homeFlag, 160)}
+                width={isClubFlag(match.homeFlag) ? 48 : 64}
                 height={48}
                 alt={match.homeTeam}
-                className="inline-block rounded-sm"
+                className={`inline-block ${isClubFlag(match.homeFlag) ? "w-12 h-12 object-contain" : "rounded-sm"}`}
               />
             ) : (
               <span className="inline-block w-16 h-12 rounded-sm bg-[#1E3862] border border-[#2A4A7A] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
@@ -92,11 +93,11 @@ export default async function MatchDetailPage({
           <div className="text-center space-y-1">
             {match.awayFlag !== "xx" ? (
               <Image
-                src={`https://flagcdn.com/w160/${match.awayFlag.toLowerCase()}.png`}
-                width={64}
+                src={getFlagSrc(match.awayFlag, 160)}
+                width={isClubFlag(match.awayFlag) ? 48 : 64}
                 height={48}
                 alt={match.awayTeam}
-                className="inline-block rounded-sm"
+                className={`inline-block ${isClubFlag(match.awayFlag) ? "w-12 h-12 object-contain" : "rounded-sm"}`}
               />
             ) : (
               <span className="inline-block w-16 h-12 rounded-sm bg-[#1E3862] border border-[#2A4A7A] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
