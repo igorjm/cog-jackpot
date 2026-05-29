@@ -6,19 +6,22 @@ export function PushToggle() {
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [supported, setSupported] = useState(false);
 
   useEffect(() => {
-    if ("Notification" in window) {
-      setPermission(Notification.permission);
-    }
+    const isSupported = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window;
+    setSupported(isSupported);
+
+    if (!isSupported) return;
+
+    setPermission(Notification.permission);
+
     // Check if already subscribed
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.ready.then((reg) => {
-        reg.pushManager.getSubscription().then((sub) => {
-          setSubscribed(!!sub);
-        });
+    navigator.serviceWorker.ready.then((reg) => {
+      reg.pushManager.getSubscription().then((sub) => {
+        setSubscribed(!!sub);
       });
-    }
+    });
   }, []);
 
   const handleToggle = async () => {
@@ -73,7 +76,9 @@ export function PushToggle() {
     }
   };
 
-  if (!("Notification" in globalThis)) return null;
+  if (!supported) {
+    return null;
+  }
   if (permission === "denied") {
     return (
       <p className="text-xs text-[#5A7A9A]">
