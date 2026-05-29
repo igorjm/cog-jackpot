@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { PHASE_LABELS } from "@/lib/constants";
+import { isBeforeDeadline } from "@/lib/deadline";
+import Link from "next/link";
 
 export default async function MyBetsPage() {
   const session = await auth();
@@ -43,6 +45,7 @@ export default async function MyBetsPage() {
       <div className="space-y-2">
         {bets.map((bet) => {
           const isFinished = bet.match.homeScore !== null;
+          const canEdit = !isFinished && isBeforeDeadline(bet.match.matchDate);
           return (
             <div
               key={bet.id}
@@ -72,7 +75,15 @@ export default async function MyBetsPage() {
                     )}
                   </div>
                 </div>
-                <div>
+                <div className="flex items-center gap-2">
+                  {canEdit && (
+                    <Link
+                      href={`/matches/${bet.matchId}`}
+                      className="text-xs font-medium text-[#22C55E] hover:text-[#22C55E]/80 transition-colors"
+                    >
+                      Editar
+                    </Link>
+                  )}
                   {isFinished ? (
                     <Badge
                       variant={bet.points && bet.points > 0 ? "points" : "error"}
