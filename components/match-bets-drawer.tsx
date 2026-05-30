@@ -55,6 +55,12 @@ export function MatchBetsDrawer({ matchId, onClose }: MatchBetsDrawerProps) {
       });
   }, [matchId]);
 
+  // Lock body scroll while drawer is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
   return (
     <>
       {/* Backdrop */}
