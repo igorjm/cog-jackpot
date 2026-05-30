@@ -213,10 +213,14 @@ export async function syncScores() {
   }
 }
 
-export async function sendTestNotification() {
+export async function sendCustomNotification(title: string, body: string) {
   const session = await auth();
   if (!session?.user || session.user.role !== "ADMIN") {
     return { error: "Acesso negado" };
+  }
+
+  if (!title.trim() || !body.trim()) {
+    return { error: "Título e mensagem são obrigatórios" };
   }
 
   const count = await prisma.pushSubscription.count();
@@ -225,8 +229,8 @@ export async function sendTestNotification() {
   }
 
   await sendPushToAll({
-    title: "🔔 Teste de notificação",
-    body: "Se você recebeu isso, as notificações estão funcionando!",
+    title: title.trim(),
+    body: body.trim(),
     icon: "/icons/icon-192.png",
     url: "/dashboard",
   });

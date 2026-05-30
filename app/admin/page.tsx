@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 import { calculateRanking } from "@/lib/ranking";
 import { PRIZE_DISTRIBUTION } from "@/lib/constants";
-import { TestNotificationButton } from "@/components/test-notification-button";
+import { SendNotificationForm } from "@/components/test-notification-button";
 
 export default async function AdminDashboard() {
   const totalUsers = await prisma.user.count({ where: { role: { not: "ADMIN" } } });
@@ -45,15 +45,12 @@ export default async function AdminDashboard() {
         </div>
       )}
 
-      {/* Test Push Notification */}
-      <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-4 flex items-center justify-between gap-4">
-        <div>
-          <h2 className="text-sm font-bold font-[family-name:var(--font-oswald)] uppercase text-[#FFD60A]">
-            Push Notifications
-          </h2>
-          <p className="text-xs text-[#94B8D8] mt-1">Envia notificação de teste para todos com push ativo</p>
-        </div>
-        <TestNotificationButton />
+      {/* Push Notifications */}
+      <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-4">
+        <h2 className="text-sm font-bold font-[family-name:var(--font-oswald)] uppercase text-[#FFD60A] mb-3">
+          Enviar Notificação
+        </h2>
+        <SendNotificationForm />
       </div>
 
       {/* Prize Distribution */}
