@@ -59,12 +59,12 @@ export function MatchBetsDrawer({ matchId, onClose }: MatchBetsDrawerProps) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 z-40"
+        className="fixed inset-0 bg-black/60 z-[60]"
         onClick={onClose}
       />
 
       {/* Drawer */}
-      <div className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] flex flex-col bg-[#0F2347] rounded-t-2xl border-t border-[#2A4A7A] shadow-2xl animate-in slide-in-from-bottom duration-300 md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:w-[420px] md:max-h-none md:rounded-t-none md:rounded-l-2xl md:border-t-0 md:border-l">
+      <div className="fixed inset-x-0 bottom-0 z-[70] max-h-[85vh] flex flex-col bg-[#0F2347] rounded-t-2xl border-t border-[#2A4A7A] shadow-2xl animate-in slide-in-from-bottom duration-300 md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:w-[420px] md:max-h-none md:rounded-t-none md:rounded-l-2xl md:border-t-0 md:border-l">
         {/* Handle (mobile) */}
         <div className="flex justify-center pt-3 pb-1 md:hidden">
           <div className="w-10 h-1 rounded-full bg-[#2A4A7A]" />

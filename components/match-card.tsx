@@ -145,7 +145,7 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
               <Badge variant={userBet.points && userBet.points > 0 ? "points" : "error"}>
                 +{userBet.points ?? 0} pts
               </Badge>
-              <span className="text-xs text-[#38BDF8]">Ver →</span>
+              <span className="text-xs font-medium text-[#38BDF8] bg-[#38BDF8]/10 px-2.5 py-1 rounded-full border border-[#38BDF8]/20">Ver →</span>
             </div>
           </div>
         ) : isFinished && !userBet ? (
@@ -153,7 +153,7 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
             <Badge variant="error">Não palpitou</Badge>
             <div className="flex items-center gap-2">
               <span className="text-xs text-[#94B8D8]">0 pts</span>
-              <span className="text-xs text-[#38BDF8]">Ver →</span>
+              <span className="text-xs font-medium text-[#38BDF8] bg-[#38BDF8]/10 px-2.5 py-1 rounded-full border border-[#38BDF8]/20">Ver →</span>
             </div>
           </div>
         ) : isOpen ? (
@@ -191,7 +191,7 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
                   {userBet.homeScore} × {userBet.awayScore}
                 </span>
               )}
-              <span className="text-xs text-[#38BDF8]">Ver palpites →</span>
+              <span className="text-xs font-medium text-[#38BDF8] bg-[#38BDF8]/10 px-2.5 py-1 rounded-full border border-[#38BDF8]/20">Ver palpites →</span>
             </div>
           </div>
         )}

@@ -151,7 +151,7 @@ export default async function MainLayout({
 
       {/* Main content */}
       <main className="flex-1 md:ml-56 relative z-10">
-        <div className="max-w-5xl mx-auto w-full px-4 py-6">
+        <div className="max-w-5xl mx-auto w-full px-4 py-6 pb-20 md:pb-6">
           {children}
         </div>
       </main>
