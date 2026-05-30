@@ -58,6 +58,7 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
             month: "short",
             hour: "2-digit",
             minute: "2-digit",
+            timeZone: "America/Sao_Paulo",
           })}
           {match.venue && ` • ${match.venue}`}
         </div>
