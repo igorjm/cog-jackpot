@@ -7,7 +7,7 @@
     },
     {
       "path": "/api/cron/deadline-reminder",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 12 * * *"
     }
   ]
 }

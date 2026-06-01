@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPushToAll } from "@/lib/push";
-import { DEADLINE_HOURS_BEFORE } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -13,39 +12,55 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Find all matches happening today (BRT = UTC-3)
   const now = new Date();
+  const startOfDay = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setHours(23, 59, 59, 999);
 
-  // Find matches whose betting deadline is within the next 15 minutes
-  // Deadline = matchDate - DEADLINE_HOURS_BEFORE (1h)
-  // So we want matches starting in 60–75 minutes from now
-  const windowStart = new Date(now.getTime() + DEADLINE_HOURS_BEFORE * 60 * 60 * 1000);
-  const windowEnd = new Date(windowStart.getTime() + 15 * 60 * 1000);
+  // Convert BRT boundaries back to UTC for DB query
+  const startUTC = new Date(startOfDay.getTime() + 3 * 60 * 60 * 1000);
+  const endUTC = new Date(endOfDay.getTime() + 3 * 60 * 60 * 1000);
 
-  const upcomingMatches = await prisma.match.findMany({
+  const todayMatches = await prisma.match.findMany({
     where: {
-      matchDate: { gte: windowStart, lt: windowEnd },
-      homeScore: null, // not finished
-      isLocked: false, // still open for bets
+      matchDate: { gte: startUTC, lte: endUTC },
+      homeScore: null, // not yet played
     },
     orderBy: { matchDate: "asc" },
   });
 
-  if (upcomingMatches.length === 0) {
-    return NextResponse.json({ sent: 0, message: "No upcoming deadlines" });
+  if (todayMatches.length === 0) {
+    return NextResponse.json({ sent: 0, message: "No matches today" });
   }
 
-  // Build notification for each match
-  for (const match of upcomingMatches) {
-    await sendPushToAll({
-      title: "⏰ Palpite fechando em breve!",
-      body: `${match.homeTeam} vs ${match.awayTeam} — faltam menos de 1h para palpitar!`,
-      icon: "/icons/icon-192.png",
-      url: `/matches/${match.id}`,
-    });
-  }
+  // Format match times in BRT
+  const matchList = todayMatches
+    .map((m) => {
+      const time = m.matchDate.toLocaleTimeString("pt-BR", {
+        timeZone: "America/Sao_Paulo",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      return `${m.homeTeam} vs ${m.awayTeam} às ${time}`;
+    })
+    .join("\n");
+
+  const body =
+    todayMatches.length === 1
+      ? `${todayMatches[0].homeTeam} vs ${todayMatches[0].awayTeam} — palpite fecha 1h antes do jogo!`
+      : `${todayMatches.length} jogos hoje — palpites fecham 1h antes de cada jogo!\n${matchList}`;
+
+  await sendPushToAll({
+    title: "⚽ Jogos de hoje — não esqueça de palpitar!",
+    body,
+    icon: "/icons/icon-192.png",
+    url: "/matches",
+  });
 
   return NextResponse.json({
-    sent: upcomingMatches.length,
-    matches: upcomingMatches.map((m) => `${m.homeTeam} vs ${m.awayTeam}`),
+    sent: todayMatches.length,
+    matches: todayMatches.map((m) => `${m.homeTeam} vs ${m.awayTeam}`),
   });
 }
