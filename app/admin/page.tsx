@@ -4,6 +4,8 @@ import { calculateRanking } from "@/lib/ranking";
 import { PRIZE_DISTRIBUTION } from "@/lib/constants";
 import { SendNotificationForm } from "@/components/test-notification-button";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard() {
   const totalUsers = await prisma.user.count({ where: { role: { not: "ADMIN" } } });
   const approvedUsers = await prisma.user.count({ where: { status: "APPROVED", role: { not: "ADMIN" } } });
