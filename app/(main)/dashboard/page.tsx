@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MatchCard } from "@/components/match-card";
+import { RecentResults } from "@/components/recent-results";
 import Link from "next/link";
 
 export default async function DashboardPage() {
@@ -111,16 +112,18 @@ export default async function DashboardPage() {
           <h2 className="text-sm font-bold uppercase text-[#94B8D8] tracking-wide">
             Últimos Resultados
           </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {recentMatches.map((match) => (
-              <MatchCard
-                key={match.id}
-                match={match}
-                userBet={betsMap.get(match.id)}
-                showBetLink={false}
-              />
-            ))}
-          </div>
+          <RecentResults
+            matches={recentMatches.map((m) => ({
+              ...m,
+              matchDate: m.matchDate.toISOString(),
+              isLocked: true,
+            }))}
+            betsMap={Object.fromEntries(
+              recentMatches
+                .filter((m) => betsMap.has(m.id))
+                .map((m) => [m.id, betsMap.get(m.id)!])
+            )}
+          />
         </section>
       )}
 
