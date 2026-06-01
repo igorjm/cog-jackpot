@@ -90,7 +90,7 @@ export function MatchBetsDrawer({ matchId, onClose }: MatchBetsDrawerProps) {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] space-y-4">
           {loading && (
             <div className="space-y-3">
               {[1, 2, 3, 4].map((i) => (
