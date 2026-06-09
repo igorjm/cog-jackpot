@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { hash } from "bcryptjs";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resultSchema } from "@/lib/validations";
@@ -133,6 +134,26 @@ export async function rejectUser(userId: string) {
 
   revalidatePath("/admin/users");
   return { success: true };
+}
+
+export async function resetUserPassword(userId: string) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { error: "Acesso negado" };
+  }
+
+  const parsed = userIdSchema.safeParse(userId);
+  if (!parsed.success) return { error: "ID inválido" };
+
+  const tempPassword = Math.random().toString(36).slice(-6);
+  const hashed = await hash(tempPassword, 12);
+
+  await prisma.user.update({
+    where: { id: parsed.data },
+    data: { password: hashed },
+  });
+
+  return { success: true, tempPassword };
 }
 
 export async function syncScores() {
