@@ -17,7 +17,17 @@ interface User {
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [resetResult, setResetResult] = useState<{ nickname: string; password: string } | null>(null);
+
+  const filteredUsers = users.filter((u) => {
+    const q = search.toLowerCase();
+    return (
+      u.name.toLowerCase().includes(q) ||
+      u.nickname.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q)
+    );
+  });
 
   useEffect(() => {
     fetch("/api/admin/users")
@@ -60,8 +70,16 @@ export default function AdminUsersPage() {
         Participantes
       </h1>
 
+      <input
+        type="text"
+        placeholder="Buscar por nome, apelido ou email..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full rounded-lg bg-[#0F2347] border border-[#2A4A7A] px-3 py-2 text-sm text-white placeholder:text-[#5A7A9A] focus:outline-none focus:border-[#38BDF8]"
+      />
+
       <div className="space-y-2">
-        {users.map((user) => (
+        {filteredUsers.map((user) => (
           <div
             key={user.id}
             className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-4 flex items-center justify-between gap-3"
