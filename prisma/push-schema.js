@@ -102,10 +102,28 @@ CREATE UNIQUE INDEX IF NOT EXISTS "Bet_userId_matchId_key" ON "Bet"("userId", "m
 CREATE UNIQUE INDEX IF NOT EXISTS "BonusBet_userId_phase_selectedTeam_key" ON "BonusBet"("userId", "phase", "selectedTeam");
 CREATE UNIQUE INDEX IF NOT EXISTS "Config_key_key" ON "Config"("key");
 
+-- PredictionType enum
+DO $$ BEGIN CREATE TYPE "PredictionType" AS ENUM ('CHAMPION', 'TOP_SCORER'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+-- Prediction table
+CREATE TABLE IF NOT EXISTS "Prediction" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "type" "PredictionType" NOT NULL,
+    "value" TEXT NOT NULL,
+    "isCorrect" BOOLEAN,
+    "points" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Prediction_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "Prediction_userId_type_key" ON "Prediction"("userId", "type");
+
 -- AddForeignKey
 ALTER TABLE "Bet" ADD CONSTRAINT "Bet_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "Bet" ADD CONSTRAINT "Bet_matchId_fkey" FOREIGN KEY ("matchId") REFERENCES "Match"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "BonusBet" ADD CONSTRAINT "BonusBet_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Prediction" ADD CONSTRAINT "Prediction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- Prisma migrations tracking table
 CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
@@ -127,11 +145,28 @@ async function main() {
   await client.connect();
   console.log('Connected to database.');
 
-  // Split into individual statements and run each separately
-  const statements = sql
-    .split(';')
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
+  // Split into individual statements, respecting $$ blocks
+  const statements = [];
+  let current = '';
+  let inDollarBlock = false;
+  for (const line of sql.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('--')) {
+      if (current) current += '\n' + line;
+      continue;
+    }
+    current += (current ? '\n' : '') + line;
+    // Track $$ blocks to avoid splitting on ; inside them
+    const dollarMatches = line.match(/\$\$/g);
+    if (dollarMatches) {
+      for (const _ of dollarMatches) inDollarBlock = !inDollarBlock;
+    }
+    if (!inDollarBlock && trimmed.endsWith(';')) {
+      statements.push(current.trim());
+      current = '';
+    }
+  }
+  if (current.trim()) statements.push(current.trim());
 
   for (const stmt of statements) {
     try {

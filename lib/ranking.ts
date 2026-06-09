@@ -26,11 +26,16 @@ export async function calculateRanking(): Promise<RankingEntry[]> {
         },
         include: { match: { select: { phase: true } } },
       },
+      predictions: {
+        where: { points: { not: null } },
+      },
     },
   });
 
   const entries: RankingEntry[] = users.map((user) => {
-    const totalPoints = user.bets.reduce((sum, bet) => sum + (bet.points ?? 0), 0);
+    const betPoints = user.bets.reduce((sum, bet) => sum + (bet.points ?? 0), 0);
+    const predictionPoints = user.predictions.reduce((sum, p) => sum + (p.points ?? 0), 0);
+    const totalPoints = betPoints + predictionPoints;
     const exactScores = user.bets.filter((bet) => bet.rawPoints === 10).length;
     const correctWinners = user.bets.filter(
       (bet) => bet.rawPoints !== null && bet.rawPoints >= 5

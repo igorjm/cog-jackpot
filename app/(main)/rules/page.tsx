@@ -1,4 +1,4 @@
-import { POINTS, MULTIPLIERS, PRIZE_DISTRIBUTION, PHASE_LABELS } from "@/lib/constants";
+import { POINTS, MULTIPLIERS, PRIZE_DISTRIBUTION, PHASE_LABELS, PREDICTION_POINTS } from "@/lib/constants";
 
 export default function RulesPage() {
   const entryFee = process.env.NEXT_PUBLIC_ENTRY_FEE ?? "50.00";
@@ -67,6 +67,26 @@ export default function RulesPage() {
           <li>Maior pontuação sem multiplicador</li>
           <li>Quem palpitou primeiro (data/hora do primeiro palpite)</li>
         </ol>
+      </section>
+
+      {/* Predictions Bonus */}
+      <section className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-5 space-y-3">
+        <h2 className="text-sm font-bold uppercase text-[#FFD60A] tracking-wide">
+          🏆 Palpites Especiais
+        </h2>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between py-2 border-b border-[#2A4A7A]">
+            <span className="text-sm">Acertar o Campeão do Mundo</span>
+            <span className="font-mono font-bold text-[#22C55E]">+{PREDICTION_POINTS} pts</span>
+          </div>
+          <div className="flex items-center justify-between py-2">
+            <span className="text-sm">Acertar o Artilheiro da Copa</span>
+            <span className="font-mono font-bold text-[#22C55E]">+{PREDICTION_POINTS} pts</span>
+          </div>
+        </div>
+        <p className="text-xs text-[#94B8D8]">
+          Prazo: até o início do primeiro jogo da fase de grupos. Pontos NÃO recebem multiplicador.
+        </p>
       </section>
 
       {/* Prizes */}

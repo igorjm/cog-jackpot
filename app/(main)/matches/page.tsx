@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { MatchCard } from "@/components/match-card";
 import { PhaseTabs } from "@/components/phase-tabs";
 import { MatchBetsDrawer } from "@/components/match-bets-drawer";
@@ -50,7 +51,7 @@ export default function MatchesPage() {
       });
   }, []);
 
-  const friendlyMatches = matches.filter((m) => m.phase === "FRIENDLY");
+  const friendlyMatches = matches.filter((m) => m.phase === "FRIENDLY" && m.homeScore === null);
 
   const filteredMatches = matches.filter((m) => {
     if (m.phase === "FRIENDLY") return false;
@@ -112,6 +113,29 @@ export default function MatchesPage() {
           <div className="border-t border-[#2A4A7A]" />
         </section>
       )}
+
+      {/* Predictions link */}
+      <Link
+        href="/predictions"
+        className="block bg-gradient-to-r from-[#1a3a6b] to-[#2a1a5e] rounded-xl border border-[#2A4A7A] p-4 hover:border-[#FFD60A]/40 transition-all group"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-bold uppercase text-[#FFD60A] tracking-wide">
+                🏆 Palpites Especiais
+              </span>
+              <span className="text-[10px] text-[#94B8D8] bg-[#1E3862] px-2 py-0.5 rounded-full">
+                +10 pts cada
+              </span>
+            </div>
+            <p className="text-xs text-[#94B8D8]">
+              Escolha o campeão e o artilheiro da Copa
+            </p>
+          </div>
+          <span className="text-[#94B8D8] group-hover:text-[#FFD60A] transition-colors text-lg">→</span>
+        </div>
+      </Link>
 
       <PhaseTabs
         activePhase={activePhase}

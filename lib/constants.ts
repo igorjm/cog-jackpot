@@ -22,6 +22,8 @@ export const MULTIPLIERS: Record<Phase, number> = {
 
 export const BONUS_POINTS = 3;
 
+export const PREDICTION_POINTS = 10;
+
 export const DEADLINE_HOURS_BEFORE = 1;
 
 export const PHASE_LABELS: Record<Phase, string> = {
