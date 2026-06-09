@@ -19,6 +19,8 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [resetResult, setResetResult] = useState<{ nickname: string; password: string } | null>(null);
+  const [confirmReset, setConfirmReset] = useState<{ userId: string; nickname: string } | null>(null);
+  const [resetting, setResetting] = useState(false);
 
   const filteredUsers = users.filter((u) => {
     const q = search.toLowerCase();
@@ -53,10 +55,17 @@ export default function AdminUsersPage() {
   };
 
   const handleReset = async (userId: string, nickname: string) => {
-    if (!confirm(`Resetar senha de @${nickname}?`)) return;
-    const result = await resetUserPassword(userId);
+    setConfirmReset({ userId, nickname });
+  };
+
+  const executeReset = async () => {
+    if (!confirmReset) return;
+    setResetting(true);
+    const result = await resetUserPassword(confirmReset.userId);
+    setResetting(false);
+    setConfirmReset(null);
     if (result.tempPassword) {
-      setResetResult({ nickname, password: result.tempPassword });
+      setResetResult({ nickname: confirmReset.nickname, password: result.tempPassword });
     }
   };
 
@@ -135,6 +144,41 @@ export default function AdminUsersPage() {
       {users.length === 0 && (
         <div className="text-center py-8 text-[#94B8D8]">
           Nenhum participante cadastrado.
+        </div>
+      )}
+
+      {confirmReset && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-6 max-w-sm w-full space-y-4">
+            <h3 className="text-sm font-bold text-[#FFD60A]">Confirmar reset de senha</h3>
+            <p className="text-sm text-[#94B8D8]">
+              Tem certeza que deseja resetar a senha de{" "}
+              <span className="text-white font-medium">@{confirmReset.nickname}</span>?
+            </p>
+            <p className="text-xs text-[#5A7A9A]">
+              Uma nova senha temporária será gerada. Você precisará enviar por WhatsApp.
+            </p>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="danger"
+                className="flex-1"
+                onClick={executeReset}
+                disabled={resetting}
+              >
+                {resetting ? "Resetando..." : "Resetar"}
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="flex-1"
+                onClick={() => setConfirmReset(null)}
+                disabled={resetting}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
