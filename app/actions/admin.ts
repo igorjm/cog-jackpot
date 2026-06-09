@@ -145,7 +145,7 @@ export async function resetUserPassword(userId: string) {
   const parsed = userIdSchema.safeParse(userId);
   if (!parsed.success) return { error: "ID inválido" };
 
-  const tempPassword = Math.random().toString(36).slice(-6);
+  const tempPassword = Math.random().toString(36).slice(-8);
   const hashed = await hash(tempPassword, 12);
 
   await prisma.user.update({
