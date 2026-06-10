@@ -80,6 +80,9 @@ export default function RegisterPage() {
     const result = await registerAction(formData);
     if (result?.error) {
       setError(result.error);
+      if (result.fieldErrors) {
+        setFieldErrors((prev) => ({ ...prev, ...result.fieldErrors }));
+      }
       setLoading(false);
     }
   }

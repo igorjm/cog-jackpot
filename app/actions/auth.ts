@@ -27,7 +27,12 @@ export async function registerAction(formData: FormData) {
 
   const parsed = registerSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0].message };
+    const fieldErrors: Record<string, string> = {};
+    for (const issue of parsed.error.issues) {
+      const field = issue.path[0] as string;
+      if (!fieldErrors[field]) fieldErrors[field] = issue.message;
+    }
+    return { error: "Corrija os campos abaixo.", fieldErrors };
   }
 
   const { name, email, nickname, password, avatar } = parsed.data;
@@ -35,12 +40,12 @@ export async function registerAction(formData: FormData) {
   try {
     const existingEmail = await prisma.user.findUnique({ where: { email } });
     if (existingEmail) {
-      return { error: "Não foi possível criar a conta. Verifique os dados." };
+      return { error: "Email já cadastrado.", fieldErrors: { email: "Este email já está em uso" } };
     }
 
     const existingNickname = await prisma.user.findUnique({ where: { nickname } });
     if (existingNickname) {
-      return { error: "Não foi possível criar a conta. Verifique os dados." };
+      return { error: "Apelido já em uso.", fieldErrors: { nickname: "Este apelido já está em uso" } };
     }
 
     const hashedPassword = await hash(password, 12);
