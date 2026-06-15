@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { calculateRanking } from "@/lib/ranking";
 import { MatchCard } from "@/components/match-card";
 import { RecentResults } from "@/components/recent-results";
 import Link from "next/link";
@@ -35,22 +36,12 @@ export default async function DashboardPage() {
   });
   const betsMap = new Map(userBets.map((b) => [b.matchId, b]));
 
-  // Get user stats
-  const totalPoints = userBets.reduce((sum, b) => sum + (b.points ?? 0), 0);
-  const exactScores = userBets.filter((b) => b.rawPoints === 10).length;
-
-  // Get user position (simple count)
-  const allUsers = await prisma.user.findMany({
-    where: { status: "APPROVED", role: { not: "ADMIN" } },
-    include: { bets: { where: { points: { not: null } } } },
-  });
-  const sortedUsers = allUsers
-    .map((u) => ({
-      id: u.id,
-      points: u.bets.reduce((sum, b) => sum + (b.points ?? 0), 0),
-    }))
-    .sort((a, b) => b.points - a.points);
-  const position = sortedUsers.findIndex((u) => u.id === userId) + 1;
+  // Get user stats from the authoritative ranking (same logic as /ranking page)
+  const ranking = await calculateRanking();
+  const myEntry = ranking.find((e) => e.userId === userId);
+  const totalPoints = myEntry?.totalPoints ?? 0;
+  const exactScores = myEntry?.exactScores ?? 0;
+  const position = ranking.findIndex((e) => e.userId === userId) + 1;
 
   return (
     <div className="space-y-6">

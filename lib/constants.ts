@@ -29,7 +29,7 @@ export const DEADLINE_HOURS_BEFORE = 1;
 export const PHASE_LABELS: Record<Phase, string> = {
   FRIENDLY: "Jogo Especial",
   GROUP: "Fase de Grupos",
-  ROUND_OF_32: "32 Avos de Final",
+  ROUND_OF_32: "16 Avos de Final",
   ROUND_OF_16: "Oitavas de Final",
   QUARTER_FINAL: "Quartas de Final",
   SEMI_FINAL: "Semifinais",

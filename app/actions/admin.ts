@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resultSchema } from "@/lib/validations";
 import { calculatePoints, calculateFinalPoints } from "@/lib/scoring";
+import { calculateRanking } from "@/lib/ranking";
 import { fetchFinishedMatches } from "@/lib/football-api";
 import { revalidatePath } from "next/cache";
 import { sendPushToAll, sendPushToUser } from "@/lib/push";
@@ -33,6 +34,17 @@ export async function saveResult(formData: FormData) {
   });
 
   if (!match) return { error: "Jogo não encontrado" };
+
+  // Snapshot current ranking positions before they change
+  const currentRanking = await calculateRanking();
+  await Promise.all(
+    currentRanking.map((entry) =>
+      prisma.user.update({
+        where: { id: entry.userId },
+        data: { previousPosition: entry.position },
+      })
+    )
+  );
 
   // Update match result
   await prisma.match.update({
@@ -167,6 +179,17 @@ export async function syncScores() {
     if (results.length === 0) {
       return { success: true, synced: 0, message: "Nenhum resultado novo encontrado" };
     }
+
+    // Snapshot current ranking positions before scores change
+    const currentRanking = await calculateRanking();
+    await Promise.all(
+      currentRanking.map((entry) =>
+        prisma.user.update({
+          where: { id: entry.userId },
+          data: { previousPosition: entry.position },
+        })
+      )
+    );
 
     let synced = 0;
 

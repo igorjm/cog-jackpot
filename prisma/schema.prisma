@@ -16,6 +16,7 @@ model User {
   avatar            String?
   status            UserStatus         @default(PENDING_PAYMENT)
   role              Role               @default(USER)
+  previousPosition  Int?
   bets              Bet[]
   bonusBets         BonusBet[]
   predictions       Prediction[]

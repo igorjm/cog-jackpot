@@ -128,6 +128,15 @@ export default function AdminResultsPage() {
       const res = await fetch("/api/admin/matches");
       const data = await res.json();
       setMatches(data);
+      // Also refresh score inputs so newly synced matches show correct values
+      const updated: Record<string, { home: number; away: number }> = {};
+      data.forEach((m: Match) => {
+        updated[m.id] = {
+          home: m.homeScore ?? 0,
+          away: m.awayScore ?? 0,
+        };
+      });
+      setScores(updated);
     }
     setSyncing(false);
     setTimeout(() => setSyncMsg(null), 5000);

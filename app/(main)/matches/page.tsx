@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MatchCard } from "@/components/match-card";
 import { PhaseTabs } from "@/components/phase-tabs";
 import { MatchBetsDrawer } from "@/components/match-bets-drawer";
 import { Phase } from "@prisma/client";
+import { cn } from "@/lib/utils";
 
 interface MatchWithBet {
   id: string;
@@ -41,6 +42,19 @@ export default function MatchesPage() {
   );
   const [loading, setLoading] = useState(true);
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<"phase" | "agenda">("phase");
+  const closeGuard = useRef(false);
+
+  const handleOpen = (matchId: string) => {
+    if (closeGuard.current) return;
+    setSelectedMatchId(matchId);
+  };
+
+  const handleClose = () => {
+    setSelectedMatchId(null);
+    closeGuard.current = true;
+    setTimeout(() => { closeGuard.current = false; }, 300);
+  };
 
   useEffect(() => {
     fetch("/api/matches")
@@ -66,6 +80,22 @@ export default function MatchesPage() {
     ),
   ].sort();
 
+  const agendaMatches = matches
+    .filter((m) => m.phase !== "FRIENDLY")
+    .sort((a, b) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime());
+
+  const agendaByDate = agendaMatches.reduce((acc, match) => {
+    const key = new Date(match.matchDate).toLocaleDateString("pt-BR", {
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+      timeZone: "America/Sao_Paulo",
+    });
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(match);
+    return acc;
+  }, {} as Record<string, MatchWithBet[]>);
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -81,9 +111,31 @@ export default function MatchesPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold font-[family-name:var(--font-oswald)] uppercase">
-        Jogos
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold font-[family-name:var(--font-oswald)] uppercase">
+          Jogos
+        </h1>
+        <div className="flex rounded-lg overflow-hidden border border-[#2A4A7A]">
+          <button
+            onClick={() => setActiveView("phase")}
+            className={cn(
+              "px-3 py-1.5 text-xs font-medium transition-all",
+              activeView === "phase" ? "bg-[#38BDF8] text-[#0F2347]" : "bg-[#162D54] text-[#94B8D8] hover:text-white"
+            )}
+          >
+            Fase
+          </button>
+          <button
+            onClick={() => setActiveView("agenda")}
+            className={cn(
+              "px-3 py-1.5 text-xs font-medium transition-all",
+              activeView === "agenda" ? "bg-[#38BDF8] text-[#0F2347]" : "bg-[#162D54] text-[#94B8D8] hover:text-white"
+            )}
+          >
+            📅 Agenda
+          </button>
+        </div>
+      </div>
 
       {/* Special matches section */}
       {friendlyMatches.length > 0 && (
@@ -97,18 +149,28 @@ export default function MatchesPage() {
             </span>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            {friendlyMatches.map((match) => (
-              <div
-                key={match.id}
-                onClick={() => match.isLocked ? setSelectedMatchId(match.id) : undefined}
-                className={match.isLocked ? "cursor-pointer" : ""}
-              >
-                <MatchCard
-                  match={{ ...match, matchDate: new Date(match.matchDate) }}
-                  userBet={match.userBet}
-                />
-              </div>
-            ))}
+            {friendlyMatches.map((match) =>
+              match.isLocked ? (
+                <button
+                  key={match.id}
+                  type="button"
+                  onClick={() => handleOpen(match.id)}
+                  className="text-left w-full"
+                >
+                  <MatchCard
+                    match={{ ...match, matchDate: new Date(match.matchDate) }}
+                    userBet={match.userBet}
+                  />
+                </button>
+              ) : (
+                <div key={match.id}>
+                  <MatchCard
+                    match={{ ...match, matchDate: new Date(match.matchDate) }}
+                    userBet={match.userBet}
+                  />
+                </div>
+              )
+            )}
           </div>
           <div className="border-t border-[#2A4A7A]" />
         </section>
@@ -137,40 +199,97 @@ export default function MatchesPage() {
         </div>
       </Link>
 
-      <PhaseTabs
-        activePhase={activePhase}
-        onPhaseChange={setActivePhase}
-        activeGroup={activeGroup}
-        onGroupChange={setActiveGroup}
-        groups={groups}
-      />
+      {activeView === "phase" && (
+        <>
+          <PhaseTabs
+            activePhase={activePhase}
+            onPhaseChange={setActivePhase}
+            activeGroup={activeGroup}
+            onGroupChange={setActiveGroup}
+            groups={groups}
+          />
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {filteredMatches.map((match) => (
-          <div
-            key={match.id}
-            onClick={() => match.isLocked ? setSelectedMatchId(match.id) : undefined}
-            className={match.isLocked ? "cursor-pointer" : ""}
-          >
-            <MatchCard
-              match={{ ...match, matchDate: new Date(match.matchDate) }}
-              userBet={match.userBet}
-            />
+          <div className="grid gap-3 sm:grid-cols-2">
+            {filteredMatches.map((match) =>
+              match.isLocked ? (
+                <button
+                  key={match.id}
+                  type="button"
+                  onClick={() => handleOpen(match.id)}
+                  className="text-left w-full"
+                >
+                  <MatchCard
+                    match={{ ...match, matchDate: new Date(match.matchDate) }}
+                    userBet={match.userBet}
+                  />
+                </button>
+              ) : (
+                <div key={match.id}>
+                  <MatchCard
+                    match={{ ...match, matchDate: new Date(match.matchDate) }}
+                    userBet={match.userBet}
+                  />
+                </div>
+              )
+            )}
           </div>
-        ))}
-      </div>
 
-      {filteredMatches.length === 0 && (
-        <div className="text-center py-8 text-[#94B8D8]">
-          Nenhum jogo nesta fase/grupo.
+          {filteredMatches.length === 0 && (
+            <div className="text-center py-8 text-[#94B8D8]">
+              Nenhum jogo nesta fase/grupo.
+            </div>
+          )}
+        </>
+      )}
+
+      {activeView === "agenda" && (
+        <div className="space-y-6">
+          {Object.entries(agendaByDate).map(([dateLabel, dayMatches]) => (
+            <div key={dateLabel} className="space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold uppercase tracking-wide text-[#FFD60A] capitalize">
+                  {dateLabel}
+                </span>
+                <div className="flex-1 h-px bg-[#2A4A7A]" />
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {dayMatches.map((match) =>
+                  match.isLocked ? (
+                    <button
+                      key={match.id}
+                      type="button"
+                      onClick={() => handleOpen(match.id)}
+                      className="text-left w-full"
+                    >
+                      <MatchCard
+                        match={{ ...match, matchDate: new Date(match.matchDate) }}
+                        userBet={match.userBet}
+                      />
+                    </button>
+                  ) : (
+                    <div key={match.id}>
+                      <MatchCard
+                        match={{ ...match, matchDate: new Date(match.matchDate) }}
+                        userBet={match.userBet}
+                      />
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          ))}
+          {agendaMatches.length === 0 && (
+            <div className="text-center py-8 text-[#94B8D8]">
+              Nenhum jogo cadastrado.
+            </div>
+          )}
         </div>
       )}
 
-      {/* Drawer for viewing all bets after deadline */}
       {selectedMatchId && (
         <MatchBetsDrawer
           matchId={selectedMatchId}
-          onClose={() => setSelectedMatchId(null)}
+          onClose={handleClose}
         />
       )}
     </div>

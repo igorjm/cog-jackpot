@@ -63,6 +63,7 @@ export async function calculateRanking(): Promise<RankingEntry[]> {
       rawTotalPoints,
       firstBetDate,
       position: 0,
+      previousPosition: user.previousPosition ?? undefined,
     };
   });
 
@@ -83,9 +84,12 @@ export async function calculateRanking(): Promise<RankingEntry[]> {
     return 0;
   });
 
-  // Assign positions
+  // Assign positions and calculate change from previous
   entries.forEach((entry, index) => {
     entry.position = index + 1;
+    if (entry.previousPosition != null) {
+      entry.positionChange = entry.previousPosition - entry.position;
+    }
   });
 
   return entries;

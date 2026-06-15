@@ -57,7 +57,7 @@ export async function fetchFinishedMatches(): Promise<MatchResult[]> {
       headers: {
         "X-Auth-Token": API_KEY,
       },
-      next: { revalidate: 300 }, // cache 5 minutes
+      cache: "no-store",
     }
   );
 
