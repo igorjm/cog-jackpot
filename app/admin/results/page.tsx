@@ -59,6 +59,8 @@ export default function AdminResultsPage() {
   const [activeFilter, setActiveFilter] = useState("PENDING");
   const [syncing, setSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; count?: number; matches?: { homeTeam: string; awayTeam: string; score: string; phase: string; date: string }[]; error?: string } | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/matches")
@@ -142,6 +144,15 @@ export default function AdminResultsPage() {
     setTimeout(() => setSyncMsg(null), 5000);
   };
 
+  const handleTestApi = async () => {
+    setTesting(true);
+    setTestResult(null);
+    const res = await fetch("/api/admin/test-football-api");
+    const data = await res.json();
+    setTestResult(data);
+    setTesting(false);
+  };
+
   if (loading) {
     return (
       <div className="space-y-3">
@@ -159,6 +170,18 @@ export default function AdminResultsPage() {
           Resultados
         </h1>
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleTestApi}
+            disabled={testing}
+            className={cn(
+              "text-xs px-3 py-1.5 rounded-lg font-medium transition-all",
+              testing
+                ? "bg-[#1E3862] text-[#5A7A9A] cursor-wait"
+                : "bg-[#A855F7]/15 text-[#A855F7] hover:bg-[#A855F7]/25 border border-[#A855F7]/30"
+            )}
+          >
+            {testing ? "Testando..." : "🔍 Test API"}
+          </button>
           <button
             onClick={handleSync}
             disabled={syncing}
@@ -185,6 +208,29 @@ export default function AdminResultsPage() {
           syncMsg.startsWith("Falha") ? "bg-[#EF4444]/15 text-[#EF4444]" : "bg-[#22C55E]/15 text-[#22C55E]"
         )}>
           {syncMsg}
+        </div>
+      )}
+
+      {testResult && (
+        <div className={cn(
+          "text-xs rounded-lg border p-3 space-y-2",
+          testResult.ok ? "bg-[#22C55E]/10 border-[#22C55E]/30" : "bg-[#EF4444]/10 border-[#EF4444]/30"
+        )}>
+          <div className="flex items-center justify-between">
+            <span className={testResult.ok ? "text-[#22C55E] font-bold" : "text-[#EF4444] font-bold"}>
+              {testResult.ok ? `✅ API OK — ${testResult.count} jogo(s) finalizado(s)` : `❌ Erro: ${testResult.error}`}
+            </span>
+            <button onClick={() => setTestResult(null)} className="text-[#5A7A9A] hover:text-white">✕</button>
+          </div>
+          {testResult.ok && testResult.matches && testResult.matches.length > 0 && (
+            <div className="space-y-1">
+              {testResult.matches.map((m, i) => (
+                <div key={i} className="font-mono text-[#94B8D8]">
+                  {m.homeTeam} {m.score} {m.awayTeam} <span className="text-[#5A7A9A]">({m.phase})</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

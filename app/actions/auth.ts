@@ -103,6 +103,7 @@ export async function loginAction(formData: FormData) {
     });
   } catch (e) {
     if (e instanceof Error && "digest" in e) throw e; // Next.js redirect
+    console.error("[loginAction] signIn error:", e);
     return { error: "Email ou senha inválidos" };
   }
 
