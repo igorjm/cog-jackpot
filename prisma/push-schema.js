@@ -94,6 +94,9 @@ CREATE TABLE IF NOT EXISTS "Config" (
 -- Add avatar column to User table (nullable)
 ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "avatar" TEXT;
 
+-- Add previousPosition column to User table (nullable)
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "previousPosition" INTEGER;
+
 -- CreateIndex
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX IF NOT EXISTS "User_nickname_key" ON "User"("nickname");
