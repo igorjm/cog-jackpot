@@ -82,7 +82,12 @@ export default function MatchesPage() {
 
   const agendaMatches = matches
     .filter((m) => m.phase !== "FRIENDLY")
-    .sort((a, b) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime());
+    .sort((a, b) => {
+      const aFinished = a.homeScore !== null && a.awayScore !== null;
+      const bFinished = b.homeScore !== null && b.awayScore !== null;
+      if (aFinished !== bFinished) return aFinished ? 1 : -1;
+      return new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime();
+    });
 
   const agendaByDate = agendaMatches.reduce((acc, match) => {
     const key = new Date(match.matchDate).toLocaleDateString("pt-BR", {
