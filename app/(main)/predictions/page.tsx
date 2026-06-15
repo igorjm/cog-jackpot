@@ -4,7 +4,16 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { savePrediction } from "@/app/actions/predictions";
-import { getFlagSrc } from "@/lib/utils";
+import { getFlagSrc, getInitials } from "@/lib/utils";
+
+type AllPrediction = {
+  userId: string;
+  nickname: string;
+  name: string;
+  avatar: string | null;
+  champion: string | null;
+  topScorer: string | null;
+};
 
 const TEAMS: { name: string; flag: string }[] = [
   { name: "México", flag: "mx" },
@@ -120,6 +129,7 @@ export default function PredictionsPage() {
   const [loading, setLoading] = useState<"CHAMPION" | "TOP_SCORER" | null>(null);
   const [messages, setMessages] = useState<{ champion?: string; topScorer?: string }>({});
   const [initialLoading, setInitialLoading] = useState(true);
+  const [allPredictions, setAllPredictions] = useState<AllPrediction[]>([]);
 
   useEffect(() => {
     fetch("/api/predictions")
@@ -134,6 +144,14 @@ export default function PredictionsPage() {
       })
       .finally(() => setInitialLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!countdown.isExpired) return;
+    fetch("/api/predictions/all")
+      .then((res) => res.json())
+      .then((data) => { if (Array.isArray(data)) setAllPredictions(data); })
+      .catch(() => {});
+  }, [countdown.isExpired]);
 
   const filteredPlayers = useMemo(() => {
     if (!search.trim()) return POPULAR_PLAYERS;
@@ -388,6 +406,96 @@ export default function PredictionsPage() {
           </div>
         )}
       </section>
+
+      {/* All players' predictions — visible only after deadline */}
+      {countdown.isExpired && allPredictions.length > 0 && (
+        <section className="px-4 md:px-0 space-y-3 pb-8">
+          <h2 className="flex items-center gap-2 text-base font-bold font-[family-name:var(--font-oswald)] uppercase text-white">
+            <span>👥</span> Palpites de Todos
+          </h2>
+          <p className="text-xs text-[#94B8D8]">
+            Veja o que cada participante apostou para campeão e artilheiro.
+          </p>
+          <div className="space-y-2">
+            {allPredictions.map((p) => {
+              const teamFlag = p.champion ? TEAMS.find((t) => t.name === p.champion)?.flag : null;
+              const playerFlag = p.topScorer
+                ? POPULAR_PLAYERS.find((pl) => pl.name === p.topScorer)?.flag
+                : null;
+              return (
+                <div
+                  key={p.userId}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#162D54] border border-[#2A4A7A]"
+                >
+                  {/* Avatar */}
+                  {p.avatar ? (
+                    <Image
+                      src={p.avatar}
+                      alt=""
+                      width={32}
+                      height={40}
+                      className="w-8 h-10 rounded-md object-cover shrink-0"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-[#1E3862] flex items-center justify-center text-xs font-bold text-[#94B8D8] shrink-0">
+                      {getInitials(p.name)}
+                    </div>
+                  )}
+                  {/* Nickname */}
+                  <span className="text-sm font-medium text-white min-w-0 flex-1 truncate">
+                    {p.nickname}
+                  </span>
+                  {/* Champion */}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {teamFlag ? (
+                      <>
+                        <Image
+                          src={getFlagSrc(teamFlag, 40)}
+                          alt={p.champion!}
+                          width={20}
+                          height={14}
+                          className="rounded-[2px]"
+                          unoptimized
+                        />
+                        <span className="text-xs text-[#94B8D8] max-w-[80px] truncate hidden sm:inline">
+                          {p.champion}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-xs text-[#5A7A9A] italic">
+                        {p.champion ?? "—"}
+                      </span>
+                    )}
+                  </div>
+                  <div className="w-px h-5 bg-[#2A4A7A] shrink-0" />
+                  {/* Top scorer */}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {playerFlag ? (
+                      <>
+                        <Image
+                          src={getFlagSrc(playerFlag, 40)}
+                          alt={p.topScorer!}
+                          width={16}
+                          height={11}
+                          className="rounded-[2px]"
+                          unoptimized
+                        />
+                        <span className="text-xs text-[#94B8D8] max-w-[80px] truncate">
+                          {p.topScorer}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-xs text-[#5A7A9A] italic">
+                        {p.topScorer ?? "—"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
