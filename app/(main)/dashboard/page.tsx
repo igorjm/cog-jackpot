@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateRanking } from "@/lib/ranking";
-import { MatchCard } from "@/components/match-card";
+import { MatchCardWithDrawer } from "@/components/match-card-with-drawer";
 import { RecentResults } from "@/components/recent-results";
 import Link from "next/link";
 
@@ -81,13 +81,13 @@ export default async function DashboardPage() {
             <h2 className="text-sm font-bold uppercase text-[#94B8D8] tracking-wide">
               Próximos Jogos
             </h2>
-            <Link href="/matches" className="text-xs font-medium px-3 py-1 rounded-full border border-[#38BDF8]/30 text-[#38BDF8] hover:bg-[#38BDF8]/10 transition-all active:scale-95">
+            <Link href="/matches" className="text-xs font-medium px-3 py-1 rounded-full border border-[#38BDF8]/30 text-[#38BDF8] hover:bg-[#38BDF8]/10 transition-all active:scale-95 cursor-pointer">
               Ver todos
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {upcomingMatches.map((match) => (
-              <MatchCard
+              <MatchCardWithDrawer
                 key={match.id}
                 match={match}
                 userBet={betsMap.get(match.id)}

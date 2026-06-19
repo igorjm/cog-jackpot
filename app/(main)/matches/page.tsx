@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { MatchCard } from "@/components/match-card";
+import { MatchCardWithDrawer } from "@/components/match-card-with-drawer";
 import { PhaseTabs } from "@/components/phase-tabs";
-import { MatchBetsDrawer } from "@/components/match-bets-drawer";
 import { Phase } from "@prisma/client";
 import { cn } from "@/lib/utils";
 
@@ -41,21 +40,7 @@ export default function MatchesPage() {
     searchParams.get("group") || "A"
   );
   const [loading, setLoading] = useState(true);
-  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<"phase" | "agenda">("phase");
-  const closeGuard = useRef(false);
-
-  const handleOpen = (matchId: string) => {
-    if (closeGuard.current) return;
-    setSelectedMatchId(matchId);
-  };
-
-  const handleClose = () => {
-    setSelectedMatchId(null);
-    closeGuard.current = true;
-    setTimeout(() => { closeGuard.current = false; }, 300);
-  };
-
   useEffect(() => {
     fetch("/api/matches")
       .then((res) => res.json())
@@ -154,28 +139,14 @@ export default function MatchesPage() {
             </span>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            {friendlyMatches.map((match) =>
-              match.isLocked ? (
-                <button
-                  key={match.id}
-                  type="button"
-                  onClick={() => handleOpen(match.id)}
-                  className="text-left w-full"
-                >
-                  <MatchCard
-                    match={{ ...match, matchDate: new Date(match.matchDate) }}
-                    userBet={match.userBet}
-                  />
-                </button>
-              ) : (
-                <div key={match.id}>
-                  <MatchCard
-                    match={{ ...match, matchDate: new Date(match.matchDate) }}
-                    userBet={match.userBet}
-                  />
-                </div>
-              )
-            )}
+            {friendlyMatches.map((match) => (
+              <MatchCardWithDrawer
+                key={match.id}
+                match={{ ...match, matchDate: new Date(match.matchDate) }}
+                userBet={match.userBet}
+                isLocked={match.isLocked}
+              />
+            ))}
           </div>
           <div className="border-t border-[#2A4A7A]" />
         </section>
@@ -215,28 +186,14 @@ export default function MatchesPage() {
           />
 
           <div className="grid gap-3 sm:grid-cols-2">
-            {filteredMatches.map((match) =>
-              match.isLocked ? (
-                <button
-                  key={match.id}
-                  type="button"
-                  onClick={() => handleOpen(match.id)}
-                  className="text-left w-full"
-                >
-                  <MatchCard
-                    match={{ ...match, matchDate: new Date(match.matchDate) }}
-                    userBet={match.userBet}
-                  />
-                </button>
-              ) : (
-                <div key={match.id}>
-                  <MatchCard
-                    match={{ ...match, matchDate: new Date(match.matchDate) }}
-                    userBet={match.userBet}
-                  />
-                </div>
-              )
-            )}
+            {filteredMatches.map((match) => (
+              <MatchCardWithDrawer
+                key={match.id}
+                match={{ ...match, matchDate: new Date(match.matchDate) }}
+                userBet={match.userBet}
+                isLocked={match.isLocked}
+              />
+            ))}
           </div>
 
           {filteredMatches.length === 0 && (
@@ -258,28 +215,14 @@ export default function MatchesPage() {
                 <div className="flex-1 h-px bg-[#2A4A7A]" />
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                {dayMatches.map((match) =>
-                  match.isLocked ? (
-                    <button
-                      key={match.id}
-                      type="button"
-                      onClick={() => handleOpen(match.id)}
-                      className="text-left w-full"
-                    >
-                      <MatchCard
-                        match={{ ...match, matchDate: new Date(match.matchDate) }}
-                        userBet={match.userBet}
-                      />
-                    </button>
-                  ) : (
-                    <div key={match.id}>
-                      <MatchCard
-                        match={{ ...match, matchDate: new Date(match.matchDate) }}
-                        userBet={match.userBet}
-                      />
-                    </div>
-                  )
-                )}
+                {dayMatches.map((match) => (
+                  <MatchCardWithDrawer
+                    key={match.id}
+                    match={{ ...match, matchDate: new Date(match.matchDate) }}
+                    userBet={match.userBet}
+                    isLocked={match.isLocked}
+                  />
+                ))}
               </div>
             </div>
           ))}
@@ -289,13 +232,6 @@ export default function MatchesPage() {
             </div>
           )}
         </div>
-      )}
-
-      {selectedMatchId && (
-        <MatchBetsDrawer
-          matchId={selectedMatchId}
-          onClose={handleClose}
-        />
       )}
     </div>
   );

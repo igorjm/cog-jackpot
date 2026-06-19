@@ -171,7 +171,7 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
               {showBetLink && (
                 <a
                   href={`/matches/${match.id}`}
-                  className={`text-xs font-semibold px-3 py-1 rounded-full transition-all active:scale-95 ${
+                  className={`text-xs font-semibold px-3 py-1 rounded-full transition-all active:scale-95 cursor-pointer ${
                     userBet
                       ? "border border-[#22C55E]/30 text-[#22C55E] hover:bg-[#22C55E]/10"
                       : "bg-[#22C55E] text-black hover:bg-[#34D65C] shadow-sm shadow-[#22C55E]/20"
