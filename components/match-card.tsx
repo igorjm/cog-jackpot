@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { CountdownTimer } from "./countdown-timer";
 import { Badge } from "./ui/badge";
-import { isBeforeDeadline } from "@/lib/deadline";
+import { isBeforeDeadline, isMatchLive } from "@/lib/deadline";
 import { getKnockoutHint } from "@/lib/knockout-hints";
 import { getFlagSrc, isClubFlag } from "@/lib/utils";
 
@@ -35,15 +35,14 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
   const homeHint = isTbd ? getKnockoutHint(match.homeTeam) : null;
   const awayHint = isTbd ? getKnockoutHint(match.awayTeam) : null;
 
-  const now = new Date();
-  const matchStart = new Date(match.matchDate);
-  const matchEnd = new Date(matchStart.getTime() + 150 * 60 * 1000); // ~2.5h
-  const isLive = !isFinished && now >= matchStart && now <= matchEnd;
+  const isLive = isMatchLive(match.matchDate, match.homeScore, match.awayScore);
 
   return (
     <div
       className={`bg-[#162D54] rounded-2xl border p-4 transition-all ${
-        isExactScore
+        isLive
+          ? "border-red-500/50 shadow-lg shadow-red-500/10"
+          : isExactScore
           ? "border-[#FFD60A]/40 shadow-lg shadow-[#FFD60A]/10"
           : userBet && userBet.rawPoints && userBet.rawPoints >= 5
           ? "border-[#22C55E]/30"

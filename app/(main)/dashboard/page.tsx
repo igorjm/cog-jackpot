@@ -5,16 +5,30 @@ import { MatchCardWithDrawer } from "@/components/match-card-with-drawer";
 import { RecentResults } from "@/components/recent-results";
 import Link from "next/link";
 
+const LIVE_WINDOW_MS = 150 * 60 * 1000;
+
 export default async function DashboardPage() {
   const session = await auth();
   const userId = session!.user!.id;
   const nickname = (session!.user as { nickname: string }).nickname;
 
+  const now = new Date();
+  const liveWindowStart = new Date(now.getTime() - LIVE_WINDOW_MS);
+
+  // Live matches (started, no result yet)
+  const liveMatches = await prisma.match.findMany({
+    where: {
+      homeScore: null,
+      matchDate: { lte: now, gte: liveWindowStart },
+    },
+    orderBy: { matchDate: "asc" },
+  });
+
   // Get upcoming matches
   const upcomingMatches = await prisma.match.findMany({
     where: {
       homeScore: null,
-      matchDate: { gt: new Date() },
+      matchDate: { gt: now },
     },
     orderBy: { matchDate: "asc" },
     take: 4,
@@ -30,7 +44,7 @@ export default async function DashboardPage() {
   });
 
   // Get user bets for these matches
-  const matchIds = [...upcomingMatches, ...recentMatches].map((m) => m.id);
+  const matchIds = [...liveMatches, ...upcomingMatches, ...recentMatches].map((m) => m.id);
   const userBets = await prisma.bet.findMany({
     where: { userId, matchId: { in: matchIds } },
   });
@@ -73,6 +87,30 @@ export default async function DashboardPage() {
           <p className="text-[10px] text-[#94B8D8] mt-0.5">Exatos</p>
         </div>
       </div>
+
+      {/* Live Matches */}
+      {liveMatches.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold uppercase text-red-400 tracking-wide flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              Ao Vivo
+            </h2>
+            <Link href="/matches" className="text-xs font-medium px-3 py-1 rounded-full border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all active:scale-95 cursor-pointer">
+              Ver todos
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {liveMatches.map((match) => (
+              <MatchCardWithDrawer
+                key={match.id}
+                match={match}
+                userBet={betsMap.get(match.id)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Upcoming Matches */}
       {upcomingMatches.length > 0 && (
@@ -119,7 +157,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Empty state */}
-      {upcomingMatches.length === 0 && recentMatches.length === 0 && (
+      {upcomingMatches.length === 0 && liveMatches.length === 0 && recentMatches.length === 0 && (
         <div className="text-center py-12 space-y-3">
           <p className="text-4xl">⚽</p>
           <p className="text-[#94B8D8]">

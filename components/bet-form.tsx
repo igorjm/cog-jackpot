@@ -15,6 +15,7 @@ interface BetFormProps {
   isLocked: boolean;
   phase?: string;
   group?: string | null;
+  returnTo?: string;
 }
 
 export function BetForm({
@@ -25,6 +26,7 @@ export function BetForm({
   isLocked,
   phase,
   group,
+  returnTo,
 }: BetFormProps) {
   const router = useRouter();
   const [homeScore, setHomeScore] = useState(existingBet?.homeScore ?? 0);
@@ -46,6 +48,10 @@ export function BetForm({
       setMessage(result.error);
       setLoading(false);
     } else {
+      if (returnTo) {
+        router.push(returnTo);
+        return;
+      }
       const params = new URLSearchParams();
       if (phase) params.set("phase", phase);
       if (group) params.set("group", group);

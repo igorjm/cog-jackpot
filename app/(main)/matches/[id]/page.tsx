@@ -11,10 +11,13 @@ import { PHASE_LABELS } from "@/lib/constants";
 
 export default async function MatchDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
   const { id } = await params;
+  const { from } = await searchParams;
   const session = await auth();
   const userId = session!.user!.id;
 
@@ -27,13 +30,17 @@ export default async function MatchDetailPage({
 
   const isOpen = isBeforeDeadline(match.matchDate);
   const isFinished = match.homeScore !== null && match.awayScore !== null;
+  const returnTo =
+    from === "my-bets"
+      ? "/my-bets"
+      : `/matches?phase=${match.phase}${match.group ? `&group=${match.group}` : ""}`;
 
   return (
     <div className="max-w-md mx-auto space-y-6">
       {/* Back link */}
       <a
-        href={`/matches?phase=${match.phase}${match.group ? `&group=${match.group}` : ""}`}
-        className="text-sm text-[#94B8D8] hover:text-white"
+        href={returnTo}
+        className="text-sm text-[#94B8D8] hover:text-white cursor-pointer"
       >
         ← Voltar
       </a>
@@ -149,6 +156,7 @@ export default async function MatchDetailPage({
             isLocked={!isOpen}
             phase={match.phase}
             group={match.group}
+            returnTo={returnTo}
           />
         </div>
       )}

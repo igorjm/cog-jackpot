@@ -47,6 +47,7 @@ export async function placeBet(formData: FormData) {
   });
 
   revalidatePath("/matches");
+  revalidatePath("/my-bets");
   revalidatePath("/dashboard");
   return { success: true };
 }

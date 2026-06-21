@@ -13,6 +13,7 @@ export interface RankingEntry {
   position: number;
   previousPosition?: number;
   positionChange?: number;
+  lastPointsGained?: number | null;
 }
 
 export async function calculateRanking(): Promise<RankingEntry[]> {
@@ -22,9 +23,14 @@ export async function calculateRanking(): Promise<RankingEntry[]> {
       bets: {
         where: {
           points: { not: null },
-          match: { phase: { not: "FRIENDLY" } },
+          match: {
+            phase: { not: "FRIENDLY" },
+            homeScore: { not: null },
+          },
         },
-        include: { match: { select: { phase: true } } },
+        include: {
+          match: { select: { phase: true, matchDate: true } },
+        },
       },
       predictions: {
         where: { points: { not: null } },
@@ -52,6 +58,11 @@ export async function calculateRanking(): Promise<RankingEntry[]> {
         )
       : null;
 
+    const lastScoredBet = [...user.bets].sort(
+      (a, b) => b.match.matchDate.getTime() - a.match.matchDate.getTime()
+    )[0];
+    const lastPointsGained = lastScoredBet?.points ?? null;
+
     return {
       userId: user.id,
       nickname: user.nickname,
@@ -64,6 +75,7 @@ export async function calculateRanking(): Promise<RankingEntry[]> {
       firstBetDate,
       position: 0,
       previousPosition: user.previousPosition ?? undefined,
+      lastPointsGained,
     };
   });
 

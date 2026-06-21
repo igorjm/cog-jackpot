@@ -78,8 +78,8 @@ export default async function MyBetsPage() {
                 <div className="flex items-center gap-2">
                   {canEdit && (
                     <Link
-                      href={`/matches/${bet.matchId}`}
-                      className="text-xs font-semibold px-3 py-1 rounded-full border border-[#22C55E]/30 text-[#22C55E] hover:bg-[#22C55E]/10 transition-all active:scale-95"
+                      href={`/matches/${bet.matchId}?from=my-bets`}
+                      className="text-xs font-semibold px-3 py-1 rounded-full border border-[#22C55E]/30 text-[#22C55E] hover:bg-[#22C55E]/10 transition-all active:scale-95 cursor-pointer"
                     >
                       Editar
                     </Link>

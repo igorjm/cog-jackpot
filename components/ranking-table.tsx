@@ -1,6 +1,7 @@
 import { getInitials } from "@/lib/utils";
 import { RankingEntry } from "@/lib/ranking";
 import { PositionChange } from "./position-change";
+import { LastPointsGain } from "./last-points-gain";
 import Image from "next/image";
 
 interface RankingTableProps {
@@ -12,7 +13,7 @@ export function RankingTable({ entries, currentUserId }: RankingTableProps) {
   return (
     <div className="space-y-1">
       {/* Header */}
-      <div className="grid grid-cols-[40px_1fr_60px_40px_40px] gap-2 px-3 py-2 text-xs text-[#94B8D8] font-medium">
+      <div className="grid grid-cols-[40px_1fr_80px_40px_40px] gap-2 px-3 py-2 text-xs text-[#94B8D8] font-medium">
         <span>#</span>
         <span>Jogador</span>
         <span className="text-right">Pts</span>
@@ -23,7 +24,7 @@ export function RankingTable({ entries, currentUserId }: RankingTableProps) {
       {entries.map((entry) => (
         <div
           key={entry.userId}
-          className={`grid grid-cols-[40px_1fr_60px_40px_40px] gap-2 px-3 py-2.5 rounded-lg items-center ${
+          className={`grid grid-cols-[40px_1fr_80px_40px_40px] gap-2 px-3 py-2.5 rounded-lg items-center ${
             entry.userId === currentUserId
               ? "bg-[#22C55E]/10 border border-[#22C55E]/20"
               : "bg-[#162D54]"
@@ -48,8 +49,9 @@ export function RankingTable({ entries, currentUserId }: RankingTableProps) {
             )}
             <span className="text-sm truncate">{entry.nickname}</span>
           </div>
-          <span className="text-sm font-mono font-bold text-right text-[#FFD60A] tabular-nums">
+          <span className="text-sm font-mono font-bold text-right text-[#FFD60A] tabular-nums inline-flex items-baseline justify-end gap-0.5 flex-wrap">
             {entry.totalPoints}
+            <LastPointsGain points={entry.lastPointsGained} />
           </span>
           <span className="text-xs text-center tabular-nums">
             {entry.exactScores}
