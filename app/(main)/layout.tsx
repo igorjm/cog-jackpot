@@ -151,13 +151,13 @@ export default async function MainLayout({
 
       {/* Main content */}
       <main className="flex-1 md:ml-56 relative z-10">
-        <div className="max-w-5xl mx-auto w-full px-4 py-6 pb-20 md:pb-6">
+        <div className="max-w-5xl mx-auto w-full px-4 py-6 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6">
           {children}
         </div>
       </main>
 
       {/* Mobile bottom nav - hidden on desktop */}
-      <nav className="sticky bottom-0 z-50 bg-[#0F2347]/90 backdrop-blur-xl border-t border-[#2A4A7A] md:hidden pb-[env(safe-area-inset-bottom)]">
+      <nav className="fixed inset-x-0 bottom-0 z-50 bg-[#0F2347]/90 backdrop-blur-xl border-t border-[#2A4A7A] md:hidden pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around py-2">
           <NavLink href="/dashboard" icon="🏠" label="Início" />
           <NavLink href="/matches" icon="⚽" label="Jogos" />
