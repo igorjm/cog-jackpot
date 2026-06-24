@@ -16,27 +16,66 @@ export interface RankingEntry {
   lastPointsGained?: number | null;
 }
 
+export function resolveLastPointsGained(
+  userBets: { matchId: string; points: number | null }[],
+  latestMatchIds: string[]
+): number | null {
+  if (latestMatchIds.length === 0) return null;
+
+  const latestBets = userBets.filter((bet) => latestMatchIds.includes(bet.matchId));
+  if (latestBets.length === 0) return 0;
+
+  return latestBets.reduce((sum, bet) => sum + (bet.points ?? 0), 0);
+}
+
+async function getLatestFinishedMatchIds(): Promise<string[]> {
+  const latestFinishedMatch = await prisma.match.findFirst({
+    where: {
+      homeScore: { not: null },
+      phase: { not: "FRIENDLY" },
+    },
+    orderBy: { matchDate: "desc" },
+    select: { matchDate: true },
+  });
+
+  if (!latestFinishedMatch) return [];
+
+  const latestMatches = await prisma.match.findMany({
+    where: {
+      homeScore: { not: null },
+      phase: { not: "FRIENDLY" },
+      matchDate: latestFinishedMatch.matchDate,
+    },
+    select: { id: true },
+  });
+
+  return latestMatches.map((match) => match.id);
+}
+
 export async function calculateRanking(): Promise<RankingEntry[]> {
-  const users = await prisma.user.findMany({
-    where: { status: "APPROVED", role: { not: "ADMIN" } },
-    include: {
-      bets: {
-        where: {
-          points: { not: null },
-          match: {
-            phase: { not: "FRIENDLY" },
-            homeScore: { not: null },
+  const [users, latestMatchIds] = await Promise.all([
+    prisma.user.findMany({
+      where: { status: "APPROVED", role: { not: "ADMIN" } },
+      include: {
+        bets: {
+          where: {
+            points: { not: null },
+            match: {
+              phase: { not: "FRIENDLY" },
+              homeScore: { not: null },
+            },
+          },
+          include: {
+            match: { select: { phase: true, matchDate: true } },
           },
         },
-        include: {
-          match: { select: { phase: true, matchDate: true } },
+        predictions: {
+          where: { points: { not: null } },
         },
       },
-      predictions: {
-        where: { points: { not: null } },
-      },
-    },
-  });
+    }),
+    getLatestFinishedMatchIds(),
+  ]);
 
   const entries: RankingEntry[] = users.map((user) => {
     const betPoints = user.bets.reduce((sum, bet) => sum + (bet.points ?? 0), 0);
@@ -58,10 +97,7 @@ export async function calculateRanking(): Promise<RankingEntry[]> {
         )
       : null;
 
-    const lastScoredBet = [...user.bets].sort(
-      (a, b) => b.match.matchDate.getTime() - a.match.matchDate.getTime()
-    )[0];
-    const lastPointsGained = lastScoredBet?.points ?? null;
+    const lastPointsGained = resolveLastPointsGained(user.bets, latestMatchIds);
 
     return {
       userId: user.id,
