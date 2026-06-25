@@ -39,6 +39,8 @@ const STAGE_MAP: Record<string, Phase> = {
 export interface MatchResult {
   homeTeam: string;
   awayTeam: string;
+  homeTla: string;
+  awayTla: string;
   homeScore: number;
   awayScore: number;
   phase: Phase;
@@ -72,6 +74,8 @@ export async function fetchFinishedMatches(): Promise<MatchResult[]> {
     .map((m) => ({
       homeTeam: m.homeTeam.name,
       awayTeam: m.awayTeam.name,
+      homeTla: m.homeTeam.tla,
+      awayTla: m.awayTeam.tla,
       homeScore: m.score.fullTime.home!,
       awayScore: m.score.fullTime.away!,
       phase: STAGE_MAP[m.stage] || "GROUP",
@@ -105,6 +109,8 @@ export async function fetchMatchesByDate(dateFrom: string, dateTo: string): Prom
     .map((m) => ({
       homeTeam: m.homeTeam.name,
       awayTeam: m.awayTeam.name,
+      homeTla: m.homeTeam.tla,
+      awayTla: m.awayTeam.tla,
       homeScore: m.score.fullTime.home!,
       awayScore: m.score.fullTime.away!,
       phase: STAGE_MAP[m.stage] || "GROUP",
