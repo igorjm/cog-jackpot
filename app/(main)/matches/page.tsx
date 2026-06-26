@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MatchCardWithDrawer } from "@/components/match-card-with-drawer";
 import { PhaseTabs } from "@/components/phase-tabs";
-import { Phase } from "@prisma/client";
+import { Phase, MatchStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
 
 interface MatchWithBet {
@@ -18,6 +18,9 @@ interface MatchWithBet {
   venue: string | null;
   homeScore: number | null;
   awayScore: number | null;
+  liveHomeScore: number | null;
+  liveAwayScore: number | null;
+  matchStatus: MatchStatus;
   multiplier: number;
   phase: Phase;
   group: string | null;

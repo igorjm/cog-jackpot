@@ -1,0 +1,27 @@
+name: Sync Live Scores
+
+on:
+  schedule:
+    - cron: "*/2 * * 6,7 *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-live-scores
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call sync-live-scores endpoint
+        run: |
+          response=$(curl -sS -w "\n%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.APP_URL }}/api/cron/sync-live-scores")
+          code=$(echo "$response" | tail -n1)
+          echo "HTTP $code"; echo "$response" | sed '$d'
+          if [ "$code" -ge 400 ]; then exit 1; fi
