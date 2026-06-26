@@ -1,12 +1,15 @@
-import Image from "next/image";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { BetForm } from "@/components/bet-form";
-import { getFlagSrc, isClubFlag } from "@/lib/utils";
+import { MatchLivePanel } from "@/components/match-live-panel";
+import { MatchBetsDrawerTrigger } from "@/components/match-bets-drawer-trigger";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { Badge } from "@/components/ui/badge";
 import { isBeforeDeadline } from "@/lib/deadline";
+import { getDisplayScore, isMatchLiveNow } from "@/lib/match-live";
+import { refreshLiveScoresIfDue } from "@/lib/live-sync";
+import { parseMatchGoals } from "@/lib/match-goals";
 import { PHASE_LABELS } from "@/lib/constants";
 
 export default async function MatchDetailPage({
@@ -21,15 +24,41 @@ export default async function MatchDetailPage({
   const session = await auth();
   const userId = session!.user!.id;
 
-  const match = await prisma.match.findUnique({ where: { id } });
+  let match = await prisma.match.findUnique({ where: { id } });
   if (!match) notFound();
+
+  const scoreFieldsBeforeSync = {
+    homeScore: match.homeScore,
+    awayScore: match.awayScore,
+    liveHomeScore: match.liveHomeScore,
+    liveAwayScore: match.liveAwayScore,
+    matchStatus: match.matchStatus,
+    matchDate: match.matchDate,
+  };
+
+  if (isMatchLiveNow(scoreFieldsBeforeSync)) {
+    await refreshLiveScoresIfDue();
+    match = await prisma.match.findUnique({ where: { id } });
+    if (!match) notFound();
+  }
 
   const userBet = await prisma.bet.findUnique({
     where: { userId_matchId: { userId, matchId: id } },
   });
 
   const isOpen = isBeforeDeadline(match.matchDate);
-  const isFinished = match.homeScore !== null && match.awayScore !== null;
+  const scoreFields = {
+    homeScore: match.homeScore,
+    awayScore: match.awayScore,
+    liveHomeScore: match.liveHomeScore,
+    liveAwayScore: match.liveAwayScore,
+    matchStatus: match.matchStatus,
+    matchDate: match.matchDate,
+  };
+  const display = getDisplayScore(scoreFields);
+  const isFinished = display.isFinished;
+  const isLive = isMatchLiveNow(scoreFields);
+  const goals = parseMatchGoals(match.liveGoals);
   const returnTo =
     from === "my-bets"
       ? "/my-bets"
@@ -37,7 +66,6 @@ export default async function MatchDetailPage({
 
   return (
     <div className="max-w-md mx-auto space-y-6">
-      {/* Back link */}
       <a
         href={returnTo}
         className="text-sm text-[#94B8D8] hover:text-white cursor-pointer"
@@ -45,17 +73,25 @@ export default async function MatchDetailPage({
         ← Voltar
       </a>
 
-      {/* Match info card */}
-      <div className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-6 space-y-4">
-        {/* Phase + Date */}
-        <div className="flex items-center justify-between">
+      <div
+        className={`bg-[#162D54] rounded-2xl border p-6 space-y-5 ${
+          isLive && !isFinished ? "border-red-500/40 shadow-lg shadow-red-500/10" : "border-[#2A4A7A]"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-2">
           <Badge variant="info">{PHASE_LABELS[match.phase]}</Badge>
-          {match.multiplier > 1 && (
-            <Badge variant="warning">{match.multiplier}×</Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {isLive && !isFinished && (
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-red-400 bg-red-500/10 border border-red-500/30 px-2.5 py-1 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                AO VIVO
+              </span>
+            )}
+            {match.multiplier > 1 && <Badge variant="warning">{match.multiplier}×</Badge>}
+          </div>
         </div>
 
-        <div className="text-center text-xs text-[#94B8D8]">
+        <div className="text-center text-xs text-[#94B8D8] leading-relaxed">
           {new Date(match.matchDate).toLocaleDateString("pt-BR", {
             weekday: "long",
             day: "2-digit",
@@ -65,84 +101,69 @@ export default async function MatchDetailPage({
             minute: "2-digit",
             timeZone: "America/Sao_Paulo",
           })}
-          {match.venue && ` • ${match.venue}`}
-        </div>
-
-        {/* Teams */}
-        <div className="flex items-center justify-center gap-6 py-4">
-          <div className="text-center space-y-1">
-            {match.homeFlag !== "xx" ? (
-              <Image
-                src={getFlagSrc(match.homeFlag, 160)}
-                width={isClubFlag(match.homeFlag) ? 48 : 64}
-                height={48}
-                alt={match.homeTeam}
-                className={`inline-block ${isClubFlag(match.homeFlag) ? "w-12 h-12 object-contain" : "rounded-sm"}`}
-              />
-            ) : (
-              <span className="inline-block w-16 h-12 rounded-sm bg-[#1E3862] border border-[#2A4A7A] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
-            )}
-            <p className="text-sm font-medium">{match.homeTeam}</p>
-          </div>
-
-          {isFinished ? (
-            <div className="text-center">
-              <div className="flex items-center gap-2">
-                <span className="text-3xl font-mono font-bold">{match.homeScore}</span>
-                <span className="text-xl text-[#FFD60A]">×</span>
-                <span className="text-3xl font-mono font-bold">{match.awayScore}</span>
-              </div>
-              <span className="text-xs text-[#94B8D8]">Final</span>
-            </div>
-          ) : (
-            <span className="text-2xl font-bold text-[#FFD60A]">×</span>
+          {match.venue && (
+            <>
+              <br />
+              <span className="text-[#5A7A9A]">{match.venue}</span>
+            </>
           )}
-
-          <div className="text-center space-y-1">
-            {match.awayFlag !== "xx" ? (
-              <Image
-                src={getFlagSrc(match.awayFlag, 160)}
-                width={isClubFlag(match.awayFlag) ? 48 : 64}
-                height={48}
-                alt={match.awayTeam}
-                className={`inline-block ${isClubFlag(match.awayFlag) ? "w-12 h-12 object-contain" : "rounded-sm"}`}
-              />
-            ) : (
-              <span className="inline-block w-16 h-12 rounded-sm bg-[#1E3862] border border-[#2A4A7A] text-center text-lg leading-[48px] text-[#5A7A9A]">?</span>
-            )}
-            <p className="text-sm font-medium">{match.awayTeam}</p>
-          </div>
         </div>
 
-        {/* Countdown */}
-        {!isFinished && (
-          <div className="text-center">
+        <MatchLivePanel
+          matchId={match.id}
+          homeTeam={match.homeTeam}
+          awayTeam={match.awayTeam}
+          homeFlag={match.homeFlag}
+          awayFlag={match.awayFlag}
+          initialHome={display.home}
+          initialAway={display.away}
+          initialIsLive={display.isLive}
+          initialIsFinished={display.isFinished}
+          initialHalfTimeHome={match.halfTimeHome}
+          initialHalfTimeAway={match.halfTimeAway}
+          initialGoals={goals}
+          pollEnabled={isLive || display.isLive}
+        />
+
+        {!isFinished && !isLive && (
+          <div className="text-center pt-1">
             <CountdownTimer matchDate={match.matchDate} />
           </div>
         )}
 
-        {/* Result info if finished */}
-        {isFinished && userBet && (
-          <div className="bg-[black] rounded-lg p-3 text-center">
-            <p className="text-xs text-[#94B8D8] mb-1">Seu palpite</p>
-            <p className="font-mono font-bold">
-              {userBet.homeScore} × {userBet.awayScore}
-            </p>
-            <Badge
-              variant={userBet.points && userBet.points > 0 ? "points" : "error"}
-              className="mt-2"
-            >
-              +{userBet.points ?? 0} pontos
-            </Badge>
+        {userBet && (isLive || isFinished || !isOpen) && (
+          <div className="rounded-xl border border-[#2A4A7A] bg-[#0F2347]/50 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-[#94B8D8] mb-1">
+                  Seu palpite
+                </p>
+                <p className="font-mono text-xl font-bold">
+                  {userBet.homeScore} × {userBet.awayScore}
+                </p>
+              </div>
+              {isFinished ? (
+                <Badge variant={userBet.points && userBet.points > 0 ? "points" : "error"}>
+                  +{userBet.points ?? 0} pts
+                </Badge>
+              ) : isLive ? (
+                <Badge variant="info">Em andamento</Badge>
+              ) : (
+                <Badge variant="error">Encerrado</Badge>
+              )}
+            </div>
           </div>
+        )}
+
+        {(isLive || (!isOpen && !isFinished)) && (
+          <MatchBetsDrawerTrigger matchId={match.id} />
         )}
       </div>
 
-      {/* Bet Form */}
-      {!isFinished && (
+      {!isFinished && isOpen && (
         <div className="bg-[#162D54] rounded-2xl border border-[#2A4A7A] p-6">
           <h2 className="text-sm font-bold uppercase text-[#94B8D8] tracking-wide mb-4 text-center">
-            {isOpen ? "Seu Palpite" : "Palpite Encerrado"}
+            Seu Palpite
           </h2>
           <BetForm
             matchId={match.id}
@@ -163,5 +184,3 @@ export default async function MatchDetailPage({
     </div>
   );
 }
-
-
