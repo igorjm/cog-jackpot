@@ -1,4 +1,4 @@
-import type { Bet, Match, MatchStatus } from "@prisma/client";
+import type { Bet, Match, MatchStatus, Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import type { LiveMatchResult, MatchResult } from "./football-api";
 import { resolveFlagCode } from "./team-codes";
@@ -93,7 +93,9 @@ export async function applyLiveMatchUpdate(
       liveAwayScore: result.liveAwayScore,
       halfTimeHome: result.halfTimeHome,
       halfTimeAway: result.halfTimeAway,
-      ...(result.goals.length > 0 ? { liveGoals: result.goals } : {}),
+      ...(result.goals.length > 0
+        ? { liveGoals: result.goals as unknown as Prisma.InputJsonValue }
+        : {}),
       matchStatus: result.status as MatchStatus,
       liveUpdatedAt: new Date(),
     },
