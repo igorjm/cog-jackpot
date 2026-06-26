@@ -36,24 +36,43 @@ enum Role {
   ADMIN
 }
 
+enum MatchStatus {
+  SCHEDULED
+  TIMED
+  IN_PLAY
+  PAUSED
+  FINISHED
+  SUSPENDED
+  POSTPONED
+  CANCELLED
+  AWARDED
+}
+
 model Match {
-  id          String   @id @default(cuid())
-  homeTeam    String
-  awayTeam    String
-  homeFlag    String
-  awayFlag    String
-  phase       Phase
-  group       String?
-  matchNumber Int      @unique
-  matchDate   DateTime
-  venue       String?
-  homeScore   Int?
-  awayScore   Int?
-  multiplier  Float    @default(1.0)
-  bets        Bet[]
-  isLocked    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String       @id @default(cuid())
+  homeTeam      String
+  awayTeam      String
+  homeFlag      String
+  awayFlag      String
+  phase         Phase
+  group         String?
+  matchNumber   Int          @unique
+  matchDate     DateTime
+  venue         String?
+  homeScore     Int?
+  awayScore     Int?
+  liveHomeScore Int?
+  liveAwayScore Int?
+  halfTimeHome  Int?
+  halfTimeAway  Int?
+  liveGoals     Json?
+  matchStatus   MatchStatus  @default(SCHEDULED)
+  liveUpdatedAt DateTime?
+  multiplier    Float        @default(1.0)
+  bets          Bet[]
+  isLocked      Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
 
 enum Phase {
