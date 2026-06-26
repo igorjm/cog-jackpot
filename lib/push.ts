@@ -1,11 +1,23 @@
 import webpush from "web-push";
 import { prisma } from "@/lib/prisma";
 
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY!;
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT ?? "mailto:admin@bolao2026.com";
+let vapidConfigured = false;
 
-webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+function ensureVapidConfigured(): boolean {
+  if (vapidConfigured) return true;
+
+  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY;
+  if (!publicKey || !privateKey) return false;
+
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT ?? "mailto:admin@bolao2026.com",
+    publicKey,
+    privateKey
+  );
+  vapidConfigured = true;
+  return true;
+}
 
 interface NotificationPayload {
   title: string;
@@ -15,6 +27,8 @@ interface NotificationPayload {
 }
 
 export async function sendPushToUser(userId: string, payload: NotificationPayload) {
+  if (!ensureVapidConfigured()) return;
+
   const subscriptions = await prisma.pushSubscription.findMany({
     where: { userId },
   });
@@ -31,7 +45,6 @@ export async function sendPushToUser(userId: string, payload: NotificationPayloa
     )
   );
 
-  // Clean up expired subscriptions
   for (let i = 0; i < results.length; i++) {
     const result = results[i];
     if (result.status === "rejected" && (result.reason as { statusCode?: number })?.statusCode === 410) {
@@ -41,6 +54,8 @@ export async function sendPushToUser(userId: string, payload: NotificationPayloa
 }
 
 export async function sendPushToAll(payload: NotificationPayload) {
+  if (!ensureVapidConfigured()) return;
+
   const subscriptions = await prisma.pushSubscription.findMany();
 
   const results = await Promise.allSettled(
@@ -55,7 +70,6 @@ export async function sendPushToAll(payload: NotificationPayload) {
     )
   );
 
-  // Clean up expired subscriptions
   for (let i = 0; i < results.length; i++) {
     const result = results[i];
     if (result.status === "rejected" && (result.reason as { statusCode?: number })?.statusCode === 410) {
