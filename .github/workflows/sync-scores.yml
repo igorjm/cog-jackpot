@@ -2,8 +2,11 @@ name: Sync World Cup Scores
 
 on:
   schedule:
-    - cron: "*/10 * * 6,7 *"   # every 10 min in Jun/Jul (UTC)
+    - cron: "*/10 * * 6,7 *"
   workflow_dispatch: {}
+
+permissions:
+  contents: read
 
 concurrency:
   group: sync-scores
@@ -21,4 +24,4 @@ jobs:
             "${{ secrets.APP_URL }}/api/cron/sync-scores")
           code=$(echo "$response" | tail -n1)
           echo "HTTP $code"; echo "$response" | sed '$d'
-          [ "$code" -ge 400 ] && exit 1 || true
+          if [ "$code" -ge 400 ]; then exit 1; fi

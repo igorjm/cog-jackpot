@@ -143,7 +143,9 @@ CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
 `;
 
 async function main() {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  if (process.env.NODE_ENV !== 'production') {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  }
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
   console.log('Connected to database.');

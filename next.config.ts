@@ -26,11 +26,11 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://flagcdn.com",
               "font-src 'self' data:",
-              "connect-src 'self' https://api.football-data.org",
+              "connect-src 'self' https://api.football-data.org https://fcm.googleapis.com https://*.push.services.mozilla.com",
               "frame-ancestors 'none'",
             ].join("; "),
           },

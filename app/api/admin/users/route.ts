@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdminSession } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user || (session.user as { role: string }).role !== "ADMIN") {
-    return NextResponse.json([], { status: 403 });
-  }
+  const guard = await requireAdminSession();
+  if (!guard.ok) return guard.response;
 
   const users = await prisma.user.findMany({
     orderBy: [
-      { status: "asc" }, // PENDING_PAYMENT first (alphabetically before APPROVED/REJECTED)
+      { status: "asc" },
       { createdAt: "desc" },
     ],
     select: {

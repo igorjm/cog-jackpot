@@ -1,10 +1,11 @@
 "use server";
 
 import { z } from "zod";
+import { randomBytes } from "crypto";
 import { hash } from "bcryptjs";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { resultSchema } from "@/lib/validations";
+import { resultSchema, notificationSchema } from "@/lib/validations";
 import { calculatePoints, calculateFinalPoints } from "@/lib/scoring";
 import { calculateRanking } from "@/lib/ranking";
 import { fetchFinishedMatches } from "@/lib/football-api";
@@ -53,6 +54,10 @@ export async function saveResult(formData: FormData) {
     data: {
       homeScore: parsed.data.homeScore,
       awayScore: parsed.data.awayScore,
+      matchStatus: "FINISHED",
+      liveHomeScore: null,
+      liveAwayScore: null,
+      liveUpdatedAt: null,
       isLocked: true,
     },
   });
@@ -158,7 +163,7 @@ export async function resetUserPassword(userId: string) {
   const parsed = userIdSchema.safeParse(userId);
   if (!parsed.success) return { error: "ID inválido" };
 
-  const tempPassword = Math.random().toString(36).slice(-8);
+  const tempPassword = randomBytes(16).toString("base64url");
   const hashed = await hash(tempPassword, 12);
 
   await prisma.user.update({
@@ -219,8 +224,8 @@ export async function syncScores() {
       message: `${synced} resultado(s) sincronizado(s)${skipped > 0 ? `, ${skipped} ignorado(s)` : ""}`,
     };
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Erro desconhecido";
-    return { error: `Falha na sincronização: ${msg}` };
+    console.error("[admin/syncScores]", e);
+    return { error: "Falha na sincronização. Tente novamente." };
   }
 }
 
@@ -230,8 +235,9 @@ export async function sendCustomNotification(title: string, body: string) {
     return { error: "Acesso negado" };
   }
 
-  if (!title.trim() || !body.trim()) {
-    return { error: "Título e mensagem são obrigatórios" };
+  const parsed = notificationSchema.safeParse({ title, body });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message };
   }
 
   const count = await prisma.pushSubscription.count();
@@ -240,8 +246,8 @@ export async function sendCustomNotification(title: string, body: string) {
   }
 
   await sendPushToAll({
-    title: title.trim(),
-    body: body.trim(),
+    title: parsed.data.title,
+    body: parsed.data.body,
     icon: "/icons/icon-192.png",
     url: "/dashboard",
   });

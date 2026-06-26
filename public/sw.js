@@ -37,9 +37,21 @@ self.addEventListener("push", (event) => {
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
+function resolveNotificationUrl(rawUrl) {
+  if (typeof rawUrl !== "string" || !rawUrl) return "/dashboard";
+  if (rawUrl.startsWith("/") && !rawUrl.startsWith("//")) return rawUrl;
+  try {
+    const parsed = new URL(rawUrl, self.location.origin);
+    if (parsed.origin === self.location.origin) return parsed.pathname + parsed.search;
+  } catch {
+    // fall through
+  }
+  return "/dashboard";
+}
+
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const url = event.notification.data?.url || "/dashboard";
+  const url = resolveNotificationUrl(event.notification.data?.url);
   event.waitUntil(
     self.clients.matchAll({ type: "window" }).then((clients) => {
       for (const client of clients) {

@@ -1,18 +1,50 @@
-import { auth } from "@/lib/auth";
+import { requireApprovedSession } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+function isValidHttpsUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:";
+  } catch {
+    return false;
   }
+}
 
+export async function POST(req: NextRequest) {
+  const guard = await requireApprovedSession();
+  if (!guard.ok) return guard.response;
+
+  const { session } = guard;
   const body = await req.json();
   const { endpoint, keys } = body;
 
   if (!endpoint || !keys?.p256dh || !keys?.auth) {
     return NextResponse.json({ error: "Invalid subscription" }, { status: 400 });
+  }
+
+  if (!isValidHttpsUrl(endpoint)) {
+    return NextResponse.json({ error: "Invalid endpoint URL" }, { status: 400 });
+  }
+
+  if (typeof keys.p256dh !== "string" || keys.p256dh.length > 200) {
+    return NextResponse.json({ error: "Invalid p256dh key" }, { status: 400 });
+  }
+
+  if (typeof keys.auth !== "string" || keys.auth.length > 100) {
+    return NextResponse.json({ error: "Invalid auth key" }, { status: 400 });
+  }
+
+  const existing = await prisma.pushSubscription.findUnique({
+    where: { endpoint },
+    select: { userId: true },
+  });
+
+  if (existing && existing.userId !== session.user.id) {
+    return NextResponse.json(
+      { error: "Endpoint already registered to another account" },
+      { status: 409 }
+    );
   }
 
   await prisma.pushSubscription.upsert({
@@ -24,6 +56,7 @@ export async function POST(req: NextRequest) {
       auth: keys.auth,
     },
     update: {
+      userId: session.user.id,
       p256dh: keys.p256dh,
       auth: keys.auth,
     },
@@ -33,11 +66,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = await requireApprovedSession();
+  if (!guard.ok) return guard.response;
 
+  const { session } = guard;
   const body = await req.json();
   const { endpoint } = body;
 

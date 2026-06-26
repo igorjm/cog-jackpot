@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireApprovedSession } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { isBeforeDeadline } from "@/lib/deadline";
 
@@ -7,10 +7,8 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
+  const guard = await requireApprovedSession();
+  if (!guard.ok) return guard.response;
 
   const { id } = await params;
 
@@ -33,7 +31,6 @@ export async function GET(
     return NextResponse.json({ error: "Jogo não encontrado" }, { status: 404 });
   }
 
-  // SECURITY: Only allow viewing bets after deadline has passed
   if (isBeforeDeadline(match.matchDate)) {
     return NextResponse.json(
       { error: "Palpites só ficam visíveis após o encerramento das apostas" },

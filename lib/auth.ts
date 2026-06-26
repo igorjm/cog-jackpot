@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { prisma } from "./prisma";
 import { authConfig } from "./auth.config";
+import { checkRateLimited } from "./rate-limit";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
@@ -15,13 +16,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        const email = (credentials.email as string).toLowerCase().trim();
+
+        if (await checkRateLimited(`login:email:${email}`, 5, 15 * 60 * 1000)) {
+          console.error("[authorize] rate limited login attempt");
+          return null;
+        }
+
         try {
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email as string },
+            where: { email },
           });
 
           if (!user) {
-            console.error("[authorize] user not found:", credentials.email);
+            console.error("[authorize] failed login attempt — user not found");
             return null;
           }
 
@@ -31,7 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
 
           if (!isPasswordValid) {
-            console.error("[authorize] invalid password for:", credentials.email);
+            console.error("[authorize] failed login attempt — invalid password");
             return null;
           }
 
@@ -53,7 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     ...authConfig.callbacks,
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id!;
         token.role = (user as { role: string }).role;
@@ -61,12 +69,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.nickname = (user as { nickname: string }).nickname;
         token.avatar = (user as { avatar: string | null }).avatar;
       }
-      // Always refresh from DB if status is pending (so approval is picked up)
-      // Also refresh on explicit session update trigger
-      if (
-        token.id &&
-        (token.status === "PENDING_PAYMENT" || trigger === "update")
-      ) {
+
+      if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
           select: { status: true, role: true, nickname: true, avatar: true },
@@ -78,6 +82,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.avatar = dbUser.avatar;
         }
       }
+
       return token;
     },
   },

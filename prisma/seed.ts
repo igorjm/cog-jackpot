@@ -5,7 +5,9 @@ import ws from "ws";
 import { hash } from "bcryptjs";
 import { MULTIPLIERS } from "../lib/constants";
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+if (process.env.NODE_ENV !== "production") {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 neonConfig.webSocketConstructor = ws;
 const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
@@ -217,8 +219,11 @@ const knockoutMatches: MatchSeed[] = [
 async function main() {
   console.log("🏆 Seeding FIFA World Cup 2026...");
 
-  // Create admin user
-  const adminPassword = await hash(process.env.ADMIN_PASSWORD || "admin123", 12);
+  if (!process.env.ADMIN_PASSWORD) {
+    throw new Error("ADMIN_PASSWORD is required to seed the admin user. Set it in .env before running db:seed.");
+  }
+
+  const adminPassword = await hash(process.env.ADMIN_PASSWORD, 12);
   await prisma.user.upsert({
     where: { email: "admin@bolao.com" },
     update: {},

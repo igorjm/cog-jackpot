@@ -4,7 +4,9 @@ const webpush = require("web-push");
 require("dotenv").config();
 const { Client } = require("pg");
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+if (process.env.NODE_ENV !== "production") {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
 webpush.setVapidDetails(
   "mailto:admin@bolao2026.com",

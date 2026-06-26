@@ -52,14 +52,19 @@ Create a `.env` file:
 
 ```env
 DATABASE_URL="postgresql://user:pass@host/db?sslmode=require&pgbouncer=true"
-NODE_TLS_REJECT_UNAUTHORIZED="0"
 AUTH_SECRET="your-secret-here"
 AUTH_URL="http://localhost:3000"
-ADMIN_EMAIL="admin@example.com"
+ADMIN_PASSWORD="your-strong-admin-password"
 NEXT_PUBLIC_PIX_KEY="your-pix-key"
 NEXT_PUBLIC_ENTRY_FEE="50.00"
 FOOTBALL_DATA_API_KEY="your-football-data-org-key"
+CRON_SECRET="your-cron-secret"
+NEXT_PUBLIC_VAPID_PUBLIC_KEY="your-vapid-public-key"
+VAPID_PRIVATE_KEY="your-vapid-private-key"
+VAPID_SUBJECT="mailto:admin@example.com"
 ```
+
+Generate VAPID keys with: `npx web-push generate-vapid-keys`
 
 ### Install & Run
 
