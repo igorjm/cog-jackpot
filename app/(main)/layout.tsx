@@ -14,16 +14,21 @@ export default async function MainLayout({
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const user = session.user;
-  const isAdmin = (user as { role?: string }).role === "ADMIN";
-
-  // Fetch fresh user data for avatar/nickname (JWT may be stale after profile update)
   const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { nickname: true, avatar: true },
+    where: { id: session.user.id },
+    select: { nickname: true, avatar: true, status: true, role: true },
   });
-  const nickname = dbUser?.nickname ?? (user as { nickname?: string }).nickname;
-  const avatar = dbUser?.avatar ?? null;
+
+  if (!dbUser || dbUser.status !== "APPROVED") {
+    if (dbUser?.status === "PENDING_PAYMENT") redirect("/pending");
+    if (dbUser?.status === "REJECTED") redirect("/rejected");
+    redirect("/login");
+  }
+
+  const user = session.user;
+  const isAdmin = dbUser.role === "ADMIN";
+  const nickname = dbUser.nickname;
+  const avatar = dbUser.avatar;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">

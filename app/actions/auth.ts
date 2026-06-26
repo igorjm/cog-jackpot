@@ -5,14 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { signIn } from "@/lib/auth";
 import { registerSchema, loginSchema } from "@/lib/validations";
 import { redirect } from "next/navigation";
-import { isRateLimited } from "@/lib/rate-limit";
+import { checkRateLimited } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 
 export async function registerAction(formData: FormData) {
   const headersList = await headers();
-  const ip = headersList.get("x-forwarded-for") ?? "unknown";
+  const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
-  if (isRateLimited(`register:${ip}`, 5, 15 * 60 * 1000)) {
+  if (await checkRateLimited(`register:${ip}`, 5, 15 * 60 * 1000)) {
     return { error: "Muitas tentativas. Aguarde 15 minutos." };
   }
 
@@ -50,8 +50,6 @@ export async function registerAction(formData: FormData) {
 
     const hashedPassword = await hash(password, 12);
 
-    const isAdmin = email === process.env.ADMIN_EMAIL;
-
     await prisma.user.create({
       data: {
         name,
@@ -59,8 +57,8 @@ export async function registerAction(formData: FormData) {
         nickname,
         password: hashedPassword,
         avatar: avatar || null,
-        role: isAdmin ? "ADMIN" : "USER",
-        status: isAdmin ? "APPROVED" : "PENDING_PAYMENT",
+        role: "USER",
+        status: "PENDING_PAYMENT",
       },
     });
 
@@ -70,18 +68,18 @@ export async function registerAction(formData: FormData) {
       redirect: false,
     });
 
-    redirect(isAdmin ? "/dashboard" : "/pending");
+    redirect("/pending");
   } catch (e) {
-    if (e instanceof Error && "digest" in e) throw e; // Next.js redirect
+    if (e instanceof Error && "digest" in e) throw e;
     return { error: "Erro ao criar conta. Tente novamente." };
   }
 }
 
 export async function loginAction(formData: FormData) {
   const headersList = await headers();
-  const ip = headersList.get("x-forwarded-for") ?? "unknown";
+  const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
-  if (isRateLimited(`login:${ip}`, 5, 15 * 60 * 1000)) {
+  if (await checkRateLimited(`login:${ip}`, 5, 15 * 60 * 1000)) {
     return { error: "Muitas tentativas. Aguarde 15 minutos." };
   }
 
@@ -102,14 +100,13 @@ export async function loginAction(formData: FormData) {
       redirect: false,
     });
   } catch (e) {
-    if (e instanceof Error && "digest" in e) throw e; // Next.js redirect
+    if (e instanceof Error && "digest" in e) throw e;
     console.error("[loginAction] signIn error:", e);
     return { error: "Email ou senha inválidos" };
   }
 
-  // Check user status for redirect
   const user = await prisma.user.findUnique({ where: { email: raw.email } });
-  if (!user) return { error: "Usuário não encontrado" };
+  if (!user) return { error: "Email ou senha inválidos" };
 
   if (user.status === "PENDING_PAYMENT") redirect("/pending");
   if (user.status === "REJECTED") redirect("/rejected");

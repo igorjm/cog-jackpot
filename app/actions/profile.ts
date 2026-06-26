@@ -5,6 +5,8 @@ import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { hash, compare } from "bcryptjs";
 import { revalidatePath } from "next/cache";
+import { avatarSchema } from "@/lib/validations";
+import { checkRateLimited } from "@/lib/rate-limit";
 
 const updateProfileSchema = z.object({
   name: z.string().min(2, "Nome deve ter no mínimo 2 caracteres"),
@@ -12,7 +14,7 @@ const updateProfileSchema = z.object({
     .string()
     .min(2, "Apelido deve ter no mínimo 2 caracteres")
     .max(20, "Apelido deve ter no máximo 20 caracteres"),
-  avatar: z.string().optional(),
+  avatar: avatarSchema.optional(),
 });
 
 const changePasswordSchema = z
@@ -72,6 +74,10 @@ export async function updateProfileAction(formData: FormData) {
 export async function changePasswordAction(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) return { error: "Não autenticado" };
+
+  if (await checkRateLimited(`change-password:${session.user.id}`, 5, 15 * 60 * 1000)) {
+    return { error: "Muitas tentativas. Aguarde 15 minutos." };
+  }
 
   const raw = {
     currentPassword: formData.get("currentPassword") as string,

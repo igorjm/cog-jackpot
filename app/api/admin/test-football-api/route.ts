@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdminSession } from "@/lib/auth-guards";
 import { fetchFinishedMatches } from "@/lib/football-api";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user || (session.user as { role: string }).role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = await requireAdminSession();
+  if (!guard.ok) return guard.response;
 
   try {
     const matches = await fetchFinishedMatches();
@@ -22,7 +20,7 @@ export async function GET() {
       })),
     });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Unknown error";
-    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
+    console.error("[admin/test-football-api]", e);
+    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
   }
 }

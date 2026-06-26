@@ -1,32 +1,31 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPushToAll } from "@/lib/push";
+import {
+  unauthorizedCronResponse,
+  verifyCronSecret,
+} from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!verifyCronSecret(request)) {
+    return unauthorizedCronResponse();
   }
 
-  // Find all matches happening today (BRT = UTC-3)
   const now = new Date();
   const startOfDay = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
   startOfDay.setHours(0, 0, 0, 0);
   const endOfDay = new Date(startOfDay);
   endOfDay.setHours(23, 59, 59, 999);
 
-  // Convert BRT boundaries back to UTC for DB query
   const startUTC = new Date(startOfDay.getTime() + 3 * 60 * 60 * 1000);
   const endUTC = new Date(endOfDay.getTime() + 3 * 60 * 60 * 1000);
 
   const todayMatches = await prisma.match.findMany({
     where: {
       matchDate: { gte: startUTC, lte: endUTC },
-      homeScore: null, // not yet played
+      homeScore: null,
     },
     orderBy: { matchDate: "asc" },
   });
@@ -35,7 +34,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ sent: 0, message: "No matches today" });
   }
 
-  // Format match times in BRT
   const matchList = todayMatches
     .map((m) => {
       const time = m.matchDate.toLocaleTimeString("pt-BR", {

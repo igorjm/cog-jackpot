@@ -1,15 +1,16 @@
 "use server";
 
-import { auth } from "@/lib/auth";
+import { requireApprovedUser } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { betSchema } from "@/lib/validations";
 import { isBeforeDeadline } from "@/lib/deadline";
 import { revalidatePath } from "next/cache";
 
 export async function placeBet(formData: FormData) {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "Não autenticado" };
-  if (session.user.status !== "APPROVED") return { error: "Acesso não autorizado" };
+  const guard = await requireApprovedUser();
+  if (!guard.ok) return { error: guard.error };
+
+  const { session } = guard;
 
   const raw = {
     matchId: formData.get("matchId") as string,

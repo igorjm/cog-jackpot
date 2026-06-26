@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireApprovedSession } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json([], { status: 401 });
-  }
+  const guard = await requireApprovedSession();
+  if (!guard.ok) return guard.response;
+
+  const { session } = guard;
 
   const predictions = await prisma.prediction.findMany({
     where: { userId: session.user.id },

@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireApprovedSession } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { isBeforeDeadline } from "@/lib/deadline";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json([], { status: 401 });
-  }
+  const guard = await requireApprovedSession();
+  if (!guard.ok) return guard.response;
+
+  const { session } = guard;
 
   const matches = await prisma.match.findMany({
     orderBy: { matchNumber: "asc" },
@@ -23,7 +23,6 @@ export async function GET() {
     const userBet = match.bets[0] ?? null;
     const deadline = !isBeforeDeadline(match.matchDate);
 
-    // Hide other users' bets before deadline (this only returns current user's bet)
     return {
       id: match.id,
       homeTeam: match.homeTeam,
@@ -34,6 +33,9 @@ export async function GET() {
       venue: match.venue,
       homeScore: match.homeScore,
       awayScore: match.awayScore,
+      liveHomeScore: match.liveHomeScore,
+      liveAwayScore: match.liveAwayScore,
+      matchStatus: match.matchStatus,
       multiplier: match.multiplier,
       phase: match.phase,
       group: match.group,
