@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Link from "next/link";
 import { MatchCard } from "./match-card";
 import { MatchBetsDrawer } from "./match-bets-drawer";
 import { isBeforeDeadline } from "@/lib/deadline";
+import { isMatchLiveNow } from "@/lib/match-live";
+import type { MatchStatus } from "@prisma/client";
 
 interface MatchCardWithDrawerProps {
   match: {
@@ -16,6 +19,9 @@ interface MatchCardWithDrawerProps {
     venue?: string | null;
     homeScore?: number | null;
     awayScore?: number | null;
+    liveHomeScore?: number | null;
+    liveAwayScore?: number | null;
+    matchStatus?: MatchStatus;
     multiplier: number;
   };
   userBet?: {
@@ -27,6 +33,7 @@ interface MatchCardWithDrawerProps {
   showBetLink?: boolean;
   /** When set, overrides deadline-based detection (e.g. from API isLocked) */
   isLocked?: boolean;
+  matchHref?: string;
 }
 
 export function MatchCardWithDrawer({
@@ -34,15 +41,26 @@ export function MatchCardWithDrawer({
   userBet,
   showBetLink = true,
   isLocked,
+  matchHref,
 }: MatchCardWithDrawerProps) {
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const closeGuard = useRef(false);
 
+  const matchDate = new Date(match.matchDate);
+  const scoreFields = {
+    homeScore: match.homeScore ?? null,
+    awayScore: match.awayScore ?? null,
+    liveHomeScore: match.liveHomeScore ?? null,
+    liveAwayScore: match.liveAwayScore ?? null,
+    matchStatus: match.matchStatus ?? "SCHEDULED",
+    matchDate,
+  };
   const isFinished =
-    match.homeScore !== null && match.homeScore !== undefined &&
-    match.awayScore !== null && match.awayScore !== undefined;
+    scoreFields.homeScore !== null && scoreFields.awayScore !== null;
+  const isLive = isMatchLiveNow(scoreFields);
   const canViewBets =
-    isLocked ?? (isFinished || !isBeforeDeadline(match.matchDate));
+    isLocked ?? (isFinished || !isBeforeDeadline(matchDate));
+  const detailHref = matchHref ?? `/matches/${match.id}`;
 
   const handleOpen = (matchId: string) => {
     if (closeGuard.current) return;
@@ -60,6 +78,14 @@ export function MatchCardWithDrawer({
   const card = (
     <MatchCard match={match} userBet={userBet} showBetLink={showBetLink} />
   );
+
+  if (isLive && !isFinished) {
+    return (
+      <Link href={detailHref} className="block w-full text-left cursor-pointer">
+        {card}
+      </Link>
+    );
+  }
 
   return (
     <>

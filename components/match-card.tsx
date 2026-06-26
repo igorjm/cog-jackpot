@@ -1,7 +1,10 @@
 import Image from "next/image";
 import { CountdownTimer } from "./countdown-timer";
 import { Badge } from "./ui/badge";
-import { isBeforeDeadline, isMatchLive } from "@/lib/deadline";
+import { LiveMatchScore } from "./live-match-score";
+import { isBeforeDeadline } from "@/lib/deadline";
+import { getDisplayScore, isMatchLiveNow } from "@/lib/match-live";
+import type { MatchStatus } from "@prisma/client";
 import { getKnockoutHint } from "@/lib/knockout-hints";
 import { getFlagSrc, isClubFlag } from "@/lib/utils";
 
@@ -16,6 +19,9 @@ interface MatchCardProps {
     venue?: string | null;
     homeScore?: number | null;
     awayScore?: number | null;
+    liveHomeScore?: number | null;
+    liveAwayScore?: number | null;
+    matchStatus?: MatchStatus;
     multiplier: number;
   };
   userBet?: {
@@ -28,14 +34,23 @@ interface MatchCardProps {
 }
 
 export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps) {
-  const isFinished = match.homeScore !== null && match.awayScore !== null;
-  const isOpen = isBeforeDeadline(match.matchDate);
+  const matchDate = new Date(match.matchDate);
+  const scoreFields = {
+    homeScore: match.homeScore ?? null,
+    awayScore: match.awayScore ?? null,
+    liveHomeScore: match.liveHomeScore ?? null,
+    liveAwayScore: match.liveAwayScore ?? null,
+    matchStatus: match.matchStatus ?? "SCHEDULED",
+    matchDate,
+  };
+  const display = getDisplayScore(scoreFields);
+  const isFinished = display.isFinished;
+  const isOpen = isBeforeDeadline(matchDate);
   const isExactScore = userBet?.rawPoints === 10;
   const isTbd = match.homeFlag === "xx";
   const homeHint = isTbd ? getKnockoutHint(match.homeTeam) : null;
   const awayHint = isTbd ? getKnockoutHint(match.awayTeam) : null;
-
-  const isLive = isMatchLive(match.matchDate, match.homeScore, match.awayScore);
+  const isLive = isMatchLiveNow(scoreFields);
 
   return (
     <div
@@ -94,24 +109,15 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
         </div>
 
         <div className="flex items-center gap-2 px-3">
-          {isFinished ? (
-            <div className="text-center">
-              <div className="flex items-center gap-1">
-                <span className="text-2xl font-mono font-bold tabular-nums">
-                  {match.homeScore}
-                </span>
-                <span className="text-[#FFD60A] font-bold">×</span>
-                <span className="text-2xl font-mono font-bold tabular-nums">
-                  {match.awayScore}
-                </span>
-              </div>
-              <span className="text-[10px] text-[#94B8D8] uppercase">Final</span>
-            </div>
-          ) : (
-            <div className="text-center">
-              <span className="text-lg text-[#FFD60A] font-bold">vs</span>
-            </div>
-          )}
+          <LiveMatchScore
+            matchId={match.id}
+            initialHome={display.home}
+            initialAway={display.away}
+            initialIsLive={display.isLive}
+            initialIsFinished={display.isFinished}
+            pollEnabled={isLive || display.isLive}
+            size="sm"
+          />
         </div>
 
         <div className="flex-1">
@@ -179,6 +185,20 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
                   {userBet ? "Editar" : "Palpitar"}
                 </a>
               )}
+            </div>
+          </div>
+        ) : isLive ? (
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-red-400 font-medium">🔴 Ao vivo agora</span>
+            <div className="flex items-center gap-2">
+              {userBet && (
+                <span className="text-xs text-[#94B8D8]">
+                  {userBet.homeScore} × {userBet.awayScore}
+                </span>
+              )}
+              <span className="text-xs font-medium text-[#38BDF8] bg-[#38BDF8]/10 px-2.5 py-1 rounded-full border border-[#38BDF8]/20">
+                Acompanhar →
+              </span>
             </div>
           </div>
         ) : (

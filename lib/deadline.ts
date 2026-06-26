@@ -1,4 +1,5 @@
 import { DEADLINE_HOURS_BEFORE } from "./constants";
+import { isMatchLiveNow, type MatchScoreFields } from "./match-live";
 
 export function isBeforeDeadline(matchDate: Date): boolean {
   const now = new Date();
@@ -15,15 +16,19 @@ export function getTimeUntilDeadline(matchDate: Date): number {
   return deadline.getTime() - Date.now();
 }
 
-const LIVE_MATCH_DURATION_MS = 150 * 60 * 1000; // ~2.5h
-
+/** @deprecated Prefer isMatchLiveNow from lib/match-live with full match fields */
 export function isMatchLive(
   matchDate: Date,
   homeScore: number | null | undefined,
-  awayScore: number | null | undefined
+  awayScore: number | null | undefined,
+  matchStatus?: MatchScoreFields["matchStatus"]
 ): boolean {
-  if (homeScore != null && awayScore != null) return false;
-  const now = Date.now();
-  const start = matchDate.getTime();
-  return now >= start && now <= start + LIVE_MATCH_DURATION_MS;
+  return isMatchLiveNow({
+    matchDate,
+    homeScore: homeScore ?? null,
+    awayScore: awayScore ?? null,
+    liveHomeScore: null,
+    liveAwayScore: null,
+    matchStatus: matchStatus ?? "SCHEDULED",
+  });
 }
