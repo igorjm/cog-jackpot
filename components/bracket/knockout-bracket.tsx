@@ -40,7 +40,15 @@ function BracketHalf({
         return (
           <div key={round.matches.join("-")} className="flex items-stretch">
             {side === "left" && !isFirstInDisplay && (
-              <BracketJoinLines height={blockHeight} side="left" />
+              <div className="flex flex-col">
+                {round.matches.map((matchNumber) => (
+                  <BracketJoinLines
+                    key={`join-${matchNumber}`}
+                    height={blockHeight}
+                    side="left"
+                  />
+                ))}
+              </div>
             )}
 
             <div className="flex flex-col">
@@ -59,7 +67,15 @@ function BracketHalf({
             </div>
 
             {side === "right" && !isLastInDisplay && (
-              <BracketJoinLines height={blockHeight} side="right" />
+              <div className="flex flex-col">
+                {round.matches.map((matchNumber) => (
+                  <BracketJoinLines
+                    key={`join-${matchNumber}`}
+                    height={blockHeight}
+                    side="right"
+                  />
+                ))}
+              </div>
             )}
           </div>
         );
