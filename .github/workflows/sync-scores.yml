@@ -2,7 +2,7 @@ name: Sync World Cup Scores
 
 on:
   schedule:
-    - cron: "*/10 * * 6,7 *"
+    - cron: "0 */2 * 6,7 *"
   workflow_dispatch: {}
 
 permissions:

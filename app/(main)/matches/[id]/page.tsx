@@ -8,7 +8,7 @@ import { CountdownTimer } from "@/components/countdown-timer";
 import { Badge } from "@/components/ui/badge";
 import { isBeforeDeadline } from "@/lib/deadline";
 import { getDisplayScore, isMatchLiveNow } from "@/lib/match-live";
-import { refreshLiveScoresIfDue } from "@/lib/live-sync";
+import { refreshLiveScoresIfDue, shouldRefreshLiveScoresOnDemand } from "@/lib/live-sync";
 import { parseMatchGoals } from "@/lib/match-goals";
 import { PHASE_LABELS } from "@/lib/constants";
 
@@ -36,7 +36,7 @@ export default async function MatchDetailPage({
     matchDate: match.matchDate,
   };
 
-  if (isMatchLiveNow(scoreFieldsBeforeSync)) {
+  if (isMatchLiveNow(scoreFieldsBeforeSync) && shouldRefreshLiveScoresOnDemand()) {
     await refreshLiveScoresIfDue();
     match = await prisma.match.findUnique({ where: { id } });
     if (!match) notFound();

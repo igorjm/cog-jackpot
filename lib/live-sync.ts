@@ -3,6 +3,11 @@ import { syncLiveMatchScores } from "./match-sync";
 
 const DEFAULT_MIN_INTERVAL_MS = 45_000;
 
+/** On-demand sync is for local dev only; production uses GitHub Actions cron. */
+export function shouldRefreshLiveScoresOnDemand(): boolean {
+  return process.env.NODE_ENV === "development";
+}
+
 let lastSyncAt = 0;
 let syncInFlight: Promise<void> | null = null;
 
