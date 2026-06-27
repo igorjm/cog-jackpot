@@ -48,7 +48,7 @@ const knockoutR32: MatchForResolve = {
   const r32 = enriched.find((m) => m.matchNumber === 79)!;
   assert(r32.homeFlag === "mx", "1º Grupo A resolves to Mexico flag when group A is complete");
   assert(r32.homeTeam === "México", "1º Grupo A resolves to Mexico name");
-  assert(r32.awayFlag === "xx", "3rd place slot stays TBD until all eligible groups finish");
+  assert(r32.awayFlag === "xx", "3rd place slot stays TBD when no group thirds are available yet");
 })();
 
 (() => {

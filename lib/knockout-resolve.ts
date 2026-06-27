@@ -24,7 +24,6 @@ export interface ResolvedTeam {
   flag: string;
 }
 
-const GROUP_LETTERS = "ABCDEFGHIJKL".split("");
 const MATCHES_PER_GROUP = 6;
 
 /** R32 third-place slots in assignment order (FIFA 2026 bracket) */
@@ -73,15 +72,10 @@ function isGroupComplete(group: string, matches: MatchForResolve[]): boolean {
   return groupMatches.every((m) => m.homeScore !== null && m.awayScore !== null);
 }
 
-function allGroupsComplete(matches: MatchForResolve[]): boolean {
-  return GROUP_LETTERS.every((group) => isGroupComplete(group, matches));
-}
-
 function buildThirdPlaceAssignments(
   matches: MatchForResolve[]
 ): Map<string, ResolvedTeam> {
   const assignments = new Map<string, ResolvedTeam>();
-  if (!allGroupsComplete(matches)) return assignments;
 
   const finished = matches
     .map(toFinishedMatch)
@@ -90,11 +84,17 @@ function buildThirdPlaceAssignments(
 
   const thirdPlaceTeams = standings
     .map((g) => {
+      if (!isGroupComplete(g.group, matches)) return null;
       const third = g.teams[2];
       return third ? { ...third, group: g.group } : null;
     })
     .filter((t): t is GroupTeamStanding & { group: string } => t !== null);
 
+  if (thirdPlaceTeams.length === 0) return assignments;
+
+  // Best 8 third-placed teams among groups that have finished (FIFA rules).
+  // Slots are filled as soon as enough groups are complete; remaining slots
+  // update when more groups finish.
   const rankedThirds = sortThirdPlaceTeams(thirdPlaceTeams).slice(0, 8);
   const assigned = new Set<string>();
 
