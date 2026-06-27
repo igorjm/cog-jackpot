@@ -36,7 +36,7 @@ interface LivePayload {
   pollRecommended: boolean;
 }
 
-const POLL_INTERVAL_MS = 30_000;
+const POLL_INTERVAL_MS = 60_000;
 
 export function MatchLivePanel({
   matchId,
@@ -84,8 +84,11 @@ export function MatchLivePanel({
     if (!pollEnabled || isFinished) return;
 
     let cancelled = false;
+    let intervalId: ReturnType<typeof setInterval> | undefined;
 
     async function poll() {
+      if (document.visibilityState === "hidden" || cancelled) return;
+
       try {
         const res = await fetch(`/api/matches/${matchId}/live`);
         if (!res.ok || cancelled) return;
@@ -117,11 +120,18 @@ export function MatchLivePanel({
       }
     }
 
-    poll();
-    const id = window.setInterval(poll, POLL_INTERVAL_MS);
+    void poll();
+    intervalId = setInterval(poll, POLL_INTERVAL_MS);
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") void poll();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
       cancelled = true;
-      window.clearInterval(id);
+      if (intervalId) clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [matchId, pollEnabled, isFinished]);
 

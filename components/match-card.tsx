@@ -115,7 +115,7 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
             initialAway={display.away}
             initialIsLive={display.isLive}
             initialIsFinished={display.isFinished}
-            pollEnabled={isLive || display.isLive}
+            pollEnabled={false}
             size="sm"
           />
         </div>

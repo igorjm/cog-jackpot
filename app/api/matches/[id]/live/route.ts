@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireApprovedSession } from "@/lib/auth-guards";
 import { getDisplayScore, isMatchLiveNow } from "@/lib/match-live";
-import { refreshLiveScoresIfDue } from "@/lib/live-sync";
+import { refreshLiveScoresIfDue, shouldRefreshLiveScoresOnDemand } from "@/lib/live-sync";
 import { parseMatchGoals } from "@/lib/match-goals";
 import { prisma } from "@/lib/prisma";
 
@@ -39,7 +39,7 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  if (isMatchLiveNow(match)) {
+  if (isMatchLiveNow(match) && shouldRefreshLiveScoresOnDemand()) {
     await refreshLiveScoresIfDue();
 
     match = await prisma.match.findUnique({
