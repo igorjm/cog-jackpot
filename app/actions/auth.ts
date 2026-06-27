@@ -38,7 +38,9 @@ export async function registerAction(formData: FormData) {
   const { name, email, nickname, password, avatar } = parsed.data;
 
   try {
-    const existingEmail = await prisma.user.findUnique({ where: { email } });
+    const existingEmail = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
+    });
     if (existingEmail) {
       return { error: "Email já cadastrado.", fieldErrors: { email: "Este email já está em uso" } };
     }
@@ -93,10 +95,12 @@ export async function loginAction(formData: FormData) {
     return { error: parsed.error.issues[0].message };
   }
 
+  const { email, password } = parsed.data;
+
   try {
     await signIn("credentials", {
-      email: raw.email,
-      password: raw.password,
+      email,
+      password,
       redirect: false,
     });
   } catch (e) {
@@ -105,7 +109,9 @@ export async function loginAction(formData: FormData) {
     return { error: "Email ou senha inválidos" };
   }
 
-  const user = await prisma.user.findUnique({ where: { email: raw.email } });
+  const user = await prisma.user.findFirst({
+    where: { email: { equals: email, mode: "insensitive" } },
+  });
   if (!user) return { error: "Email ou senha inválidos" };
 
   if (user.status === "PENDING_PAYMENT") redirect("/pending");

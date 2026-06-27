@@ -65,7 +65,7 @@ export default function LoginPage() {
             label="Senha"
             placeholder="••••••"
             required
-            minLength={6}
+            minLength={8}
           />
 
           {error && (

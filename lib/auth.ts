@@ -4,6 +4,7 @@ import { compare } from "bcryptjs";
 import { prisma } from "./prisma";
 import { authConfig } from "./auth.config";
 import { checkRateLimited } from "./rate-limit";
+import { normalizeEmail } from "./validations";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
@@ -16,7 +17,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const email = (credentials.email as string).toLowerCase().trim();
+        const email = normalizeEmail(credentials.email as string);
 
         if (await checkRateLimited(`login:email:${email}`, 5, 15 * 60 * 1000)) {
           console.error("[authorize] rate limited login attempt");
@@ -24,8 +25,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         try {
-          const user = await prisma.user.findUnique({
-            where: { email },
+          const user = await prisma.user.findFirst({
+            where: {
+              email: { equals: email, mode: "insensitive" },
+            },
           });
 
           if (!user) {

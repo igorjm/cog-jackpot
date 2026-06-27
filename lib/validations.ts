@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+const emailField = z
+  .string()
+  .trim()
+  .transform(normalizeEmail)
+  .pipe(z.string().email("Email inválido"));
+
 export const avatarSchema = z
   .string()
   .regex(
@@ -8,14 +18,14 @@ export const avatarSchema = z
   );
 
 export const loginSchema = z.object({
-  email: z.string().email("Email inválido"),
+  email: emailField,
   password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres"),
 });
 
 export const registerSchema = z
   .object({
     name: z.string().min(2, "Nome deve ter no mínimo 2 caracteres"),
-    email: z.string().email("Email inválido"),
+    email: emailField,
     nickname: z
       .string()
       .min(2, "Apelido deve ter no mínimo 2 caracteres")
