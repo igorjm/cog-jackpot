@@ -155,6 +155,26 @@ export default function MatchesPage() {
         </section>
       )}
 
+      {/* Knockout bracket link */}
+      <Link
+        href="/bracket"
+        className="block bg-gradient-to-r from-[#1a2a1a] to-[#1a3a6b] rounded-xl border border-[#FFD60A]/20 p-4 hover:border-[#FFD60A]/50 transition-all group"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-bold uppercase text-[#FFD60A] tracking-wide">
+                🎯 Chave do Mata-Mata
+              </span>
+            </div>
+            <p className="text-xs text-[#94B8D8]">
+              Visualize a chave completa da Copa em formato de bracket
+            </p>
+          </div>
+          <span className="text-[#94B8D8] group-hover:text-[#FFD60A] transition-colors text-lg">→</span>
+        </div>
+      </Link>
+
       {/* Predictions link */}
       <Link
         href="/predictions"

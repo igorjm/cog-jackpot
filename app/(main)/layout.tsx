@@ -62,6 +62,7 @@ export default async function MainLayout({
         <nav className="flex-1 px-3 py-4 space-y-1">
           <SidebarLink href="/dashboard" icon="🏠" label="Início" />
           <SidebarLink href="/matches" icon="⚽" label="Jogos" />
+          <SidebarLink href="/bracket" icon="🎯" label="Mata-Mata" />
           <SidebarLink href="/ranking" icon="🏆" label="Ranking" />
           <SidebarLink href="/my-bets" icon="📋" label="Meus Palpites" />
           <SidebarLink href="/rules" icon="📖" label="Regras" />
