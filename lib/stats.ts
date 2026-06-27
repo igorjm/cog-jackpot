@@ -282,7 +282,7 @@ function sortStandings(teams: GroupTeamStanding[]): GroupTeamStanding[] {
   });
 }
 
-function calculateGroupStandings(matches: FinishedMatch[]): GroupStanding[] {
+export function buildGroupStandings(matches: FinishedMatch[]): GroupStanding[] {
   const groupMaps = new Map<string, Map<string, GroupTeamStanding>>();
 
   for (const m of matches) {
@@ -454,7 +454,7 @@ export function calculateTournamentStats(
       awayWins,
       total: finished,
     },
-    groupStandings: calculateGroupStandings(matches),
+    groupStandings: buildGroupStandings(matches),
     topScorers: calculateTeamGoals(matches)
       .filter((t) => t.played > 0)
       .sort((a, b) => b.goalsFor - a.goalsFor || b.goalDiff - a.goalDiff)

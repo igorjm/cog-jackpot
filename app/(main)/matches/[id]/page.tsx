@@ -11,6 +11,7 @@ import { getDisplayScore, isMatchLiveNow } from "@/lib/match-live";
 import { refreshLiveScoresIfDue, shouldRefreshLiveScoresOnDemand } from "@/lib/live-sync";
 import { parseMatchGoals } from "@/lib/match-goals";
 import { PHASE_LABELS } from "@/lib/constants";
+import { enrichKnockoutTeams } from "@/lib/knockout-resolve";
 
 export default async function MatchDetailPage({
   params,
@@ -41,6 +42,9 @@ export default async function MatchDetailPage({
     match = await prisma.match.findUnique({ where: { id } });
     if (!match) notFound();
   }
+
+  const allMatches = await prisma.match.findMany({ orderBy: { matchNumber: "asc" } });
+  match = enrichKnockoutTeams(allMatches).find((m) => m.id === id)!;
 
   const userBet = await prisma.bet.findUnique({
     where: { userId_matchId: { userId, matchId: id } },

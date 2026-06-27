@@ -10,6 +10,7 @@ import { calculatePoints, calculateFinalPoints } from "@/lib/scoring";
 import { calculateRanking } from "@/lib/ranking";
 import { fetchFinishedMatches } from "@/lib/football-api";
 import { syncFinishedMatchResults } from "@/lib/match-sync";
+import { persistKnockoutTeamResolution } from "@/lib/knockout-resolve";
 import { revalidatePath } from "next/cache";
 import { sendPushToAll, sendPushToUser } from "@/lib/push";
 
@@ -94,6 +95,8 @@ export async function saveResult(formData: FormData) {
       });
     }
   }
+
+  await persistKnockoutTeamResolution();
 
   revalidatePath("/admin/results");
   revalidatePath("/ranking");
@@ -183,7 +186,19 @@ export async function syncScores() {
   try {
     const results = await fetchFinishedMatches();
     if (results.length === 0) {
-      return { success: true, synced: 0, message: "Nenhum resultado novo encontrado" };
+      const knockoutUpdated = await persistKnockoutTeamResolution();
+      revalidatePath("/admin/results");
+      revalidatePath("/matches");
+      return {
+        success: true,
+        synced: 0,
+        skipped: 0,
+        knockoutUpdated,
+        message:
+          knockoutUpdated > 0
+            ? `${knockoutUpdated} mata-mata(s) atualizado(s)`
+            : "Nenhum resultado novo encontrado",
+      };
     }
 
     // Snapshot current ranking positions before scores change
@@ -203,6 +218,7 @@ export async function syncScores() {
     const syncResult = await syncFinishedMatchResults(results);
     synced = syncResult.synced;
     skipped = syncResult.skipped;
+    const knockoutUpdated = syncResult.knockoutUpdated;
 
     revalidatePath("/admin/results");
     revalidatePath("/ranking");
@@ -221,7 +237,8 @@ export async function syncScores() {
       success: true,
       synced,
       skipped,
-      message: `${synced} resultado(s) sincronizado(s)${skipped > 0 ? `, ${skipped} ignorado(s)` : ""}`,
+      knockoutUpdated,
+      message: `${synced} resultado(s) sincronizado(s)${skipped > 0 ? `, ${skipped} ignorado(s)` : ""}${knockoutUpdated > 0 ? `, ${knockoutUpdated} mata-mata(s) atualizado(s)` : ""}`,
     };
   } catch (e) {
     console.error("[admin/syncScores]", e);

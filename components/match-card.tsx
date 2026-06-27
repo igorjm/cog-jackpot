@@ -47,9 +47,10 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
   const isFinished = display.isFinished;
   const isOpen = isBeforeDeadline(matchDate);
   const isExactScore = userBet?.rawPoints === 10;
-  const isTbd = match.homeFlag === "xx";
-  const homeHint = isTbd ? getKnockoutHint(match.homeTeam) : null;
-  const awayHint = isTbd ? getKnockoutHint(match.awayTeam) : null;
+  const isTbdHome = match.homeFlag === "xx";
+  const isTbdAway = match.awayFlag === "xx";
+  const homeHint = isTbdHome ? getKnockoutHint(match.homeTeam) : null;
+  const awayHint = isTbdAway ? getKnockoutHint(match.awayTeam) : null;
   const isLive = isMatchLiveNow(scoreFields);
 
   return (

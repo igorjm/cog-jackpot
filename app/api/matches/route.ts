@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireApprovedSession } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { isBeforeDeadline } from "@/lib/deadline";
+import { enrichKnockoutTeams } from "@/lib/knockout-resolve";
 
 export async function GET() {
   const guard = await requireApprovedSession();
@@ -19,7 +20,9 @@ export async function GET() {
     },
   });
 
-  const result = matches.map((match) => {
+  const enriched = enrichKnockoutTeams(matches);
+
+  const result = enriched.map((match) => {
     const userBet = match.bets[0] ?? null;
     const deadline = !isBeforeDeadline(match.matchDate);
 

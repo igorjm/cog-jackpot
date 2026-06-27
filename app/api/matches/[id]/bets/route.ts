@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireApprovedSession } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { isBeforeDeadline } from "@/lib/deadline";
+import { enrichKnockoutTeams } from "@/lib/knockout-resolve";
 
 export async function GET(
   _request: Request,
@@ -12,10 +13,11 @@ export async function GET(
 
   const { id } = await params;
 
-  const match = await prisma.match.findUnique({
+  const matchRecord = await prisma.match.findUnique({
     where: { id },
     select: {
       id: true,
+      matchNumber: true,
       matchDate: true,
       homeTeam: true,
       awayTeam: true,
@@ -24,19 +26,24 @@ export async function GET(
       homeScore: true,
       awayScore: true,
       multiplier: true,
+      phase: true,
+      group: true,
     },
   });
 
-  if (!match) {
+  if (!matchRecord) {
     return NextResponse.json({ error: "Jogo não encontrado" }, { status: 404 });
   }
 
-  if (isBeforeDeadline(match.matchDate)) {
+  if (isBeforeDeadline(matchRecord.matchDate)) {
     return NextResponse.json(
       { error: "Palpites só ficam visíveis após o encerramento das apostas" },
       { status: 403 }
     );
   }
+
+  const allMatches = await prisma.match.findMany({ orderBy: { matchNumber: "asc" } });
+  const match = enrichKnockoutTeams(allMatches).find((m) => m.id === id)!;
 
   const bets = await prisma.bet.findMany({
     where: {

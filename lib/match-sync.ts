@@ -3,6 +3,7 @@ import { prisma } from "./prisma";
 import type { LiveMatchResult, MatchResult } from "./football-api";
 import { resolveFlagCode } from "./team-codes";
 import { calculatePoints, calculateFinalPoints } from "./scoring";
+import { persistKnockoutTeamResolution } from "./knockout-resolve";
 
 type MatchWithBets = Match & { bets: Bet[] };
 
@@ -104,7 +105,7 @@ export async function applyLiveMatchUpdate(
 
 export async function syncFinishedMatchResults(
   results: MatchResult[]
-): Promise<{ synced: number; skipped: number }> {
+): Promise<{ synced: number; skipped: number; knockoutUpdated: number }> {
   let synced = 0;
   let skipped = 0;
 
@@ -119,7 +120,9 @@ export async function syncFinishedMatchResults(
     synced++;
   }
 
-  return { synced, skipped };
+  const knockoutUpdated = await persistKnockoutTeamResolution();
+
+  return { synced, skipped, knockoutUpdated };
 }
 
 /** Updates live scores only — never recalculates bet points. */

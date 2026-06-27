@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateRanking } from "@/lib/ranking";
+import { enrichKnockoutTeams } from "@/lib/knockout-resolve";
 import { MatchCardWithDrawer } from "@/components/match-card-with-drawer";
 import { RecentResults } from "@/components/recent-results";
 import Link from "next/link";
@@ -15,33 +16,25 @@ export default async function DashboardPage() {
   const now = new Date();
   const liveWindowStart = new Date(now.getTime() - LIVE_WINDOW_MS);
 
-  // Live matches (started, no result yet)
-  const liveMatches = await prisma.match.findMany({
-    where: {
-      homeScore: null,
-      matchDate: { lte: now, gte: liveWindowStart },
-    },
-    orderBy: { matchDate: "asc" },
-  });
+  const allMatches = enrichKnockoutTeams(
+    await prisma.match.findMany({ orderBy: { matchNumber: "asc" } })
+  );
 
-  // Get upcoming matches
-  const upcomingMatches = await prisma.match.findMany({
-    where: {
-      homeScore: null,
-      matchDate: { gt: now },
-    },
-    orderBy: { matchDate: "asc" },
-    take: 4,
-  });
+  const liveMatches = allMatches.filter(
+    (m) =>
+      m.homeScore === null &&
+      m.matchDate <= now &&
+      m.matchDate >= liveWindowStart
+  );
 
-  // Get recent finished matches
-  const recentMatches = await prisma.match.findMany({
-    where: {
-      homeScore: { not: null },
-    },
-    orderBy: { matchDate: "desc" },
-    take: 5,
-  });
+  const upcomingMatches = allMatches
+    .filter((m) => m.homeScore === null && m.matchDate > now)
+    .slice(0, 4);
+
+  const recentMatches = allMatches
+    .filter((m) => m.homeScore !== null)
+    .sort((a, b) => b.matchDate.getTime() - a.matchDate.getTime())
+    .slice(0, 5);
 
   // Get user bets for these matches
   const matchIds = [...liveMatches, ...upcomingMatches, ...recentMatches].map((m) => m.id);
