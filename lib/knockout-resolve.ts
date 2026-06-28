@@ -5,6 +5,10 @@ import {
   type FinishedMatch,
 } from "./stats";
 import { prisma } from "./prisma";
+import {
+  lookupThirdPlaceMapping,
+  THIRD_PLACE_SLOT_WINNER,
+} from "./third-place-annex-c";
 
 export interface MatchForResolve {
   id: string;
@@ -25,6 +29,56 @@ export interface ResolvedTeam {
 }
 
 const MATCHES_PER_GROUP = 6;
+
+/** Original seed placeholders for knockout matches (used to re-resolve after group updates). */
+const KNOCKOUT_PLACEHOLDERS: Record<
+  number,
+  Pick<MatchForResolve, "homeTeam" | "awayTeam" | "homeFlag" | "awayFlag">
+> = {
+  73: { homeTeam: "2º Grupo A", awayTeam: "2º Grupo B", homeFlag: "xx", awayFlag: "xx" },
+  74: { homeTeam: "1º Grupo E", awayTeam: "3º ABCDF", homeFlag: "xx", awayFlag: "xx" },
+  75: { homeTeam: "1º Grupo F", awayTeam: "2º Grupo C", homeFlag: "xx", awayFlag: "xx" },
+  76: { homeTeam: "1º Grupo C", awayTeam: "2º Grupo F", homeFlag: "xx", awayFlag: "xx" },
+  77: { homeTeam: "1º Grupo I", awayTeam: "3º CDFGH", homeFlag: "xx", awayFlag: "xx" },
+  78: { homeTeam: "2º Grupo E", awayTeam: "2º Grupo I", homeFlag: "xx", awayFlag: "xx" },
+  79: { homeTeam: "1º Grupo A", awayTeam: "3º CEFHI", homeFlag: "xx", awayFlag: "xx" },
+  80: { homeTeam: "1º Grupo L", awayTeam: "3º EHIJK", homeFlag: "xx", awayFlag: "xx" },
+  81: { homeTeam: "1º Grupo D", awayTeam: "3º BEFIJ", homeFlag: "xx", awayFlag: "xx" },
+  82: { homeTeam: "1º Grupo G", awayTeam: "3º AEHIJ", homeFlag: "xx", awayFlag: "xx" },
+  83: { homeTeam: "2º Grupo K", awayTeam: "2º Grupo L", homeFlag: "xx", awayFlag: "xx" },
+  84: { homeTeam: "1º Grupo H", awayTeam: "2º Grupo J", homeFlag: "xx", awayFlag: "xx" },
+  85: { homeTeam: "1º Grupo B", awayTeam: "3º EFGIJ", homeFlag: "xx", awayFlag: "xx" },
+  86: { homeTeam: "1º Grupo J", awayTeam: "2º Grupo H", homeFlag: "xx", awayFlag: "xx" },
+  87: { homeTeam: "1º Grupo K", awayTeam: "3º DEIJL", homeFlag: "xx", awayFlag: "xx" },
+  88: { homeTeam: "2º Grupo D", awayTeam: "2º Grupo G", homeFlag: "xx", awayFlag: "xx" },
+  89: { homeTeam: "Venc. Jogo 74", awayTeam: "Venc. Jogo 77", homeFlag: "xx", awayFlag: "xx" },
+  90: { homeTeam: "Venc. Jogo 73", awayTeam: "Venc. Jogo 75", homeFlag: "xx", awayFlag: "xx" },
+  91: { homeTeam: "Venc. Jogo 76", awayTeam: "Venc. Jogo 78", homeFlag: "xx", awayFlag: "xx" },
+  92: { homeTeam: "Venc. Jogo 79", awayTeam: "Venc. Jogo 80", homeFlag: "xx", awayFlag: "xx" },
+  93: { homeTeam: "Venc. Jogo 83", awayTeam: "Venc. Jogo 84", homeFlag: "xx", awayFlag: "xx" },
+  94: { homeTeam: "Venc. Jogo 81", awayTeam: "Venc. Jogo 82", homeFlag: "xx", awayFlag: "xx" },
+  95: { homeTeam: "Venc. Jogo 86", awayTeam: "Venc. Jogo 88", homeFlag: "xx", awayFlag: "xx" },
+  96: { homeTeam: "Venc. Jogo 85", awayTeam: "Venc. Jogo 87", homeFlag: "xx", awayFlag: "xx" },
+  97: { homeTeam: "Venc. Jogo 89", awayTeam: "Venc. Jogo 90", homeFlag: "xx", awayFlag: "xx" },
+  98: { homeTeam: "Venc. Jogo 93", awayTeam: "Venc. Jogo 94", homeFlag: "xx", awayFlag: "xx" },
+  99: { homeTeam: "Venc. Jogo 91", awayTeam: "Venc. Jogo 92", homeFlag: "xx", awayFlag: "xx" },
+  100: { homeTeam: "Venc. Jogo 95", awayTeam: "Venc. Jogo 96", homeFlag: "xx", awayFlag: "xx" },
+  101: { homeTeam: "Venc. Jogo 97", awayTeam: "Venc. Jogo 98", homeFlag: "xx", awayFlag: "xx" },
+  102: { homeTeam: "Venc. Jogo 99", awayTeam: "Venc. Jogo 100", homeFlag: "xx", awayFlag: "xx" },
+  103: { homeTeam: "Perd. Jogo 101", awayTeam: "Perd. Jogo 102", homeFlag: "xx", awayFlag: "xx" },
+  104: { homeTeam: "Venc. Jogo 101", awayTeam: "Venc. Jogo 102", homeFlag: "xx", awayFlag: "xx" },
+};
+
+function resetUnplayedKnockoutPlaceholders<T extends MatchForResolve>(
+  matches: T[]
+): T[] {
+  return matches.map((m) => {
+    if (m.matchNumber < 73 || m.homeScore !== null) return m;
+    const ph = KNOCKOUT_PLACEHOLDERS[m.matchNumber];
+    if (!ph) return m;
+    return { ...m, ...ph };
+  });
+}
 
 /** R32 third-place slots in assignment order (FIFA 2026 bracket) */
 const THIRD_PLACE_SLOTS = [
@@ -90,23 +144,30 @@ function buildThirdPlaceAssignments(
     })
     .filter((t): t is GroupTeamStanding & { group: string } => t !== null);
 
-  if (thirdPlaceTeams.length === 0) return assignments;
+  if (thirdPlaceTeams.length < 8) return assignments;
 
-  // Best 8 third-placed teams among groups that have finished (FIFA rules).
-  // Slots are filled as soon as enough groups are complete; remaining slots
-  // update when more groups finish.
-  const rankedThirds = sortThirdPlaceTeams(thirdPlaceTeams).slice(0, 8);
-  const assigned = new Set<string>();
+  const rankedThirds = sortThirdPlaceTeams(thirdPlaceTeams);
+  const qualifyingThirds = rankedThirds.slice(0, 8);
+  const qualifyingGroups = qualifyingThirds.map((t) => t.group);
+
+  const winnerToThirdGroup = lookupThirdPlaceMapping(qualifyingGroups);
+  if (!winnerToThirdGroup) return assignments;
+
+  const thirdByGroup = new Map(
+    thirdPlaceTeams.map((t) => [t.group, { team: t.team, flag: t.flag }])
+  );
 
   for (const eligibleGroups of THIRD_PLACE_SLOTS) {
     const key = `3º ${eligibleGroups}`;
-    const eligible = eligibleGroups.split("");
-    const candidate = rankedThirds.find(
-      (t) => eligible.includes(t.group) && !assigned.has(t.flag)
-    );
-    if (candidate) {
-      assigned.add(candidate.flag);
-      assignments.set(key, { team: candidate.team, flag: candidate.flag });
+    const winnerGroup = THIRD_PLACE_SLOT_WINNER[eligibleGroups];
+    if (!winnerGroup) continue;
+
+    const thirdGroup = winnerToThirdGroup.get(winnerGroup);
+    if (!thirdGroup) continue;
+
+    const resolved = thirdByGroup.get(thirdGroup);
+    if (resolved) {
+      assignments.set(key, resolved);
     }
   }
 
@@ -206,7 +267,8 @@ function resolvePlaceholder(
  * Returns a new array with confirmed teams showing real names and flags.
  */
 export function enrichKnockoutTeams<T extends MatchForResolve>(matches: T[]): T[] {
-  const enriched: EnrichedMatch[] = matches.map((m) => ({ ...m }));
+  const withPlaceholders = resetUnplayedKnockoutPlaceholders(matches);
+  const enriched: EnrichedMatch[] = withPlaceholders.map((m) => ({ ...m }));
   const thirdPlaceAssignments = buildThirdPlaceAssignments(matches);
 
   for (let pass = 0; pass < 12; pass++) {
@@ -274,10 +336,16 @@ export async function persistKnockoutTeamResolution(): Promise<number> {
     const resolved = enriched.find((m) => m.id === original.id);
     if (!resolved) continue;
 
+    // Only update team slots for unplayed matches (avoid rewriting history).
+    if (original.homeScore !== null || original.awayScore !== null) continue;
+    if (original.matchNumber < 73) continue;
+
     const homeChanged =
-      original.homeFlag === "xx" && resolved.homeFlag !== "xx";
+      resolved.homeTeam !== original.homeTeam ||
+      resolved.homeFlag !== original.homeFlag;
     const awayChanged =
-      original.awayFlag === "xx" && resolved.awayFlag !== "xx";
+      resolved.awayTeam !== original.awayTeam ||
+      resolved.awayFlag !== original.awayFlag;
 
     if (!homeChanged && !awayChanged) continue;
 

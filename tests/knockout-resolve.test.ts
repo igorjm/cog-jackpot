@@ -85,3 +85,14 @@ const knockoutR32: MatchForResolve = {
 })();
 
 console.log("\nAll knockout-resolve tests passed!");
+
+// FIFA Annex C lookup for confirmed 2026 group-stage third-place combination
+(() => {
+  const { lookupThirdPlaceMapping } = require("../lib/third-place-annex-c") as typeof import("../lib/third-place-annex-c");
+  const map = lookupThirdPlaceMapping(["B", "D", "E", "F", "I", "J", "K", "L"]);
+  assert(map?.get("E") === "D", "Annex C: Germany (1E) faces Paraguay (3D)");
+  assert(map?.get("I") === "F", "Annex C: France (1I) faces Sweden (3F)");
+  assert(map?.get("L") === "K", "Annex C: England (1L) faces DR Congo (3K)");
+  assert(map?.get("G") === "I", "Annex C: Belgium (1G) faces Senegal (3I)");
+  assert(map?.get("B") === "J", "Annex C: Switzerland (1B) faces Algeria (3J)");
+})();
