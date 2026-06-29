@@ -6,11 +6,11 @@ import { hash } from "bcryptjs";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resultSchema, notificationSchema } from "@/lib/validations";
-import { calculatePoints, calculateFinalPoints } from "@/lib/scoring";
 import { calculateRanking } from "@/lib/ranking";
 import { fetchFinishedMatches } from "@/lib/football-api";
 import { syncFinishedMatchResults } from "@/lib/match-sync";
 import { persistKnockoutTeamResolution } from "@/lib/knockout-resolve";
+import { recalculateBetPointsForMatch, recalculateAllFinishedBetPoints } from "@/lib/bet-points";
 import { revalidatePath } from "next/cache";
 import { sendPushToAll, sendPushToUser } from "@/lib/push";
 
@@ -63,23 +63,15 @@ export async function saveResult(formData: FormData) {
     },
   });
 
-  // Calculate points for all bets on this match
-  for (const bet of match.bets) {
-    const result = calculatePoints(
-      { homeScore: bet.homeScore, awayScore: bet.awayScore },
-      { homeScore: parsed.data.homeScore, awayScore: parsed.data.awayScore }
-    );
-
-    const finalPoints = calculateFinalPoints(result.points, match.multiplier);
-
-    await prisma.bet.update({
-      where: { id: bet.id },
-      data: {
-        rawPoints: result.points,
-        points: finalPoints,
-      },
-    });
-  }
+  await recalculateBetPointsForMatch(
+    {
+      id: match.id,
+      homeScore: parsed.data.homeScore,
+      awayScore: parsed.data.awayScore,
+      multiplier: match.multiplier,
+    },
+    match.bets
+  );
 
   // If this is a FRIENDLY match, check if ALL friendly matches now have results.
   // If yes, zero out all friendly bet points (they don't count long-term).
@@ -243,6 +235,36 @@ export async function syncScores() {
   } catch (e) {
     console.error("[admin/syncScores]", e);
     return { error: "Falha na sincronização. Tente novamente." };
+  }
+}
+
+export async function recalculateAllBetPoints() {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { error: "Acesso negado" };
+  }
+
+  try {
+    const results = await recalculateAllFinishedBetPoints();
+    const changed = results.reduce((sum, r) => sum + r.changed, 0);
+    const updated = results.reduce((sum, r) => sum + r.updated, 0);
+
+    revalidatePath("/admin/results");
+    revalidatePath("/admin");
+    revalidatePath("/ranking");
+    revalidatePath("/matches");
+    revalidatePath("/my-bets");
+    revalidatePath("/dashboard");
+
+    return {
+      success: true,
+      message: `${changed} palpite(s) corrigido(s) em ${results.length} jogo(s) (${updated} total).`,
+      changed,
+      matches: results.length,
+    };
+  } catch (e) {
+    console.error("[admin/recalculateAllBetPoints]", e);
+    return { error: "Falha ao recalcular pontos. Tente novamente." };
   }
 }
 

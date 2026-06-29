@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { saveResult, syncScores } from "@/app/actions/admin";
+import { saveResult, syncScores, recalculateAllBetPoints } from "@/app/actions/admin";
 import { getFlagSrc, isClubFlag } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -59,6 +59,7 @@ export default function AdminResultsPage() {
   const [activeFilter, setActiveFilter] = useState("PENDING");
   const [syncing, setSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState<string | null>(null);
+  const [recalculating, setRecalculating] = useState(false);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; count?: number; matches?: { homeTeam: string; awayTeam: string; score: string; phase: string; date: string }[]; error?: string } | null>(null);
 
@@ -144,6 +145,19 @@ export default function AdminResultsPage() {
     setTimeout(() => setSyncMsg(null), 5000);
   };
 
+  const handleRecalculate = async () => {
+    setRecalculating(true);
+    setSyncMsg(null);
+    const result = await recalculateAllBetPoints();
+    if (result.error) {
+      setSyncMsg(result.error);
+    } else {
+      setSyncMsg(result.message || "Pontos recalculados!");
+    }
+    setRecalculating(false);
+    setTimeout(() => setSyncMsg(null), 8000);
+  };
+
   const handleTestApi = async () => {
     setTesting(true);
     setTestResult(null);
@@ -183,8 +197,20 @@ export default function AdminResultsPage() {
             {testing ? "Testando..." : "🔍 Test API"}
           </button>
           <button
+            onClick={handleRecalculate}
+            disabled={recalculating || syncing}
+            className={cn(
+              "text-xs px-3 py-1.5 rounded-lg font-medium transition-all",
+              recalculating
+                ? "bg-[#1E3862] text-[#5A7A9A] cursor-wait"
+                : "bg-[#22C55E]/15 text-[#22C55E] hover:bg-[#22C55E]/25 border border-[#22C55E]/30"
+            )}
+          >
+            {recalculating ? "Recalculando..." : "↻ Recalcular pts"}
+          </button>
+          <button
             onClick={handleSync}
-            disabled={syncing}
+            disabled={syncing || recalculating}
             className={cn(
               "text-xs px-3 py-1.5 rounded-lg font-medium transition-all",
               syncing
