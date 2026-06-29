@@ -60,5 +60,5 @@ export function calculateFinalPoints(
   rawPoints: number,
   multiplier: number
 ): number {
-  return Math.round(rawPoints * multiplier);
+  return Math.round(rawPoints * multiplier * 100) / 100;
 }

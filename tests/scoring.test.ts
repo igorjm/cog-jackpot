@@ -147,12 +147,22 @@ function assert(condition: boolean, message: string) {
 
 (() => {
   const final = calculateFinalPoints(7, 1.5);
-  assert(final === 11, "7 pts × 1.5 multiplier = 11 final pts (rounded)");
+  assert(final === 10.5, "7 pts × 1.5 multiplier = 10.5 final pts (exact)");
+})();
+
+(() => {
+  const final = calculateFinalPoints(7, 1.25);
+  assert(final === 8.75, "7 pts × 1.25 multiplier = 8.75 final pts (exact)");
+})();
+
+(() => {
+  const final = calculateFinalPoints(10, 1.25);
+  assert(final === 12.5, "10 pts × 1.25 multiplier = 12.5 final pts (exact)");
 })();
 
 (() => {
   const final = calculateFinalPoints(5, 2.5);
-  assert(final === 13, "5 pts × 2.5 multiplier = 13 final pts (rounded)");
+  assert(final === 12.5, "5 pts × 2.5 multiplier = 12.5 final pts (exact)");
 })();
 
 (() => {

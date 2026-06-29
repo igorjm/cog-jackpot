@@ -2,7 +2,7 @@ import type { Bet, Match, MatchStatus, Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import type { LiveMatchResult, MatchResult } from "./football-api";
 import { resolveFlagCode } from "./team-codes";
-import { calculatePoints, calculateFinalPoints } from "./scoring";
+import { recalculateBetPointsForMatch } from "./bet-points";
 import { persistKnockoutTeamResolution } from "./knockout-resolve";
 
 type MatchWithBets = Match & { bets: Bet[] };
@@ -69,18 +69,15 @@ export async function applyMatchResult(
     },
   });
 
-  for (const bet of match.bets) {
-    const pointsResult = calculatePoints(
-      { homeScore: bet.homeScore, awayScore: bet.awayScore },
-      { homeScore: result.homeScore, awayScore: result.awayScore }
-    );
-    const finalPoints = calculateFinalPoints(pointsResult.points, match.multiplier);
-
-    await prisma.bet.update({
-      where: { id: bet.id },
-      data: { rawPoints: pointsResult.points, points: finalPoints },
-    });
-  }
+  await recalculateBetPointsForMatch(
+    {
+      id: match.id,
+      homeScore: result.homeScore,
+      awayScore: result.awayScore,
+      multiplier: match.multiplier,
+    },
+    match.bets
+  );
 }
 
 export async function applyLiveMatchUpdate(
