@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatPoints } from "@/lib/utils";
 import { calculateRanking } from "@/lib/ranking";
 import { PRIZE_DISTRIBUTION } from "@/lib/constants";
+import { calculatePrizePool } from "@/lib/prizes";
 import { SendNotificationForm } from "@/components/test-notification-button";
 
 export const dynamic = "force-dynamic";
@@ -10,8 +11,7 @@ export default async function AdminDashboard() {
   const totalUsers = await prisma.user.count({ where: { role: { not: "ADMIN" } } });
   const approvedUsers = await prisma.user.count({ where: { status: "APPROVED", role: { not: "ADMIN" } } });
   const pendingUsers = await prisma.user.count({ where: { status: "PENDING_PAYMENT", role: { not: "ADMIN" } } });
-  const entryFee = parseFloat(process.env.NEXT_PUBLIC_ENTRY_FEE ?? "50");
-  const totalAmount = approvedUsers * entryFee;
+  const prizePool = calculatePrizePool(approvedUsers);
 
   const matchesWithoutResult = await prisma.match.count({
     where: { homeScore: null, matchDate: { lt: new Date() } },
@@ -20,9 +20,9 @@ export default async function AdminDashboard() {
   const ranking = await calculateRanking();
 
   const prizes = [
-    { label: "🥇 1º Lugar", pct: PRIZE_DISTRIBUTION.first, amount: totalAmount * PRIZE_DISTRIBUTION.first },
-    { label: "🥈 2º Lugar", pct: PRIZE_DISTRIBUTION.second, amount: totalAmount * PRIZE_DISTRIBUTION.second },
-    { label: "🥉 3º Lugar", pct: PRIZE_DISTRIBUTION.third, amount: totalAmount * PRIZE_DISTRIBUTION.third },
+    { label: "🥇 1º Lugar", pct: PRIZE_DISTRIBUTION.first, amount: prizePool.first },
+    { label: "🥈 2º Lugar", pct: PRIZE_DISTRIBUTION.second, amount: prizePool.second },
+    { label: "🥉 3º Lugar", pct: PRIZE_DISTRIBUTION.third, amount: prizePool.third },
   ];
 
   return (
@@ -35,7 +35,7 @@ export default async function AdminDashboard() {
         <StatCard label="Total Inscritos" value={totalUsers.toString()} />
         <StatCard label="Aprovados" value={approvedUsers.toString()} color="text-[#22C55E]" />
         <StatCard label="Pendentes" value={pendingUsers.toString()} color="text-[#FFD60A]" />
-        <StatCard label="Montante" value={formatCurrency(totalAmount)} color="text-[#FFD60A]" />
+        <StatCard label="Montante" value={formatCurrency(prizePool.total)} color="text-[#FFD60A]" />
       </div>
 
       {matchesWithoutResult > 0 && (
@@ -117,7 +117,7 @@ export default async function AdminDashboard() {
                         {entry.nickname}
                       </td>
                       <td className="py-2 text-right font-mono font-bold">
-                        {entry.totalPoints}
+                        {formatPoints(entry.totalPoints)}
                       </td>
                       <td className="py-2 text-right font-mono text-xs">
                         {entry.exactScores}
