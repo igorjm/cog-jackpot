@@ -94,7 +94,7 @@ model Bet {
   matchId   String
   homeScore Int
   awayScore Int
-  points    Int?
+  points    Float?
   rawPoints Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

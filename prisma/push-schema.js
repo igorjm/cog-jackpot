@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS "Bet" (
     "matchId" TEXT NOT NULL,
     "homeScore" INTEGER NOT NULL,
     "awayScore" INTEGER NOT NULL,
-    "points" INTEGER,
+    "points" DOUBLE PRECISION,
     "rawPoints" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -96,6 +96,9 @@ ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "avatar" TEXT;
 
 -- Add previousPosition column to User table (nullable)
 ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "previousPosition" INTEGER;
+
+-- Bet.points: store exact decimal multipliers (e.g. 12.5 for 10 × 1.25)
+ALTER TABLE "Bet" ALTER COLUMN "points" TYPE DOUBLE PRECISION USING "points"::double precision;
 
 -- CreateIndex
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
