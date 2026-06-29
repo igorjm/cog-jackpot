@@ -40,3 +40,18 @@ export function formatCurrency(value: number): string {
     currency: "BRL",
   }).format(value);
 }
+
+/** Format bet/ranking points — integers as-is, decimals up to 2 (pt-BR). */
+export function formatPoints(value: number): string {
+  const normalized = Math.round(value * 100) / 100;
+  const hasFraction = Math.abs(normalized - Math.trunc(normalized)) > 1e-9;
+
+  if (!hasFraction) {
+    return String(Math.trunc(normalized));
+  }
+
+  return new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 2,
+  }).format(normalized);
+}

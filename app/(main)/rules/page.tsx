@@ -52,7 +52,8 @@ export default function RulesPage() {
           ))}
         </div>
         <p className="text-xs text-[#94B8D8]">
-          Pontos do jogo × multiplicador = pontos finais creditados.
+          Pontos finais = pontos do jogo × multiplicador (sem arredondamento).
+          Ex.: 7 pts × 1,25 = <strong className="text-white">8,75 pts</strong>.
         </p>
       </section>
 

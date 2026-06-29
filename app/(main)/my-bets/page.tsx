@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { PHASE_LABELS } from "@/lib/constants";
 import { isBeforeDeadline } from "@/lib/deadline";
+import { formatPoints } from "@/lib/utils";
 import Link from "next/link";
 
 export default async function MyBetsPage() {
@@ -28,7 +29,7 @@ export default async function MyBetsPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-3 text-center">
-          <p className="text-xl font-mono font-bold text-[#22C55E]">{totalPoints}</p>
+          <p className="text-xl font-mono font-bold text-[#22C55E]">{formatPoints(totalPoints)}</p>
           <p className="text-[10px] text-[#94B8D8]">Total Pts</p>
         </div>
         <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-3 text-center">
@@ -88,7 +89,7 @@ export default async function MyBetsPage() {
                     <Badge
                       variant={bet.points && bet.points > 0 ? "points" : "error"}
                     >
-                      +{bet.points ?? 0}
+                      +{formatPoints(bet.points ?? 0)}
                     </Badge>
                   ) : (
                     <Badge variant="info">Pendente</Badge>

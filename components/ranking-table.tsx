@@ -1,4 +1,4 @@
-import { getInitials } from "@/lib/utils";
+import { getInitials, formatPoints } from "@/lib/utils";
 import { RankingEntry } from "@/lib/ranking";
 import { PositionChange } from "./position-change";
 import { LastPointsGain } from "./last-points-gain";
@@ -50,7 +50,7 @@ export function RankingTable({ entries, currentUserId }: RankingTableProps) {
             <span className="text-sm truncate">{entry.nickname}</span>
           </div>
           <span className="text-sm font-mono font-bold text-right text-[#FFD60A] tabular-nums inline-flex items-baseline justify-end gap-0.5 flex-wrap">
-            {entry.totalPoints}
+            {formatPoints(entry.totalPoints)}
             <LastPointsGain points={entry.lastPointsGained} />
           </span>
           <span className="text-xs text-center tabular-nums">

@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateRanking } from "@/lib/ranking";
 import { enrichKnockoutTeams } from "@/lib/knockout-resolve";
+import { formatPoints } from "@/lib/utils";
 import { MatchCardWithDrawer } from "@/components/match-card-with-drawer";
 import { RecentResults } from "@/components/recent-results";
 import Link from "next/link";
@@ -69,7 +70,7 @@ export default async function DashboardPage() {
         </div>
         <div className="bg-[#162D54] rounded-xl border border-[#2A4A7A] p-3 text-center">
           <p className="text-2xl font-mono font-bold text-[#22C55E]">
-            {totalPoints}
+            {formatPoints(totalPoints)}
           </p>
           <p className="text-[10px] text-[#94B8D8] mt-0.5">Pontos</p>
         </div>

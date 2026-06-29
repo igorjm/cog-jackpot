@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { getFlagSrc, isClubFlag } from "@/lib/utils";
+import { getFlagSrc, isClubFlag, formatPoints } from "@/lib/utils";
 
 interface BetEntry {
   homeScore: number;
@@ -102,7 +102,7 @@ function PointsBadge({ bet }: { bet: BetEntry }) {
   if (bet.points === null) return null;
   return (
     <span
-      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${
+      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 whitespace-nowrap tabular-nums ${
         bet.rawPoints === 10
           ? "bg-[#FFD60A]/20 text-[#FFD60A]"
           : bet.points > 0
@@ -110,7 +110,7 @@ function PointsBadge({ bet }: { bet: BetEntry }) {
           : "bg-[#EF4444]/20 text-[#EF4444]"
       }`}
     >
-      +{bet.points}
+      +{formatPoints(bet.points)}
     </span>
   );
 }

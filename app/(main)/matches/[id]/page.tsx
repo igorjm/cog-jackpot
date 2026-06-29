@@ -12,6 +12,7 @@ import { refreshLiveScoresIfDue, shouldRefreshLiveScoresOnDemand } from "@/lib/l
 import { parseMatchGoals } from "@/lib/match-goals";
 import { PHASE_LABELS } from "@/lib/constants";
 import { enrichKnockoutTeams } from "@/lib/knockout-resolve";
+import { formatPoints } from "@/lib/utils";
 
 export default async function MatchDetailPage({
   params,
@@ -148,7 +149,7 @@ export default async function MatchDetailPage({
               </div>
               {isFinished ? (
                 <Badge variant={userBet.points && userBet.points > 0 ? "points" : "error"}>
-                  +{userBet.points ?? 0} pts
+                  +{formatPoints(userBet.points ?? 0)} pts
                 </Badge>
               ) : isLive ? (
                 <Badge variant="info">Em andamento</Badge>

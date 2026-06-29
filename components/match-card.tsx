@@ -6,7 +6,7 @@ import { isBeforeDeadline } from "@/lib/deadline";
 import { getDisplayScore, isMatchLiveNow } from "@/lib/match-live";
 import type { MatchStatus } from "@prisma/client";
 import { getKnockoutHint } from "@/lib/knockout-hints";
-import { getFlagSrc, isClubFlag } from "@/lib/utils";
+import { getFlagSrc, isClubFlag, formatPoints } from "@/lib/utils";
 
 interface MatchCardProps {
   match: {
@@ -148,8 +148,11 @@ export function MatchCard({ match, userBet, showBetLink = true }: MatchCardProps
               Seu palpite: {userBet.homeScore} × {userBet.awayScore}
             </span>
             <div className="flex items-center gap-2">
-              <Badge variant={userBet.points && userBet.points > 0 ? "points" : "error"}>
-                +{userBet.points ?? 0} pts
+              <Badge
+                variant={userBet.points && userBet.points > 0 ? "points" : "error"}
+                className="shrink-0 whitespace-nowrap tabular-nums"
+              >
+                +{formatPoints(userBet.points ?? 0)} pts
               </Badge>
               <span className="text-xs font-medium text-[#38BDF8] bg-[#38BDF8]/10 px-2.5 py-1 rounded-full border border-[#38BDF8]/20">Ver →</span>
             </div>

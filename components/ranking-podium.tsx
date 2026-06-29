@@ -1,5 +1,5 @@
 import { RankingEntry } from "@/lib/ranking";
-import { getInitials } from "@/lib/utils";
+import { getInitials, formatPoints } from "@/lib/utils";
 import { LastPointsGain } from "./last-points-gain";
 import Image from "next/image";
 
@@ -55,7 +55,7 @@ export function RankingPodium({ top3 }: RankingPodiumProps) {
             {entry.nickname}
           </p>
           <p className="text-xs font-mono text-[#FFD60A]">
-            {entry.totalPoints}
+            {formatPoints(entry.totalPoints)}
             <LastPointsGain points={entry.lastPointsGained} className="ml-0.5" />
           </p>
           <div

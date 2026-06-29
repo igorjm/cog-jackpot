@@ -1,3 +1,5 @@
+import { formatPoints } from "@/lib/utils";
+
 interface LastPointsGainProps {
   points: number | null | undefined;
   className?: string;
@@ -5,6 +7,8 @@ interface LastPointsGainProps {
 
 export function LastPointsGain({ points, className = "" }: LastPointsGainProps) {
   if (points == null) return null;
+
+  const formatted = formatPoints(points);
 
   return (
     <span
@@ -16,7 +20,7 @@ export function LastPointsGain({ points, className = "" }: LastPointsGainProps) 
           : "text-[#EF4444]"
       } ${className}`}
     >
-      (+{points})
+      (+{formatted})
     </span>
   );
 }
