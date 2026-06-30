@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { enrichKnockoutTeams } from "@/lib/knockout-resolve";
-import { KNOCKOUT_MATCH_NUMBER_MIN } from "@/lib/bracket-tree";
+import { KNOCKOUT_MATCH_NUMBER_MIN, type BracketMatchData } from "@/lib/bracket-tree";
+import type { WinnerSide } from "@/lib/match-winner";
 import { KnockoutBracket } from "@/components/bracket/knockout-bracket";
 import Link from "next/link";
 
@@ -13,6 +14,7 @@ const matchSelect = {
   awayFlag: true,
   homeScore: true,
   awayScore: true,
+  winnerSide: true,
   phase: true,
   group: true,
 } as const;
@@ -24,7 +26,7 @@ export default async function BracketPage() {
     select: matchSelect,
   });
 
-  const matches = enrichKnockoutTeams(allMatches)
+  const matches: BracketMatchData[] = enrichKnockoutTeams(allMatches)
     .filter((m) => m.matchNumber >= KNOCKOUT_MATCH_NUMBER_MIN)
     .map((m) => ({
       id: m.id,
@@ -35,6 +37,10 @@ export default async function BracketPage() {
       awayFlag: m.awayFlag,
       homeScore: m.homeScore,
       awayScore: m.awayScore,
+      winnerSide:
+        m.winnerSide === "home" || m.winnerSide === "away"
+          ? (m.winnerSide as WinnerSide)
+          : null,
     }));
 
   return (
