@@ -84,6 +84,40 @@ const knockoutR32: MatchForResolve = {
   assert(resolved.homeTeam === "Alemanha", "Winner shows resolved team name");
 })();
 
+(() => {
+  const drawnR32: MatchForResolve = {
+    id: "k74",
+    matchNumber: 74,
+    homeTeam: "Alemanha",
+    awayTeam: "Paraguai",
+    homeFlag: "de",
+    awayFlag: "py",
+    homeScore: 1,
+    awayScore: 1,
+    winnerSide: "away",
+    phase: "ROUND_OF_32",
+    group: null,
+  };
+
+  const r16: MatchForResolve = {
+    id: "k89",
+    matchNumber: 89,
+    homeTeam: "Venc. Jogo 74",
+    awayTeam: "Venc. Jogo 77",
+    homeFlag: "xx",
+    awayFlag: "xx",
+    homeScore: null,
+    awayScore: null,
+    phase: "ROUND_OF_16",
+    group: null,
+  };
+
+  const enriched = enrichKnockoutTeams([drawnR32, r16]);
+  const resolved = enriched.find((m) => m.matchNumber === 89)!;
+  assert(resolved.homeFlag === "py", "Penalty winner (away) propagates on draw");
+  assert(resolved.homeTeam === "Paraguai", "Paraguay advances after 1-1");
+})();
+
 console.log("\nAll knockout-resolve tests passed!");
 
 // FIFA Annex C lookup for confirmed 2026 group-stage third-place combination

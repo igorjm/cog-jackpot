@@ -9,6 +9,7 @@ import {
   lookupThirdPlaceMapping,
   THIRD_PLACE_SLOT_WINNER,
 } from "./third-place-annex-c";
+import { resolveMatchWinnerSide, type WinnerSide } from "./match-winner";
 
 export interface MatchForResolve {
   id: string;
@@ -19,6 +20,7 @@ export interface MatchForResolve {
   awayFlag: string;
   homeScore: number | null;
   awayScore: number | null;
+  winnerSide?: string | null;
   phase: Phase;
   group: string | null;
 }
@@ -207,8 +209,14 @@ function getMatchWinner(
 
   if (home.flag === "xx" || away.flag === "xx") return null;
 
-  if (match.homeScore > match.awayScore) return home;
-  if (match.awayScore > match.homeScore) return away;
+  const side = resolveMatchWinnerSide({
+    homeScore: match.homeScore,
+    awayScore: match.awayScore,
+    winnerSide: match.winnerSide as WinnerSide | null | undefined,
+  });
+
+  if (side === "home") return home;
+  if (side === "away") return away;
   return null;
 }
 
@@ -222,8 +230,14 @@ function getMatchLoser(
 
   if (home.flag === "xx" || away.flag === "xx") return null;
 
-  if (match.homeScore > match.awayScore) return away;
-  if (match.awayScore > match.homeScore) return home;
+  const side = resolveMatchWinnerSide({
+    homeScore: match.homeScore,
+    awayScore: match.awayScore,
+    winnerSide: match.winnerSide as WinnerSide | null | undefined,
+  });
+
+  if (side === "home") return away;
+  if (side === "away") return home;
   return null;
 }
 
@@ -324,6 +338,7 @@ export async function persistKnockoutTeamResolution(): Promise<number> {
       awayFlag: true,
       homeScore: true,
       awayScore: true,
+      winnerSide: true,
       phase: true,
       group: true,
     },

@@ -100,6 +100,9 @@ ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "previousPosition" INTEGER;
 -- Bet.points: store exact decimal multipliers (e.g. 12.5 for 10 × 1.25)
 ALTER TABLE "Bet" ALTER COLUMN "points" TYPE DOUBLE PRECISION USING "points"::double precision;
 
+-- Knockout draw winner (penalties / extra time)
+ALTER TABLE "Match" ADD COLUMN IF NOT EXISTS "winnerSide" TEXT;
+
 -- CreateIndex
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX IF NOT EXISTS "User_nickname_key" ON "User"("nickname");

@@ -2,6 +2,8 @@
 
 export type BracketSlotSize = "sm" | "md" | "lg" | "xl" | "final";
 
+import { resolveMatchWinnerSide, type WinnerSide } from "./match-winner";
+
 export interface BracketMatchData {
   id: string;
   matchNumber: number;
@@ -11,6 +13,7 @@ export interface BracketMatchData {
   awayFlag: string;
   homeScore: number | null;
   awayScore: number | null;
+  winnerSide?: WinnerSide | null;
 }
 
 export interface BracketRoundDef {
@@ -41,10 +44,7 @@ export const BASE_MATCH_HEIGHT = 56;
 export function getWinnerSide(
   match: BracketMatchData
 ): "home" | "away" | null {
-  if (match.homeScore === null || match.awayScore === null) return null;
-  if (match.homeScore > match.awayScore) return "home";
-  if (match.awayScore > match.homeScore) return "away";
-  return null;
+  return resolveMatchWinnerSide(match);
 }
 
 export function shortPlaceholderLabel(team: string, flag: string): string {

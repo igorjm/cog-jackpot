@@ -1,5 +1,6 @@
 import { MatchStatus, Phase } from "@prisma/client";
 import type { MatchGoal } from "./match-goals";
+import { mapApiWinner, type WinnerSide } from "./match-winner";
 
 // football-data.org v4 API client for World Cup 2026 score updates
 // Free tier: 10 requests/minute — live sync uses 1 req/min (status=LIVE filter)
@@ -29,6 +30,8 @@ interface ApiMatch {
   awayTeam: { id: number; name: string; tla: string };
   goals?: ApiGoal[];
   score: {
+    winner?: string | null;
+    duration?: string | null;
     fullTime: { home: number | null; away: number | null };
     halfTime?: { home: number | null; away: number | null };
   };
@@ -58,6 +61,7 @@ export interface MatchResult {
   phase: Phase;
   matchDate: string;
   status: string;
+  winnerSide?: WinnerSide;
 }
 
 export interface LiveMatchResult {
@@ -109,6 +113,7 @@ function mapApiMatchToResult(m: ApiMatch): MatchResult | null {
     phase: STAGE_MAP[m.stage] || "GROUP",
     matchDate: m.utcDate,
     status: m.status,
+    winnerSide: mapApiWinner(m.score.winner),
   };
 }
 

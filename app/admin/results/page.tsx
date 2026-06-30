@@ -16,10 +16,20 @@ interface Match {
   matchDate: string;
   homeScore: number | null;
   awayScore: number | null;
+  winnerSide: string | null;
   matchNumber: number;
   phase: string;
   group: string | null;
 }
+
+const KNOCKOUT_PHASES = new Set([
+  "ROUND_OF_32",
+  "ROUND_OF_16",
+  "QUARTER_FINAL",
+  "SEMI_FINAL",
+  "THIRD_PLACE",
+  "FINAL",
+]);
 
 const PHASE_OPTIONS = [
   { value: "ALL", label: "Todos" },
@@ -54,6 +64,7 @@ export default function AdminResultsPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [scores, setScores] = useState<Record<string, { home: number; away: number }>>({});
+  const [winnerSides, setWinnerSides] = useState<Record<string, "home" | "away" | null>>({});
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<Set<string>>(new Set());
   const [activeFilter, setActiveFilter] = useState("PENDING");
@@ -76,6 +87,14 @@ export default function AdminResultsPage() {
           };
         });
         setScores(initial);
+        const winners: Record<string, "home" | "away" | null> = {};
+        data.forEach((m: Match) => {
+          winners[m.id] =
+            m.winnerSide === "home" || m.winnerSide === "away"
+              ? m.winnerSide
+              : null;
+        });
+        setWinnerSides(winners);
         setLoading(false);
       });
   }, []);
@@ -86,12 +105,19 @@ export default function AdminResultsPage() {
     formData.set("matchId", matchId);
     formData.set("homeScore", scores[matchId].home.toString());
     formData.set("awayScore", scores[matchId].away.toString());
+    const winner = winnerSides[matchId];
+    if (winner) formData.set("winnerSide", winner);
     const result = await saveResult(formData);
     if (result?.success) {
       setMatches((prev) =>
         prev.map((m) =>
           m.id === matchId
-            ? { ...m, homeScore: scores[matchId].home, awayScore: scores[matchId].away }
+            ? {
+                ...m,
+                homeScore: scores[matchId].home,
+                awayScore: scores[matchId].away,
+                winnerSide: winnerSides[matchId] ?? null,
+              }
             : m
         )
       );
@@ -380,6 +406,45 @@ export default function AdminResultsPage() {
                   </div>
                 </div>
               </div>
+
+              {KNOCKOUT_PHASES.has(match.phase) &&
+                scores[match.id]?.home === scores[match.id]?.away && (
+                  <div className="mt-3 rounded-lg border border-[#FFD60A]/30 bg-[#FFD60A]/5 p-3">
+                    <p className="text-[10px] uppercase tracking-wide text-[#FFD60A] mb-2">
+                      Empate — quem avançou?
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setWinnerSides((prev) => ({ ...prev, [match.id]: "home" }))
+                        }
+                        className={cn(
+                          "flex-1 text-xs py-2 px-2 rounded-lg border transition-all",
+                          winnerSides[match.id] === "home"
+                            ? "border-[#22C55E] bg-[#22C55E]/15 text-white"
+                            : "border-[#2A4A7A] text-[#94B8D8] hover:border-[#22C55E]/40"
+                        )}
+                      >
+                        {match.homeTeam}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setWinnerSides((prev) => ({ ...prev, [match.id]: "away" }))
+                        }
+                        className={cn(
+                          "flex-1 text-xs py-2 px-2 rounded-lg border transition-all",
+                          winnerSides[match.id] === "away"
+                            ? "border-[#22C55E] bg-[#22C55E]/15 text-white"
+                            : "border-[#2A4A7A] text-[#94B8D8] hover:border-[#22C55E]/40"
+                        )}
+                      >
+                        {match.awayTeam}
+                      </button>
+                    </div>
+                  </div>
+                )}
 
               {/* Save button */}
               <div className="mt-3 flex justify-end">

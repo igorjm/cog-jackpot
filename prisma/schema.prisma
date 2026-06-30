@@ -61,6 +61,8 @@ model Match {
   venue         String?
   homeScore     Int?
   awayScore     Int?
+  /** Set when knockout match ends level — winner after extra time / penalties. */
+  winnerSide    String?
   liveHomeScore Int?
   liveAwayScore Int?
   halfTimeHome  Int?

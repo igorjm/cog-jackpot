@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { fetchFinishedMatches } from "@/lib/football-api";
 import { syncFinishedMatchResults } from "@/lib/match-sync";
-import { persistKnockoutTeamResolution } from "@/lib/knockout-resolve";
+import { refreshKnockoutBracketFromApi } from "@/lib/knockout-bracket-sync";
 import {
   internalErrorResponse,
   unauthorizedCronResponse,
@@ -18,13 +18,15 @@ export async function GET(request: Request) {
   try {
     const results = await fetchFinishedMatches();
     if (results.length === 0) {
-      const knockoutUpdated = await persistKnockoutTeamResolution();
+      const { knockoutUpdated, winnerSidesUpdated } =
+        await refreshKnockoutBracketFromApi([]);
       return NextResponse.json({
         synced: 0,
         knockoutUpdated,
+        winnerSidesUpdated,
         message:
-          knockoutUpdated > 0
-            ? `${knockoutUpdated} knockout slot(s) updated`
+          knockoutUpdated > 0 || winnerSidesUpdated > 0
+            ? `${winnerSidesUpdated > 0 ? `${winnerSidesUpdated} penalty winner(s), ` : ""}${knockoutUpdated} knockout slot(s) updated`
             : "No new results",
       });
     }

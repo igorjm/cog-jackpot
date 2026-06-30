@@ -17,6 +17,7 @@ export async function GET() {
       matchDate: true,
       homeScore: true,
       awayScore: true,
+      winnerSide: true,
       matchNumber: true,
       phase: true,
       group: true,

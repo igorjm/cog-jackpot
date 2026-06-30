@@ -9,6 +9,11 @@ import { resultSchema, notificationSchema } from "@/lib/validations";
 import { calculateRanking } from "@/lib/ranking";
 import { fetchFinishedMatches } from "@/lib/football-api";
 import { syncFinishedMatchResults } from "@/lib/match-sync";
+import {
+  parseWinnerSide,
+  requiresKnockoutWinner,
+  refreshKnockoutBracketFromApi,
+} from "@/lib/knockout-bracket-sync";
 import { persistKnockoutTeamResolution } from "@/lib/knockout-resolve";
 import { recalculateBetPointsForMatch, recalculateAllFinishedBetPoints } from "@/lib/bet-points";
 import { revalidatePath } from "next/cache";
@@ -38,6 +43,21 @@ export async function saveResult(formData: FormData) {
 
   if (!match) return { error: "Jogo não encontrado" };
 
+  const winnerSide = parseWinnerSide(formData.get("winnerSide"));
+  if (
+    requiresKnockoutWinner(
+      match.phase,
+      parsed.data.homeScore,
+      parsed.data.awayScore
+    ) &&
+    !winnerSide
+  ) {
+    return {
+      error:
+        "Empate no mata-mata: selecione quem avançou (prorrogação/pênaltis).",
+    };
+  }
+
   // Snapshot current ranking positions before they change
   const currentRanking = await calculateRanking();
   await Promise.all(
@@ -55,6 +75,8 @@ export async function saveResult(formData: FormData) {
     data: {
       homeScore: parsed.data.homeScore,
       awayScore: parsed.data.awayScore,
+      winnerSide:
+        parsed.data.homeScore === parsed.data.awayScore ? winnerSide : null,
       matchStatus: "FINISHED",
       liveHomeScore: null,
       liveAwayScore: null,
@@ -93,6 +115,7 @@ export async function saveResult(formData: FormData) {
   revalidatePath("/admin/results");
   revalidatePath("/ranking");
   revalidatePath("/matches");
+  revalidatePath("/bracket");
 
   // Send push notification to all users
   sendPushToAll({
@@ -177,18 +200,21 @@ export async function syncScores() {
 
   try {
     const results = await fetchFinishedMatches();
+
     if (results.length === 0) {
-      const knockoutUpdated = await persistKnockoutTeamResolution();
+      const { knockoutUpdated, winnerSidesUpdated } =
+        await refreshKnockoutBracketFromApi([]);
       revalidatePath("/admin/results");
       revalidatePath("/matches");
+      revalidatePath("/bracket");
       return {
         success: true,
         synced: 0,
         skipped: 0,
         knockoutUpdated,
         message:
-          knockoutUpdated > 0
-            ? `${knockoutUpdated} mata-mata(s) atualizado(s)`
+          winnerSidesUpdated > 0 || knockoutUpdated > 0
+            ? `${winnerSidesUpdated > 0 ? `${winnerSidesUpdated} vencedor(es) de pênaltis, ` : ""}${knockoutUpdated} mata-mata(s) atualizado(s)`
             : "Nenhum resultado novo encontrado",
       };
     }
@@ -215,6 +241,7 @@ export async function syncScores() {
     revalidatePath("/admin/results");
     revalidatePath("/ranking");
     revalidatePath("/matches");
+    revalidatePath("/bracket");
 
     if (synced > 0) {
       sendPushToAll({

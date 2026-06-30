@@ -3,7 +3,7 @@ import { prisma } from "./prisma";
 import type { LiveMatchResult, MatchResult } from "./football-api";
 import { resolveFlagCode } from "./team-codes";
 import { recalculateBetPointsForMatch } from "./bet-points";
-import { persistKnockoutTeamResolution } from "./knockout-resolve";
+import { refreshKnockoutBracketFromApi } from "./knockout-bracket-sync";
 
 type MatchWithBets = Match & { bets: Bet[] };
 
@@ -61,6 +61,10 @@ export async function applyMatchResult(
     data: {
       homeScore: result.homeScore,
       awayScore: result.awayScore,
+      winnerSide:
+        result.homeScore === result.awayScore
+          ? (result.winnerSide ?? null)
+          : null,
       matchStatus: "FINISHED",
       liveHomeScore: null,
       liveAwayScore: null,
@@ -117,7 +121,7 @@ export async function syncFinishedMatchResults(
     synced++;
   }
 
-  const knockoutUpdated = await persistKnockoutTeamResolution();
+  const { knockoutUpdated } = await refreshKnockoutBracketFromApi(results);
 
   return { synced, skipped, knockoutUpdated };
 }
