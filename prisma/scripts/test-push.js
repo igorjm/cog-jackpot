@@ -1,5 +1,5 @@
 // Test push notification script
-// Usage: node prisma/test-push.js
+// Usage: node prisma/scripts/test-push.js
 const webpush = require("web-push");
 require("dotenv").config();
 const { Client } = require("pg");

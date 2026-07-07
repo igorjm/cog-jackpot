@@ -54,7 +54,7 @@ This is a fullstack World Cup 2026 betting pool app ("Bolão") built for a group
 
 - Prisma schema in `prisma/schema.prisma`
 - Do NOT use `prisma db push` directly (Rust engine TLS issue with Neon PG17)
-- Use the custom push script: `node prisma/push-schema.js`
+- Use the custom push script: `node prisma/scripts/push-schema.js`
 - Seed with: `npx tsx prisma/seed.ts`
 - Admin user is excluded from rankings (filter: `role: { not: "ADMIN" }`)
 

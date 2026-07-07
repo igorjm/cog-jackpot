@@ -1,5 +1,5 @@
 // Create PushSubscription table
-// Usage: node prisma/add-push-subscription.js
+// Usage: node prisma/scripts/add-push-subscription.js
 require("dotenv").config();
 const { Client } = require("pg");
 

@@ -85,6 +85,8 @@ npm run dev        # start dev server (http://localhost:3000)
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Start dev server with Turbopack |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run all unit tests |
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
 | `npm run db:push` | Push Prisma schema to DB |
@@ -99,35 +101,41 @@ Production runs on **[Vercel](https://bolao-cog.vercel.app)** with **[Neon](http
 
 ```
 app/
-├── (main)/          # Authenticated app (dashboard, matches, ranking, bets, rules)
+├── (main)/          # Authenticated shell (dashboard, matches, ranking, bracket, stats…)
 ├── admin/           # Admin panel (users, results)
-├── login/           # Login page (with background image)
-├── register/        # Registration
-├── pending/         # Payment pending screen
-├── rejected/        # Rejected screen
-├── actions/         # Server actions (auth, bets, admin)
-└── api/             # API routes
+├── actions/         # Server Actions (auth, bets, admin, profile)
+├── api/             # Route handlers (cron, matches, auth, push)
+└── login|register|pending|rejected/   # Auth lifecycle pages
 
 components/
-├── ui/              # Reusable primitives (Button, Input, Badge)
-├── match-card.tsx   # Match display with score + bet info
-├── bet-form.tsx     # Score input for betting
-├── phase-tabs.tsx   # Phase/group navigation
-├── ranking-*.tsx    # Podium + table
-└── countdown-timer.tsx
+├── ui/              # Primitives (Button, Input, Badge)
+├── bracket/         # Knockout bracket tree
+├── stats/           # Charts and standings
+└── *.tsx            # Feature components (match cards, ranking, forms)
 
 lib/
-├── auth.ts          # NextAuth config
-├── prisma.ts        # Prisma client (Neon adapter)
-├── ranking.ts       # Ranking calculation + tiebreakers
-├── constants.ts     # Points, multipliers, prize distribution
-├── football-api.ts  # football-data.org API client (live scores)
-├── knockout-hints.ts # Bracket team resolution hints
-└── deadline.ts      # Bet deadline logic (1h before match)
+├── jobs/            # Background job runners (sync scores, reminders)
+├── auth*.ts         # NextAuth config and guards
+├── match-*.ts       # Live scores, sync, goals
+├── knockout-*.ts    # Bracket resolution and hints
+├── scoring.ts       # Points calculation
+├── ranking.ts       # Leaderboard and tiebreakers
+└── prisma.ts        # Database client (Neon)
 
 prisma/
 ├── schema.prisma    # Database schema
-└── seed.ts          # Seed data (matches, admin)
+├── seed.ts          # Seed matches + admin user
+├── migrations/      # Formal Prisma migrations
+└── scripts/         # One-off DDL / data patch scripts (legacy)
+
+scripts/
+├── run-tests.ts     # Test runner (used by npm test)
+├── sync-*.ts        # GitHub Actions cron entrypoints
+├── deadline-reminder.ts
+├── recalculate-match-points.ts
+└── dev/             # Local dev utilities (test-db, test-api)
+
+tests/               # Unit tests (*.test.ts)
 ```
 
 ## Scoring Rules

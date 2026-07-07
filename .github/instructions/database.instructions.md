@@ -18,7 +18,7 @@ NEVER use `npx prisma db push` — it will fail with TLS errors.
 
 Use the custom script instead:
 ```bash
-node prisma/push-schema.js
+node prisma/scripts/push-schema.js
 ```
 
 This uses the `pg` package directly to execute raw SQL DDL.
