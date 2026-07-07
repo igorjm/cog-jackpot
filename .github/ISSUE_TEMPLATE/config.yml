@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Live app
+    url: https://bolao-cog.vercel.app
+    about: Open the deployed Bolão Copa 2026 app
+  - name: Scoring & rules
+    url: https://bolao-cog.vercel.app/rules
+    about: Read the official scoring rules and prize distribution

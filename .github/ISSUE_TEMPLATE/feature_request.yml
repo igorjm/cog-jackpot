@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest an improvement for the betting pool
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem you're trying to solve and how the feature would help players or admins.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      placeholder: "I'm always frustrated when..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Who benefits?
+      options:
+        - All players
+        - Admins only
+        - Both
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      placeholder: Optional — other approaches you thought about

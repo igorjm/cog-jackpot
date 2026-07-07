@@ -1,0 +1,72 @@
+name: Bug report
+description: Something is broken or behaving unexpectedly
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please include steps to reproduce and what you expected vs. what happened.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Matches / betting
+        - Live scores
+        - Ranking / prizes
+        - Knockout bracket
+        - Admin panel
+        - Auth / registration
+        - Push notifications
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Go to ...\n2. Click ...\n3. See error"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Production (bolao-cog.vercel.app)
+        - Local development
+        - GitHub Actions
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser / device (if UI)
+      placeholder: "e.g. Chrome 138 on Android 15"
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues before opening this one
+          required: true

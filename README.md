@@ -1,5 +1,9 @@
 # ⚽ Bolão Copa do Mundo 2026
 
+> **Friends betting pool for FIFA World Cup 2026** — predict scores, track live results, climb the ranking, and compete for the prize pool.
+
+**[→ Open the app](https://bolao-cog.vercel.app)** · [Rules & scoring](https://bolao-cog.vercel.app/rules) · [Report a bug](https://github.com/igorjm/cog-jackpot/issues/new/choose)
+
 [![Deploy](https://img.shields.io/badge/Vercel-deployed-black?logo=vercel)](https://bolao-cog.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
@@ -33,6 +37,7 @@ A fullstack World Cup 2026 betting pool app for friends. Mobile-first, real-time
 - **Live ranking** with tiebreakers and position change tracking
 - **Prize distribution** — 1st (60%), 2nd (25%), 3rd (15%) of the pool
 - **API sync** — football-data.org integration for automatic score updates
+- **Knockout bracket** — interactive mata-mata tree with live team resolution
 - **Knockout hints** — shows possible teams for undecided bracket matches
 - **Admin dashboard** — approve users, enter/sync results, view ranking + prizes
 - **Responsive** — mobile bottom nav + desktop sidebar
@@ -85,6 +90,10 @@ npm run dev        # start dev server (http://localhost:3000)
 | `npm run db:push` | Push Prisma schema to DB |
 | `npm run db:seed` | Seed 104 matches + admin user |
 | `npm run db:reset` | Reset DB + reseed |
+
+## Deployment
+
+Production runs on **[Vercel](https://bolao-cog.vercel.app)** with **[Neon](https://neon.tech)** PostgreSQL. Background jobs (live score sync, finished results, daily reminders) run on **GitHub Actions** to stay within Vercel's free tier.
 
 ## Project Structure
 
