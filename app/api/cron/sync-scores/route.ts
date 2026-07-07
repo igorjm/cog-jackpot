@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchFinishedMatches } from "@/lib/football-api";
-import { syncFinishedMatchResults } from "@/lib/match-sync";
-import { refreshKnockoutBracketFromApi } from "@/lib/knockout-bracket-sync";
+import { runSyncScoresJob } from "@/lib/jobs/sync-scores";
 import {
   internalErrorResponse,
   unauthorizedCronResponse,
@@ -16,30 +14,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const results = await fetchFinishedMatches();
-    if (results.length === 0) {
-      const { knockoutUpdated, winnerSidesUpdated } =
-        await refreshKnockoutBracketFromApi([]);
-      return NextResponse.json({
-        synced: 0,
-        knockoutUpdated,
-        winnerSidesUpdated,
-        message:
-          knockoutUpdated > 0 || winnerSidesUpdated > 0
-            ? `${winnerSidesUpdated > 0 ? `${winnerSidesUpdated} penalty winner(s), ` : ""}${knockoutUpdated} knockout slot(s) updated`
-            : "No new results",
-      });
-    }
-
-    const { synced, skipped, knockoutUpdated } = await syncFinishedMatchResults(results);
-
-    return NextResponse.json({
-      success: true,
-      synced,
-      skipped,
-      knockoutUpdated,
-      message: `${synced} result(s) synced${skipped > 0 ? `, ${skipped} skipped` : ""}${knockoutUpdated > 0 ? `, ${knockoutUpdated} knockout slot(s) updated` : ""}`,
-    });
+    const result = await runSyncScoresJob();
+    return NextResponse.json({ success: true, ...result });
   } catch (e) {
     console.error("[cron/sync-scores]", e);
     return internalErrorResponse();

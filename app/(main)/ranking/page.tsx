@@ -1,10 +1,9 @@
 import { auth } from "@/lib/auth";
-import { calculateRanking } from "@/lib/ranking";
-import { prisma } from "@/lib/prisma";
 import { calculatePrizePool } from "@/lib/prizes";
 import { formatCurrency } from "@/lib/utils";
 import { RankingPodium } from "@/components/ranking-podium";
 import { RankingTable } from "@/components/ranking-table";
+import { getCachedApprovedPlayerCount, getCachedRanking } from "@/lib/cached-data";
 import Link from "next/link";
 
 export default async function RankingPage() {
@@ -12,8 +11,8 @@ export default async function RankingPage() {
   const userId = session!.user!.id;
 
   const [ranking, playerCount] = await Promise.all([
-    calculateRanking(),
-    prisma.user.count({ where: { status: "APPROVED", role: { not: "ADMIN" } } }),
+    getCachedRanking(),
+    getCachedApprovedPlayerCount(),
   ]);
 
   const prizePool = calculatePrizePool(playerCount);

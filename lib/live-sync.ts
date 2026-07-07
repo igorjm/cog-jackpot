@@ -3,7 +3,7 @@ import { syncLiveMatchScores } from "./match-sync";
 
 const DEFAULT_MIN_INTERVAL_MS = 45_000;
 
-/** On-demand sync is for local dev only; production uses GitHub Actions cron. */
+/** On-demand sync is for local dev only; production uses GitHub Actions (direct DB, no Vercel CPU). */
 export function shouldRefreshLiveScoresOnDemand(): boolean {
   return process.env.NODE_ENV === "development";
 }

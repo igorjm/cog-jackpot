@@ -55,17 +55,26 @@ export async function GET(
   const display = getDisplayScore(match);
   const goals = parseMatchGoals(match.liveGoals);
 
-  return NextResponse.json({
-    matchId: match.id,
-    homeScore: display.home,
-    awayScore: display.away,
-    isLive: display.isLive,
-    isFinished: display.isFinished,
-    matchStatus: match.matchStatus,
-    halfTimeHome: match.halfTimeHome,
-    halfTimeAway: match.halfTimeAway,
-    goals,
-    lastUpdated: match.liveUpdatedAt?.toISOString() ?? null,
-    pollRecommended: isMatchLiveNow(match),
-  });
+  const pollRecommended = isMatchLiveNow(match);
+
+  return NextResponse.json(
+    {
+      matchId: match.id,
+      homeScore: display.home,
+      awayScore: display.away,
+      isLive: display.isLive,
+      isFinished: display.isFinished,
+      matchStatus: match.matchStatus,
+      halfTimeHome: match.halfTimeHome,
+      halfTimeAway: match.halfTimeAway,
+      goals,
+      lastUpdated: match.liveUpdatedAt?.toISOString() ?? null,
+      pollRecommended,
+    },
+    {
+      headers: pollRecommended
+        ? { "Cache-Control": "private, max-age=30, stale-while-revalidate=60" }
+        : { "Cache-Control": "private, max-age=300" },
+    }
+  );
 }

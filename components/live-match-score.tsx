@@ -22,7 +22,7 @@ interface LivePayload {
   pollRecommended: boolean;
 }
 
-const POLL_INTERVAL_MS = 30_000;
+const POLL_INTERVAL_MS = 60_000;
 
 export function LiveMatchScore({
   matchId,

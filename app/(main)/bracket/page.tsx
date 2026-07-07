@@ -1,47 +1,9 @@
-import { prisma } from "@/lib/prisma";
-import { enrichKnockoutTeams } from "@/lib/knockout-resolve";
-import { KNOCKOUT_MATCH_NUMBER_MIN, type BracketMatchData } from "@/lib/bracket-tree";
-import type { WinnerSide } from "@/lib/match-winner";
+import { getCachedBracketMatches } from "@/lib/cached-data";
 import { KnockoutBracket } from "@/components/bracket/knockout-bracket";
 import Link from "next/link";
 
-const matchSelect = {
-  id: true,
-  matchNumber: true,
-  homeTeam: true,
-  awayTeam: true,
-  homeFlag: true,
-  awayFlag: true,
-  homeScore: true,
-  awayScore: true,
-  winnerSide: true,
-  phase: true,
-  group: true,
-} as const;
-
 export default async function BracketPage() {
-  // Need ALL matches (including group stage) so placeholders resolve correctly.
-  const allMatches = await prisma.match.findMany({
-    orderBy: { matchNumber: "asc" },
-    select: matchSelect,
-  });
-
-  const matches: BracketMatchData[] = enrichKnockoutTeams(allMatches)
-    .filter((m) => m.matchNumber >= KNOCKOUT_MATCH_NUMBER_MIN)
-    .map((m) => ({
-      id: m.id,
-      matchNumber: m.matchNumber,
-      homeTeam: m.homeTeam,
-      awayTeam: m.awayTeam,
-      homeFlag: m.homeFlag,
-      awayFlag: m.awayFlag,
-      homeScore: m.homeScore,
-      awayScore: m.awayScore,
-      winnerSide:
-        m.winnerSide === "home" || m.winnerSide === "away"
-          ? (m.winnerSide as WinnerSide)
-          : null,
-    }));
+  const matches = await getCachedBracketMatches();
 
   return (
     <div className="space-y-4 -mx-2 md:-mx-4 max-w-none">
